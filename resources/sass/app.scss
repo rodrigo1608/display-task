@@ -1,0 +1,362 @@
+// Fonts
+@import url('https://fonts.bunny.net/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+//Accordion
+$accordion-bg: white;
+$accordion-color: black;
+$accordion-border-width: 2px;
+$accordion-border-color: black;
+$accordion-button-color: black;
+$accordion-button-bg: white;
+$accordion-button-active-bg: white;
+$accordion-button-active-color: black;
+$accordion-button-focus-border-color: rgb(222, 222, 222);
+$accordion-button-focus-box-shadow: black;
+
+$input-group-addon-border-color: black;
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap';
+
+*::selection {
+    color: white;
+    background-color: black;
+}
+
+*::-moz-selection {
+    color: white;
+    background-color: black;
+}
+
+.custom-padding {
+    padding: 20px;
+}
+
+// dimensions
+.profile-picture-container {
+    height: 150px;
+    width: 150px
+}
+
+.profile-picture-accordion {
+    height: 80px;
+    width: 80px
+}
+
+.img-size {
+    width: 150px
+}
+
+//background color white
+body,
+.card,
+.btn-primary,
+.form-check-input,
+.list-group-item {
+    background-color: white;
+}
+
+//buttons - links
+.week-day:hover {
+    font-weight: bolder !important;
+}
+
+.btn-close:focus {
+    outline: black !important;
+    border: 2px solid black;
+    color: black;
+    font-family: "Poppins", sans-serif;
+}
+
+.btn-secondary {
+    background-color: black;
+    color: white;
+    font-family: "Poppins", sans-serif;
+}
+
+.btn-secondary:hover {
+    background-color: black;
+    font-weight: 500;
+}
+
+.btn-primary {
+    border: 2px solid black;
+    color: black;
+    font-family: "Poppins", sans-serif;
+}
+
+.btn-primary:hover {
+    border: 2px solid black;
+    font-weight: 500;
+    color: black;
+    background-color: rgb(222, 222, 222);
+}
+
+.btn-primary:active {
+    border: 2px solid black !important;
+    color: white !important;
+    background-color: black !important;
+
+}
+
+.btn-primary:focus {
+    border: 2px solid black !important;
+    color: white !important;
+    background-color: black !important;
+}
+
+.btn-link {
+    color: black
+}
+
+.btn-link:hover {
+    color: black;
+    font-weight: 500;
+}
+
+.dropdown-item {
+    font-family: roboto;
+}
+
+.dropdown-item:hover {
+    font-weight: 500;
+    color: black;
+    background-color: rgb(222, 222, 222);
+}
+
+.circle-button {
+    width: 70px;
+    height: 70px;
+    border: 3px solid #000;
+    border-radius: 50%;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1.2rem;
+    line-height: 50px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.side-link {
+    font-size: 1.2rem;
+    position: relative;
+    margin-bottom: 2px;
+    text-decoration: none;
+}
+
+.side-link:hover {
+    font-weight: 400;
+}
+
+.side-link::before {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0.1rem;
+    height: 2px;
+    background-color: black;
+    transition: width 0.3s ease;
+}
+
+.side-link:hover::before {
+    width: 50%;
+}
+
+.list-group-item {
+    border: none;
+}
+
+//cards
+.card {
+    // border: 3px solid black;
+    border: none;
+    box-shadow: 0 10px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+    font-family: roboto;
+}
+
+.card>* {
+    font-size: 1.1rem;
+
+}
+
+//inputs
+.color-container {
+    margin: 10px;
+    height: 100px;
+    width: 100px;
+}
+
+.color-container:hover {
+    margin: 2px;
+    height: 110px;
+    width: 110px;
+}
+
+.focused {
+    outline: 8px solid rgb(222, 222, 222);
+    border: 3px solid black;
+
+}
+
+.form-control {
+    border: 2px solid black;
+    border-radius: 0.5rem;
+}
+
+.form-control:focus {
+    outline: 5px solid rgb(222, 222, 222);
+    border: 3px solid black;
+    box-shadow: none;
+}
+
+.form-check-input {
+    border: 2px solid black;
+}
+
+.form-check-input:checked {
+    background-color: black;
+    border-color: gray;
+    box-shadow: none;
+}
+
+.form-check-input:focus {
+    border: 2px solid black;
+    outline-color: gray;
+    box-shadow: none;
+}
+
+.form-select {
+    border: 2px solid black;
+    border-radius: 0.5rem;
+
+}
+
+.form-select:focus {
+    outline: 5px solid rgb(222, 222, 222);
+    border: 3px solid black;
+    box-shadow: none;
+}
+
+//Poppins's classes
+
+.poppins-extralight {
+    font-family: "Poppins", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+}
+
+.poppins {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.poppins-regular {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.poppins-medium {
+    font-family: "Poppins", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.poppins-semibold {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+}
+
+.poppins-light-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.poppins-regular-italic {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+//Roboto's classes
+
+.roboto-thin {
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-style: normal;
+}
+
+.roboto-light {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+.roboto {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.roboto-medium {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.roboto-bold {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.roboto-black {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    font-style: normal;
+}
+
+.roboto-thin-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 100;
+    font-style: italic;
+}
+
+.roboto-light-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: italic;
+}
+
+.roboto-regular-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.roboto-medium-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    font-style: italic;
+}
+
+.roboto-bold-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.roboto-black-italic {
+    font-family: "Roboto", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+}
