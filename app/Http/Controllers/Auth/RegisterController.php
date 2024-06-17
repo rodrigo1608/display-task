@@ -103,6 +103,23 @@ class RegisterController extends Controller
         ]);
     }
 
+    public function getProfilePicturePath($image, $email)
+    {
+
+        $hasUserUploadedPicture = isset($image);
+
+        if ($hasUserUploadedPicture) {
+
+            $emailWithoutDotCom = str_replace('.com', '', $email);
+
+            $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
+
+            return  $image->storeAs('profile_pictures', $profilePictureName);
+        }
+
+        return 'default_user_icon.jpg';
+    }
+
     /**
      * Create a new user instance after a valid registration.
      *
@@ -111,9 +128,28 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+
+        $profilePicture = $data['profile_picture'];
+
+        $profilePicturePath = $this->getProfilePicturePath($profilePicture, $data['email']) ?? null;
+
         return User::create([
             'name' => $data['name'],
+
+            'lastname' => $data['lastname'],
+
+            'role' => $data['role'],
+
+            'telephone' => $data['telephone'],
+
+            'profile_picture' => $profilePicturePath,
+
             'email' => $data['email'],
+
+            'color' => $data['color'],
+
+            'avaliable' => 'Y',
+
             'password' => Hash::make($data['password']),
         ]);
     }
