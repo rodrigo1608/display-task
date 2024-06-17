@@ -96,11 +96,40 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        $genericStringRules =  ['required', 'min:2', 'max:30'];
+
+        $rules = [
+            'name' => $genericStringRules,
+            'lastname' => $genericStringRules,
+            'role' => $genericStringRules,
+            'email' => 'required|email|unique:users',
+            'telephone' => 'required|numeric|digits:11|unique:users',
+            'color' => 'required|unique:users,color',
+            'profile_picture' => 'image',
+            'password' => 'required|confirmed',
+        ];
+
+        $feedbacks = [
+            'name.required' => 'Não esqueça de inserir seu nome para criar o perfil',
+            'name.min' => 'Seu nome precisa ter pelo menos 2 caracteres.',
+            'name.max' => 'Seu nome não pode ter mais que 30 caracteres.',
+            'lastname.required' => 'O campo sobrenome é obrigatório.',
+            'lastname.min' => 'Seu sobrenome precisa ter pelo menos 2 caracteres.',
+            'lastname.max' => 'O sobrenome é importante para facilitar uma identificação.',
+            'email.required' => 'O campo de e-mail é obrigatório.',
+            'email.email' => 'Por favor, insira um endereço de e-mail válido.',
+            'email.unique' => 'Este endereço de e-mail já está em uso.',
+            'telephone.required' => 'O campo telefone é obrigatório.',
+            'telephone.numeric' => 'O telefone deve conter apenas números.',
+            'telephone.size' => 'O telefone deve ter exatamente 11 dígitos(código do estado + número).',
+            'telephone.unique' => 'Este telefone já está sendo utilizado por outro usuário.',
+            'color.required' => 'O campo de cor é obrigatório.',
+            'color.unique' => 'A cor já está em uso. Por favor, escolha outra cor única.',
+            'profile_picture.image' => 'O arquivo deve ser uma imagem válida.',
+            'password.required' => 'A senha é obrigatória.',
+
+        ];
+        return Validator::make($data, $rules, $feedbacks);
     }
 
     public function getProfilePicturePath($image, $email)
@@ -113,6 +142,9 @@ class RegisterController extends Controller
             $emailWithoutDotCom = str_replace('.com', '', $email);
 
             $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
+
+            // rodrigo
+            // @dd($profilePictureName);
 
             return  $image->storeAs('profile_pictures', $profilePictureName);
         }
