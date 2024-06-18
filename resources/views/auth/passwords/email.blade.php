@@ -35,16 +35,24 @@
                             </div>
 
                             <div class="row mb-0 mt-4">
+
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
                                         {{ __('Send Password Reset Link') }}
                                     </button>
                                 </div>
+
                             </div>
+
                         </form>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 @endsection
