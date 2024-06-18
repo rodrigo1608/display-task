@@ -36,13 +36,15 @@
             <div class="col-md-9 container" style="position:relative">
 
                 <div class="row">
+
                     @if (session('success'))
-                        <div id="success-alert" class="row" style="position:absolute; left: 40%;">
+                        <div id="success-alert" class="row" style="position:absolute; left: 80%;">
                             <div class="alert alert-success col-md-4">
                                 {{ session('success') }}
                             </div>
                         </div>
                     @endif
+
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
 
@@ -62,6 +64,7 @@
                             }
                         });
                     </script>
+
                     <div
                         class="col-md-1 profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
 

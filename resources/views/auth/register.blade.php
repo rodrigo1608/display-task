@@ -233,7 +233,7 @@
                                 <div class="col-md-6">
                                     <input id="password" type="password"
                                         class="form-control @error('password') is-invalid @enderror" name="password"
-                                        autocomplete="new-password" value="{{ old('name') }}">
+                                        autocomplete="new-password" value="{{ old('password') }}">
 
                                     @error('password')
                                         <span class="invalid-feedback" role="alert">

@@ -55,35 +55,37 @@
                     {{ config('app.name', 'Tela tarefa') }}
                 </a>
 
-                {{-- <div class="dropdown">
+                @auth
+                    <div class="dropdown">
 
-                    <button class="btn btn-secondary" type="button" id="dropdownMenuButtonEvent"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Criar evento
-                    </button>
+                        <button class="btn btn-secondary" type="button" id="dropdownMenuButtonEvent"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Criar evento
+                        </button>
 
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonEvent">
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonEvent">
 
-                        <li class="">
-                            <a class="dropdown-item" href="{{ route('reminder.create') }}">
-                                Lembrete
-                            </a>
-                        </li>
+                            <li class="">
+                                <a class="dropdown-item" href="{{ route('reminder.create') }}">
+                                    Lembrete
+                                </a>
+                            </li>
 
-                        <li class="">
-                            <a class="dropdown-item" href="{{ route('task.create') }}">
-                                Tarefa
-                            </a>
-                        </li>
-                    </ul>
+                            <li class="">
+                                <a class="dropdown-item" href="{{ route('task.create') }}">
+                                    Tarefa
+                                </a>
+                            </li>
+                        </ul>
 
-                </div>
+                    </div>
+                @endauth
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
-                </button> --}}
+                </button>
 
                 <div class="navbar-collapse collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
@@ -93,37 +95,38 @@
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
-                        {{-- @php
-                            $pluralOrSingularInvitation =
-                                count($pendingTasks) > 1 ? 'convites pendentes' : 'convite pendente';
-                        @endphp
+                        @auth
+                            @php
+                                $pluralOrSingularInvitation =
+                                    count($pendingTasks) > 1 ? 'convites pendentes' : 'convite pendente';
+                            @endphp
 
-                        @if (count($pendingTasks))
+                            @if (count($pendingTasks))
+                                <div class="btn-group">
 
-                            <div class="btn-group">
+                                    <button type="button" class="btn btn-danger dropdown-toggle me-3"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
 
-                                <button type="button" class="btn btn-danger dropdown-toggle me-3"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                        Voce possui {{ count($pendingTasks) }} {{ $pluralOrSingularInvitation }}
 
-                                    Voce possui {{ count($pendingTasks) }} {{ $pluralOrSingularInvitation }}
+                                    </button>
 
-                                </button>
+                                    <ul class="dropdown-menu">
 
-                                <ul class="dropdown-menu">
+                                        @foreach ($pendingTasks as $task)
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    href="{{ route('task.show', ['task' => $task->id, 'view' => 'pending']) }}">{{ $task->title }}
+                                                    - {{ $task->creator->name }}
+                                                    {{ $task->creator->lastname }} </a>
+                                            </li>
+                                        @endforeach
 
-                                    @foreach ($pendingTasks as $task)
-                                        <li>
-                                            <a class="dropdown-item"
-                                                href="{{ route('task.show', ['task' => $task->id, 'view' => 'pending']) }}">{{ $task->title }}
-                                                - {{ $task->creator->name }}
-                                                {{ $task->creator->lastname }} </a>
-                                        </li>
-                                    @endforeach
+                                    </ul>
+                                </div>
+                            @endif
 
-                                </ul>
-                            </div>
-
-                        @endif  --}}
+                        @endauth
 
                         <!-- Authentication Links -->
                         @guest
@@ -148,8 +151,10 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
 
-                                    {{-- <a href="{{ route('user.edit', auth()->id()) }}" class="dropdown-item">Editar
-                                    perfil</a> --}}
+                                    @auth
+                                        <a href="{{ route('user.edit', auth()->id()) }}" class="dropdown-item">Editar
+                                            perfil</a>
+                                    @endauth
 
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                         onclick="event.preventDefault();
