@@ -7,7 +7,7 @@
                 <div class="card">
                     <div class="card-header poppins-regular py-3">{{ __('Reset Password') }}</div>
 
-                    <div class="card-body py-5">
+                    <div class="card-body pb-b">
                         @if (session('status'))
                             <div class="text-success m-3" role="alert">
                                 {{ session('status') }}

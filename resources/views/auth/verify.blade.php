@@ -13,18 +13,20 @@
                     <div class="card-body py-5">
 
                         @if (session('resent'))
-                            <div class="text-success my-2" role="alert">
+                            <div class="text-success mb-4" role="alert">
                                 {{ __('A fresh verification link has been sent to your email address.') }}
                             </div>
                         @endif
 
-                        {{ __('Before proceeding, please check your email for a verification link.') }}
-                        {{ __('If you did not receive the email') }},
+                        <p>Enviamos um link de verificação para o seu e-mail. </p>
+
 
                         <form class="d-inline" method="POST" action="{{ route('verification.resend') }}">
                             @csrf
-                            <button type="submit"
-                                class="btn btn-link m-0 p-0 align-baseline">{{ __('click here to request another') }}</button>.
+                            <p class="">Se você não recebeu o e-mail,
+                                <button type="submit"
+                                    class="btn btn-link m-0 p-0 align-baseline">{{ __('click here to request another') }}</button>.
+                            </p>
                         </form>
 
                     </div>
