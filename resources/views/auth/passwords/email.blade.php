@@ -5,9 +5,9 @@
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">{{ __('Reset Password') }}</div>
+                    <div class="card-header poppins-regular py-3">{{ __('Reset Password') }}</div>
 
-                    <div class="card-body">
+                    <div class="card-body py-5">
                         @if (session('status'))
                             <div class="text-success m-3" role="alert">
                                 {{ session('status') }}
@@ -34,7 +34,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mb-0">
+                            <div class="row mb-0 mt-4">
                                 <div class="col-md-6 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
                                         {{ __('Send Password Reset Link') }}

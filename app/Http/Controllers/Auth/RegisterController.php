@@ -40,7 +40,6 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-
     public function showRegistrationForm()
     {
         $avaliableColors =  [
@@ -161,7 +160,7 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
 
-        $profilePicture = $data['profile_picture'];
+        $profilePicture = $data['profile_picture'] ?? null;
 
         $profilePicturePath = $this->getProfilePicturePath($profilePicture, $data['email']) ?? null;
 

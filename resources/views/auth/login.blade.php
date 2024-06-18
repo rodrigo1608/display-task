@@ -7,7 +7,7 @@
 
             <div class="col-md-8">
 
-                <div class="card mt-5 py-5">
+                <div class="card mt-5">
 
                     <div class="card-body">
 
