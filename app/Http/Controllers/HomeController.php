@@ -76,9 +76,12 @@ class HomeController extends Controller
 
             $duration = Duration::where('task_id', $task->id)->where('user_id', $userID)->first();
 
-            $task['start_time'] = Carbon::parse($duration->start_time)->format('H:i') ?? null;
+            // rodrigo
+            // dd($duration->start);
 
-            $task['end_time'] = Carbon::parse($duration->end_time)->format('H:i') ?? null;
+            $task['start_time'] = Carbon::parse($duration->start)->format('H:i') ?? null;
+
+            $task['end_time'] = Carbon::parse($duration->end)->format('H:i') ?? null;
 
             $currentTime = Carbon::now();
 

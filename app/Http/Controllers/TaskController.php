@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TaskInvitationMail;
 use App\Http\Requests\StoreTaskRequest;
-
-// use App\Models\NotificationTime
-
+// use App\Models\NotificationTime;
 use App\Models\Attachment;
 use App\Models\Duration;
 use App\Models\Feedback;
@@ -18,6 +17,8 @@ use App\Models\Reminder;
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
+
+use Mail;
 
 class TaskController extends Controller
 {
@@ -150,10 +151,12 @@ class TaskController extends Controller
 
         ];
 
-
         Recurring::create($recurringData);
 
         NotificationTime::create($notificationData);
+
+        // Rodrigo
+        // dd($request->all());
 
         foreach ($request->all() as $key => $value) {
 
@@ -162,7 +165,6 @@ class TaskController extends Controller
                 Participant::create([
 
                     'user_id' => User::where('email', $value)->first()->id,
-
                     'task_id' => $task->id
 
                 ]);
@@ -177,10 +179,30 @@ class TaskController extends Controller
             'start' => $startTime,
             'end' => $endTime,
             'task_id' => $task->id,
-
             'user_id' => auth()->id(),
 
         ]);
+
+        $participants = Participant::all();
+
+        // dd($participants);
+
+        $participantsEmails = [];
+
+        foreach ($participants as $index => $participant) {
+
+            $participantsEmails[$index] = User::whereHas('participatingTasks', function ($query) use ($participant, $task) {
+
+                $query->where('user_id', $participant->user_id)->where('task_id', $task->id);
+            })->first()->email;
+        }
+
+        $creator = User::where('id',$task->created_by)->first();
+
+
+        $creatorName = "$creator->name $creator->lastname" ;
+
+        Mail::to($participantsEmails)->send(new TaskInvitationMail($task,$creatorName));
 
         return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
     }
