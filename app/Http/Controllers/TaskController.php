@@ -199,17 +199,16 @@ class TaskController extends Controller
 
         $hasAnyParticipant = !empty($participantsEmails);
 
-        if($hasAnyParticipant){
-            $creator = User::where('id',$task->created_by)->first();
+        if ($hasAnyParticipant) {
 
-            $creatorName = "$creator->name $creator->lastname" ;
+            $creator = User::where('id', $task->created_by)->first();
 
-            Mail::to($participantsEmails)->send(new TaskInvitationMail($task,$creatorName));
+            $creatorName = "$creator->name $creator->lastname";
 
+            Mail::to($participantsEmails)->send(new TaskInvitationMail($task, $creatorName));
         }
 
         return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
-
     }
 
     /**
@@ -291,8 +290,8 @@ class TaskController extends Controller
                 }
             }
         } else {
-
-            $recurringMessage = "A tarefa acontecerá na data: $recurring->specific_date ";
+            $formatedDate = '<strong>' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</strong>';
+            $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate ";
         }
         return $view === 'pending'
             ?  view('tasks/showPending', compact('attachments', 'createdBy', 'description', 'endTime', 'recurringMessage', 'startTime', 'task'))

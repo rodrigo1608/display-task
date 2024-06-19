@@ -54,7 +54,6 @@
                                     <p class="roboto col-md-3">{{ $createdBy->email }} </p>
                                 </div>
 
-
                                 <div class="row mt-3">
                                     <p class="poppins-semibold col-md-2">Descrição: </p>
                                     <p class="roboto col-md-8">{{ $description }}</p>
@@ -63,6 +62,7 @@
                                 @php
                                     $hasAnyAttachment = isset($attachments) && !empty($attachments);
                                 @endphp
+
                                 @if ($hasAnyAttachment)
                                     <p class="poppins-semibold col-md-3">Anexos:</p>
                                     <div class="d-flex w-50 flex-row flex-wrap">
@@ -111,7 +111,7 @@
 
                                 <div class="row mt-3">
                                     <p class="poppins-semibold col-md-2">Recorrencia: </p>
-                                    <p class="roboto col-md-8">{{ $recurringMessage }}</p>
+                                    <p class="roboto col-md-8">{!! $recurringMessage !!}</p>
                                 </div>
 
                             </div>
