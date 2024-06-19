@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\TaskInvitationMail;
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\SetPendingTaskDuration;
 // use App\Models\NotificationTime;
 use App\Models\Attachment;
 use App\Models\Duration;
@@ -325,6 +326,27 @@ class TaskController extends Controller
 
             'start_time' => $startTime,
             'end_time' => $endTime,
+            'task_id' => $id,
+            'user_id' => $request->user_id
+        ]);
+
+        $participant = Participant::where('user_id', $request->user_id)->where('task_id', $id)->first();
+        $participant->status = 'accepted';
+
+        $participant->save();
+
+        return redirect('home');
+    }
+
+    public function acceptPendingTask(SetPendingTaskDuration $request, string $id)
+    {
+        $startTime = $request->start ? date('Y-m-d H:i:s', strtotime($request->start)) : null;
+        $endTime = $request->end ? date('Y-m-d H:i:s', strtotime($request->end)) : null;
+
+        $duration = Duration::create([
+
+            'start' => $startTime,
+            'end' => $endTime,
             'task_id' => $id,
             'user_id' => $request->user_id
         ]);

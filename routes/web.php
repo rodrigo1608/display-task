@@ -23,6 +23,7 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::resource('reminder', ReminderController::class);
 
 Route::resource('task', TaskController::class);
+Route::put('task/{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('task.acceptPendingTask');
 
 Route::get('user/{id}', [UserController::class, 'edit'])->name('user.edit');
 Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');

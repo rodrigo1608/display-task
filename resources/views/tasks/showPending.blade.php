@@ -95,6 +95,7 @@
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                                 aria-label="Close"></button>
                                                         </div>
+
                                                         <div class="modal-body">
                                                             <img src="{{ asset('storage/' . $attachment->path) }}"
                                                                 alt="Attachment Image">
@@ -106,6 +107,7 @@
 
                                             </div>
                                         @endforeach
+
                                     </div>
                                 @endif
 
@@ -118,39 +120,41 @@
 
                             <div class="card-footer ps-5 pt-4">
 
-                                <form action="{{ route('task.update', ['task' => $task->id]) }}" method="post">
+                                <form action="{{ route('task.acceptPendingTask', ['task' => $task->id]) }}" method="post">
                                     @csrf
                                     @method('PUT')
+
                                     <input type="hidden" name="user_id" value="{{ auth()->id() }}">
+
                                     <div class="row d-flex align-items-center mb-5">
 
-                                        <p class="poppins-semibold col-md-2 mt-4">Período de Trabalho: </p>
+                                        <p class="poppins-semibold col-md-2 mt-4">Duração: </p>
 
-                                        <div class="col-md-2">
+                                        <div class="col-md-2 position-relative">
 
                                             <label class="poppins fs-6">Começar em: </label>
 
-                                            <input id="start-time" type="time" name="start_time"
-                                                class="form-control fs-6 @error('start-time') is-invalid @enderror text-center"
-                                                value="{{ $startTime }}">
+                                            <input id="start" type="time" name="start"
+                                                class="form-control fs-6 @error('start') is-invalid @enderror text-center"
+                                                value="{{ old('start') }}">
 
-                                            @error('start-time')
-                                                <div class="invalid-feedback">
+                                            @error('start')
+                                                <div class="invalid-feedback position-absolute">
                                                     {{ $message }}
                                                 </div>
                                             @enderror
                                         </div>
 
-                                        <div class="col-md-2 offset-1">
+                                        <div class="col-md-2 offset-1 position-relative">
 
                                             <label class="poppins fs-6">Terminar em: </label>
 
-                                            <input id="start-time" type="time" name="end_time"
-                                                class="form-control fs-6 @error('end-time') is-invalid @enderror text-center"
-                                                value="{{ $endTime }}">
+                                            <input id="end" type="time" name="end"
+                                                class="form-control fs-6 @error('end') is-invalid @enderror text-center"
+                                                value="{{ old('end') }}">
 
-                                            @error('start-time')
-                                                <div class="invalid-feedback">
+                                            @error('end')
+                                                <div class="invalid-feedback position-absolute">
                                                     {{ $message }}
                                                 </div>
                                             @enderror
@@ -169,6 +173,7 @@
 
                                     </div>
                                 </form>
+
                                 <div class="modal fade" id="deleteParticipantModal" tabindex="-1"
                                     aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
 
