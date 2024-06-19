@@ -23,11 +23,13 @@ class StoreTaskRequest extends FormRequest
     public function rules(): array
     {
 
-        $defaultTimeData = ['required', 'date_format:H:i'];
+        // $defaultTimeData = ['required', 'date_format:H:i'];
 
         return [
-            'start_time' => $defaultTimeData,
-            'end_time' => $defaultTimeData,
+            'start' => ['required', 'date_format:H:i'],
+            'end' => ['required', 'date_format:H:i', 'after:start'],
+            'time' => ['date_format:H:i'],
+            // 'before:start'
             'title' => 'min:3|max:50',
             'task-attachments' => 'image',
             'description' => 'required'
@@ -40,10 +42,13 @@ class StoreTaskRequest extends FormRequest
         $defaultTimeFeedback = 'O valor deve estar no formato de horas e minutos.';
 
         return [
-            'start_time.required' => 'Escolha o melhor horário para você começar a tarefa.',
-            'start_time.date_format' =>  $defaultTimeFeedback,
-            'end_time.required' => 'Defina o horário para encerrar a atividade.',
-            'end_time.date_format' =>  $defaultTimeFeedback,
+            'start.required' => 'Escolha o melhor horário para você começar a tarefa.',
+            'start.date_format' =>  $defaultTimeFeedback,
+            'end.required' => 'Defina o horário para encerrar a atividade.',
+            'end.date_format' =>  $defaultTimeFeedback,
+            'end.after' => 'O horario de término deve ser posterior a de início.',
+            'time.date_format' => $defaultTimeFeedback,
+            'time.date_format' => 'O horário da notificação deve ser anterior ao horário de início.',
             'title.min' => 'Ops! Seu título precisa de pelo menos 3 caracteres para fazer sentido',
             'title.max' => 'Seu título está muito longo, guarde um pouco para mensagem de notificação',
             'description.required' => 'Descrição é importante para que todos os participantes entendam o propósito, as etapas e outros detalhes da tarefa.',

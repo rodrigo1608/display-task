@@ -68,7 +68,7 @@
                     <div
                         class="col-md-1 profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
 
-                        <img class="img-size" src="{{ asset('storage/' . $user->profile_picture) }}"
+                        <img class="img-size" src="{{ asset('storage/' . $currentUser->profile_picture) }}"
                             alt="Imagem do usuário">
 
                     </div>
@@ -76,15 +76,15 @@
                     <div class='col-md-5 ms-4 text-start'>
 
                         <h2 class="fs-1 poppins-medium m-0 p-0">
-                            {{ $user->name }}
-                            {{ $user->lastname }}
+                            {{ $currentUser->name }}
+                            {{ $currentUser->lastname }}
                         </h2>
 
-                        <p class="fs-5 roboto">{{ $user->role }} </p>
+                        <p class="fs-5 roboto">{{ $currentUser->role }} </p>
 
-                        <p class="fs-5 roboto">{{ $user->email }} </p>
+                        <p class="fs-5 roboto">{{ $currentUser->email }} </p>
 
-                        <p class="fs-5 roboto m-0">{{ $user->telephone }} </p>
+                        <p class="fs-5 roboto m-0">{{ $currentUser->telephone }} </p>
 
                         {{-- <a href="{{ route('user.edit', auth()->id()) }}" class="btn btn-primary mt-4">Editar</a> --}}
 
@@ -93,19 +93,19 @@
                     @if ($isThereAnyReminder)
                         <div class='col-md-2 text-start'>
 
-                            <h2 class="fs-6 poppins-medium" style="color:{{ $user->color }}">
+                            <h2 class="fs-6 poppins-medium" style="color:{{ $currentUser->color }}">
                                 Lembretes
                             </h2>
 
                             <ul class="roboto" style="list-style-type: circle">
-                                @foreach ($userReminders->take(5) as $reminder)
+                                @foreach ($currentUserReminders->take(5) as $reminder)
                                     <li class="">{{ $reminder->title }}</li>
                                 @endforeach
                             </ul>
 
                             <div class="d-flex justify-content-end">
                                 <a href="{{ route('reminder.index') }}" class="userReminders-link">
-                                    {{ $userReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
+                                    {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
                                 </a>
                             </div>
 

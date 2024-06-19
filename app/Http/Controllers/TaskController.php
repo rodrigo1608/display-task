@@ -172,33 +172,21 @@ class TaskController extends Controller
             }
         }
 
-        $startTime = $request->start_time ? date('Y-m-d H:i:s', strtotime($request->start_time)) : null;
-        $endTime = $request->end_time ? date('Y-m-d H:i:s', strtotime($request->end_time)) : null;
+        // $startTime = $request->start ? date('Y-m-d H:i:s', strtotime($request->start)) : null;
+        // $endTime = $request->end ? date('Y-m-d H:i:s', strtotime($request->end)) : null;
 
         Duration::create([
 
-            'start' => $startTime,
-            'end' => $endTime,
+            'start' => $request->start,
+            'end' => $request->end,
             'task_id' => $task->id,
             'user_id' => auth()->id(),
 
         ]);
 
-        $participants = Participant::all();
+        $participantEmails = $task->participants()->pluck('users.email');
 
-        // dd($participants);
-
-        $participantsEmails = [];
-
-        foreach ($participants as $index => $participant) {
-
-            $participantsEmails[$index] = User::whereHas('participatingTasks', function ($query) use ($participant, $task) {
-
-                $query->where('user_id', $participant->user_id)->where('task_id', $task->id);
-            })->first()->email;
-        }
-
-        $hasAnyParticipant = !empty($participantsEmails);
+        $hasAnyParticipant = !empty($participantEmails);
 
         if ($hasAnyParticipant) {
 
@@ -206,7 +194,7 @@ class TaskController extends Controller
 
             $creatorName = "$creator->name $creator->lastname";
 
-            Mail::to($participantsEmails)->send(new TaskInvitationMail($task, $creatorName));
+            Mail::to($participantEmails)->send(new TaskInvitationMail($task, $creatorName));
         }
 
         return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');

@@ -40,33 +40,33 @@ class HomeController extends Controller
         $dayOfWeek = strtolower(Carbon::now()->format('l'));
 
         $today = Carbon::today()->format('Y-m-d');
-
+        // Rodrigo
         // dd($today);
 
         $isThereAnyUser = Auth::check();
 
         $userReminders = Reminder::whereNotNull('user_id')->where('user_id', auth()->id())->get();
 
-        $isThereAnyReminder = $userReminders->count() >= 1;
+        $isThereAnyReminder = $userReminders->isNotEmpty();
 
-        $user = Auth::user();
+        $currentUser = Auth::user();
 
-        $userID = $user->id;
+        $currentUserID = $currentUser->id;
 
-        $user->telephone = '(' . substr($user->telephone, 0, 2) . ') ' . substr($user->telephone, 2, 1) . ' ' . substr($user->telephone, 3);
+        $currentUser->telephone = '(' . substr($currentUser->telephone, 0, 2) . ') ' . substr($currentUser->telephone, 2, 1) . ' ' . substr($currentUser->telephone, 3);
 
-        $myTasksBuilder = Task::whereHas('participants', function ($query) use ($userID) {
+        $myTasksBuilder = Task::whereHas('participants', function ($query) use ($currentUserID) {
 
-            $query->where('user_id', $userID)
+            $query->where('user_id', $currentUserID)
                 ->where('status', 'accepted');
-        })->orWhere('created_by', $userID);
+        })->orWhere('created_by', $currentUserID);
 
         $myTasksToday = $myTasksBuilder->whereHas('reminder', function ($query) use ($today, $dayOfWeek) {
 
             $query->whereHas('recurring', function ($recurringQuery) use ($today, $dayOfWeek) {
 
                 $recurringQuery->where('specific_date', $today)
-                    ->orWhere($dayOfWeek, true); // Verifica se o dia da semana é true
+                    ->orWhere($dayOfWeek, true);
             });
         })->get();
 
@@ -74,18 +74,23 @@ class HomeController extends Controller
 
         foreach ($myTasks as $task) {
 
-            $duration = Duration::where('task_id', $task->id)->where('user_id', $userID)->first();
+            // rodrigo
+            // dd($task);
+
+            $duration = Duration::where('task_id', $task->id)->where('user_id', $currentUserID)->first();
+
+            $durationExist = $duration !== null;
 
             // rodrigo
             // dd($duration->start);
 
-            $task['start_time'] = Carbon::parse($duration->start)->format('H:i') ?? null;
+            $task['start'] = $durationExist ? Carbon::parse($duration->start)->format('H:i') : null;
 
-            $task['end_time'] = Carbon::parse($duration->end)->format('H:i') ?? null;
+            $task['end'] = $durationExist ? Carbon::parse($duration->end)->format('H:i') : null;
 
             $currentTime = Carbon::now();
 
-            // $timeDifference = $currentTime->diffForHumans($duration->start_time, [
+            // $timeDifference = $currentTime->diffForHumans($duration->start, [
             //     'parts' => 2,
             //     'join' => true,
             //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
@@ -95,22 +100,28 @@ class HomeController extends Controller
 
         foreach ($myTasksToday as $task) {
 
+            // Rodrigo
             // dd($task->reminder->recurring);
 
-            $duration = Duration::where('task_id', $task->id)->where('user_id', $userID)->first();
+            $duration = Duration::where('task_id', $task->id)->where('user_id', $currentUserID)->first();
 
+            $durationExist = $duration !== null;
+
+            // Rodrigo
             // dd($duration);
 
-            if ($duration) {
+            if ($durationExist) {
 
-                $startTime = Carbon::parse($duration->start_time);
+                // rodrigo
+                // dd(Carbon::parse($duration->start));
 
-                $task['start_time'] =  $startTime;
+                $startTime = Carbon::parse($duration->start);
 
+                $task['start'] =  $startTime;
 
-                $endTime = Carbon::parse($duration->end_time);
+                $endTime = Carbon::parse($duration->end);
 
-                $task['end_time'] = $endTime;
+                $task['end'] = $endTime;
 
                 $currentTime = Carbon::now();
 
@@ -122,7 +133,7 @@ class HomeController extends Controller
             }
         }
 
-        // $startTime = Carbon::parse($task->start_time);
+        // $startTime = Carbon::parse($task->start);
 
         // $currentTime = Carbon::now();
 
@@ -132,6 +143,6 @@ class HomeController extends Controller
         //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
         // ]);
 
-        return view('home', compact('isThereAnyReminder', 'myTasks', 'myTasksToday', 'user', 'userReminders'));
+        return view('home', compact('isThereAnyReminder', 'myTasks', 'myTasksToday', 'currentUser', 'userReminders'));
     }
 }

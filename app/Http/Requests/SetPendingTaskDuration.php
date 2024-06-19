@@ -21,11 +21,9 @@ class SetPendingTaskDuration extends FormRequest
      */
     public function rules(): array
     {
-        $defaultTimeData = ['required', 'date_format:H:i'];
-
         return [
-            'start' => $defaultTimeData,
-            'end' => $defaultTimeData,
+            'start' => ['required', 'date_format:H:i'],
+            'end' => ['required', 'date_format:H:i', 'after:start'],
         ];
     }
 
@@ -39,6 +37,7 @@ class SetPendingTaskDuration extends FormRequest
             'start.date_format' =>  $defaultTimeFeedback,
             'end.required' => 'Defina o horário para encerrar a atividade.',
             'end.date_format' =>  $defaultTimeFeedback,
+            'end.after' => 'O horario de término deve ser posterior a de início.',
         ];
     }
 }

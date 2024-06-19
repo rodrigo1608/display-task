@@ -139,12 +139,13 @@
 
                                     <div class="col-md-3">
 
-                                        <label for="start_time" class="poppins-regular fs-6 me-3">iniciar em:</label>
+                                        <label for="start" class="poppins-regular fs-6 me-3">iniciar em:</label>
 
-                                        <input id="start_time" type="time" name="start_time"
-                                            class="form-control fs-6 @error('start_time') is-invalid @enderror text-center"
-                                            name="start_time" value={{ old('start_time') }}>
-                                        @error('start_time')
+                                        <input id="start" type="time" name="start"
+                                            class="form-control fs-6 @error('start') is-invalid @enderror text-center"
+                                            name="start" value={{ old('start') }}>
+
+                                        @error('start')
                                             <div class="invalid-feedback">
                                                 <strong>{{ $message }}</strong>
                                             </div>
@@ -154,13 +155,13 @@
 
                                     <div class="col-md-3 offset-md-1">
 
-                                        <label for="end_time" class="poppins-regular fs-6 me-3">finalizar em:</label>
+                                        <label for="end" class="poppins-regular fs-6 me-3">finalizar em:</label>
 
-                                        <input id="end_time" type="time" name="end_time"
-                                            class="form-control fs-6 @error('end_time') is-invalid @enderror text-center"
-                                            name="end_time" value={{ old('end_time') }}>
+                                        <input id="end" type="time" name="end"
+                                            class="form-control fs-6 @error('end') is-invalid @enderror text-center"
+                                            name="end" value={{ old('end') }}>
 
-                                        @error('end_time')
+                                        @error('end')
                                             <div class="invalid-feedback">
                                                 <strong>{{ $message }}</strong>
                                             </div>
@@ -174,7 +175,7 @@
                                             (Opcional)</label>
 
                                         <input id="local" type="text" name="local" class="form-control fs-6"
-                                            name="local" old={{ 'local' }}>
+                                            name="local" value={{ old('local') }}>
 
                                     </div>
                                 </div>
@@ -189,6 +190,12 @@
                                         <input id="custom-alert-time" type="time" name="time"
                                             class="form-control fs-6 m-0 text-center" name="time"
                                             value="{{ old('time') }}">
+
+                                        @error('time')
+                                            <div class="invalid-feedback">
+                                                <strong>{{ $message }}</strong>
+                                            </div>
+                                        @enderror
 
                                     </div>
 
