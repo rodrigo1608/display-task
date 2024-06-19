@@ -197,14 +197,19 @@ class TaskController extends Controller
             })->first()->email;
         }
 
-        $creator = User::where('id',$task->created_by)->first();
+        $hasAnyParticipant = !empty($participantsEmails);
 
+        if($hasAnyParticipant){
+            $creator = User::where('id',$task->created_by)->first();
 
-        $creatorName = "$creator->name $creator->lastname" ;
+            $creatorName = "$creator->name $creator->lastname" ;
 
-        Mail::to($participantsEmails)->send(new TaskInvitationMail($task,$creatorName));
+            Mail::to($participantsEmails)->send(new TaskInvitationMail($task,$creatorName));
+
+        }
 
         return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
+
     }
 
     /**

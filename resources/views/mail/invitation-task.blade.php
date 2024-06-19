@@ -1,5 +1,5 @@
 <x-mail::message>
-{{ $creator }} te convidou para participar da tarefa: {{ $task->title }}
+{{ $creator }} te convidou para: {{ $task->title }}
 
 <x-mail::button :url="$url">
 Clique aqui para ver a tarefa

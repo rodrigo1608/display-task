@@ -34,7 +34,7 @@ class TaskInvitationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Convite para participar de nova Tarefa',
+            subject: 'Convite pra uma nova tarefa',
         );
     }
 
