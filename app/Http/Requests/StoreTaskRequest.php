@@ -28,7 +28,7 @@ class StoreTaskRequest extends FormRequest
         return [
             'start' => ['required', 'date_format:H:i'],
             'end' => ['required', 'date_format:H:i', 'after:start'],
-            'time' => ['date_format:H:i', 'before:start'],
+            'time' => ['nullable', 'date_format:H:i', 'before:start'],
             'title' => 'min:3|max:50',
             'task-attachments' => 'image',
             'description' => 'required'

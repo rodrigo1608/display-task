@@ -337,8 +337,50 @@ class TaskController extends Controller
 
     public function acceptPendingTask(SetPendingTaskDuration $request, string $id)
     {
-        $startTime = $request->start ? date('Y-m-d H:i:s', strtotime($request->start)) : null;
-        $endTime = $request->end ? date('Y-m-d H:i:s', strtotime($request->end)) : null;
+
+        $currentUserID = auth()->id();
+        dd($request->all());
+
+        $startTime = $request->start ? date('H:i', strtotime($request->start)) : null;
+        $endTime = $request->end ? date('H:i', strtotime($request->end)) : null;
+
+        $myTasks = Task::whereHas('participants', function ($query) use ($currentUserID) {
+
+            $query->where('user_id', $currentUserID)->where('status', 'accepted');
+        })->orWhere('created_by', $currentUserID)->with(['durations' => function ($query) use ($currentUserID) {
+            $query->where('user_id', $currentUserID);
+        }])->get();
+
+        $currentUserDurations = Duration::whereHas('task', function ($query) use ($currentUserID) {
+            $query->where('user_id', $currentUserID);
+        })->get();
+
+        dd($currentUserDurations);
+
+        // Verificar conflitos de horário
+
+        $currentUserTaskDuration = [];
+
+        // dd($myTasks);
+
+        foreach ($myTasks as $task) {
+
+            dd($task->reminder->recurring);
+
+            foreach ($task->durations as $duration) {
+
+                $overlappingTimeCheck = ($startTime >= $duration->start && $startTime < $duration->end) ||
+                    ($endTime > $duration->start && $endTime <= $duration->end) ||
+                    ($startTime <= $duration->start && $endTime >= $duration->end);
+
+                if ($duration->user_id === $currentUserID) {
+                    if ($overlappingTimeCheck) {
+                        // Conflito encontrado
+                        return redirect('home')->withErrors(['conflict' => 'Você já possui um compromisso nesse horário.']);
+                    }
+                };
+            }
+        }
 
         $duration = Duration::create([
 
