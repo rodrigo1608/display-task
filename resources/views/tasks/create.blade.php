@@ -229,7 +229,8 @@
                                                                 <input class="form-check-input alertOption"
                                                                     type="checkbox" value="true"
                                                                     name="{{ $alertIndex }}"
-                                                                    id="alert{{ $alertIndex }}CheckDefault">
+                                                                    id="alert{{ $alertIndex }}CheckDefault"
+                                                                    {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
 
                                                                 <label class="form-check-label"
                                                                     for="alert{{ $alertIndex }}CheckDefault">
@@ -317,14 +318,15 @@
 
                                         <div>
                                             @if ($participants->isNotEmpty())
-                                                <button type="button" class="btn btn-primary me-3"
-                                                    data-bs-toggle="modal" data-bs-target="#participantsModal">
+                                                <button id="participants-button" type="button"
+                                                    class="btn btn-primary me-3" data-bs-toggle="modal"
+                                                    data-bs-target="#participantsModal">
                                                     Adicionar participantes
+                                                    <span id="participantCounterDisplay"></span>
                                                 </button>
                                             @endif
 
                                             <!-- Modal -->
-
                                             <div class="modal fade" id="participantsModal" tabindex="-1"
                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
 
@@ -347,10 +349,13 @@
 
                                                                     <div class="form-check">
 
-                                                                        <input class="form-check-input" type="checkbox"
+                                                                        <input
+                                                                            class="form-check-input participant-checkbox"
+                                                                            type="checkbox"
                                                                             value=" {{ $participant->email }}"
                                                                             name="participant{{ $index }}"
-                                                                            id="participant{{ $index }}CheckDefault">
+                                                                            id="participant{{ $index }}CheckDefault"
+                                                                            {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
 
                                                                         <label class="form-check-label"
                                                                             for="participant{{ $index }}CheckDefault">
@@ -369,6 +374,34 @@
                                                         </div>
 
                                                     </div>
+
+                                                    <script>
+                                                        const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+                                                        const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+
+                                                        function updateParticipantCounter() {
+
+                                                            const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
+                                                            const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+
+                                                            const checkedCounter = checkedParticipants.length;
+
+                                                            const hasAnyParticipant = checkedCounter > 0;
+
+                                                            if (hasAnyParticipant) {
+                                                                participantCounterDisplay.innerText = '(' + checkedCounter + ')';
+                                                            } else {
+                                                                participantCounterDisplay.innerText = '';
+                                                            }
+                                                        }
+
+                                                        // updateParticipantCounter();
+
+                                                        participantCheckboxes.forEach(participantCheckbox => participantCheckbox.addEventListener('change', () =>
+                                                            updateParticipantCounter()));
+
+                                                        updateParticipantCounter();
+                                                    </script>
 
                                                 </div>
 
@@ -604,20 +637,25 @@
 
                 const alertOptionsCollection = document.querySelectorAll('.alertOption');
 
-
                 const alertOptions = Array.from(alertOptionsCollection);
+
+                const displaySelectedAlertCounter = () => {
+
+                    const checkedOptions = alertOptions.filter(option => option.checked);
+                    const checkedRegister = checkedOptions.length;
+
+                    checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                            checkedRegister + ')') :
+                        alertOptionsCounterLabel.innerText = "";
+                }
+
+                displaySelectedAlertCounter();
 
                 alertOptions.forEach(optionAlert => {
 
                     optionAlert.addEventListener('click', () => {
 
-                        const checkedOptions = alertOptions.filter(option => option.checked)
-
-                        const checkedRegister = checkedOptions.length;
-
-                        checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
-                                checkedRegister + ')') :
-                            alertOptionsCounterLabel.innerText = "";
+                        displaySelectedAlertCounter();
 
                         handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
 
