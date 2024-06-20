@@ -63,6 +63,7 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
+        // rodrigo
         // dd($request->all());
 
         $task = Task::create([
@@ -156,9 +157,6 @@ class TaskController extends Controller
 
         NotificationTime::create($notificationData);
 
-        // Rodrigo
-        // dd($request->all());
-
         foreach ($request->all() as $key => $value) {
 
             if (str_starts_with($key, 'participant')) {
@@ -186,9 +184,19 @@ class TaskController extends Controller
 
         $participantEmails = $task->participants()->pluck('users.email');
 
+        //Rodrigo
+        // dd($participantEmails);
+
         $hasAnyParticipant = !empty($participantEmails);
 
+        //Rodrigo
+        // dd($hasAnyParticipant);
+
         if ($hasAnyParticipant) {
+
+            //Rodrigo
+            // dd($hasAnyParticipant);
+
 
             $creator = User::where('id', $task->created_by)->first();
 
@@ -221,6 +229,7 @@ class TaskController extends Controller
         $duration = $task->durations->first();
 
         $startTime = $duration->start_time ? date('H:i', strtotime($duration->start_time)) : null;
+
         $endTime = $duration->end_time ? date('H:i', strtotime($duration->end_time)) : null;
 
         // $startTime = Carbon::parse($duration->start_time)->format('H:i');

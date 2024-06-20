@@ -140,7 +140,7 @@
 
                                             @error('start')
                                                 <div class="invalid-feedback position-absolute">
-                                                    {{ $message }}
+                                                    <strong>{{ $message }}</strong>
                                                 </div>
                                             @enderror
                                         </div>
@@ -155,7 +155,7 @@
 
                                             @error('end')
                                                 <div class="invalid-feedback position-absolute">
-                                                    {{ $message }}
+                                                    <strong>{{ $message }}</strong>
                                                 </div>
                                             @enderror
 

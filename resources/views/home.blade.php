@@ -38,7 +38,7 @@
                 <div class="row">
 
                     @if (session('success'))
-                        <div id="success-alert" class="row" style="position:absolute; left: 80%;">
+                        <div id="success-alert" class="row" style="position:absolute; left: 20%;">
                             <div class="alert alert-success col-md-4">
                                 {{ session('success') }}
                             </div>

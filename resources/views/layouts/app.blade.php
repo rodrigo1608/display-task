@@ -97,11 +97,12 @@
                     <ul class="navbar-nav ms-auto">
                         @auth
                             @php
+                                $hasAnyPendingTask = count($pendingTasks) > 0;
                                 $pluralOrSingularInvitation =
                                     count($pendingTasks) > 1 ? 'convites pendentes' : 'convite pendente';
                             @endphp
 
-                            @if (count($pendingTasks))
+                            @if ($hasAnyPendingTask)
                                 <div class="btn-group">
 
                                     <button type="button" class="btn btn-danger dropdown-toggle me-3"
@@ -167,7 +168,6 @@
                                     </form>
 
                                 </div>
-
 
                             </li>
 

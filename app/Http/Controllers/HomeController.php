@@ -45,9 +45,9 @@ class HomeController extends Controller
 
         $isThereAnyUser = Auth::check();
 
-        $userReminders = Reminder::whereNotNull('user_id')->where('user_id', auth()->id())->get();
+        $currentUserReminders = Reminder::whereNotNull('user_id')->where('user_id', auth()->id())->get();
 
-        $isThereAnyReminder = $userReminders->isNotEmpty();
+        $isThereAnyReminder = $currentUserReminders->isNotEmpty();
 
         $currentUser = Auth::user();
 
@@ -143,6 +143,6 @@ class HomeController extends Controller
         //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
         // ]);
 
-        return view('home', compact('isThereAnyReminder', 'myTasks', 'myTasksToday', 'currentUser', 'userReminders'));
+        return view('home', compact('isThereAnyReminder', 'myTasks', 'myTasksToday', 'currentUser', 'currentUserReminders'));
     }
 }

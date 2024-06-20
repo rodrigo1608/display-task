@@ -27,8 +27,8 @@ class AppServiceProvider extends ServiceProvider
 
             $user = Auth::user();
 
-
             if ($user) {
+
                 $userID = $user->id;
 
                 $pendingTasks = Task::whereHas('participants', function ($query) use ($userID) {
@@ -36,9 +36,11 @@ class AppServiceProvider extends ServiceProvider
                         ->where('status', 'pending');
                 })->get();
             } else {
+
                 $userID = null;
                 $pendingTasks = collect();
             }
+
             $view->with('user', $user);
 
 

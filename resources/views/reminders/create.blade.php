@@ -139,7 +139,7 @@
                                         name="time">
                                     @error('time')
                                         <div class="invalid-feedback">
-                                            {{ $message }}
+                                            <strong>{{ $message }}</strong>
                                         </div>
                                     @enderror
 
@@ -155,7 +155,7 @@
 
                                     @error('title')
                                         <div class="invalid-feedback">
-                                            {{ $message }}
+                                            <strong>{{ $message }}</strong>
                                         </div>
                                     @enderror
                                 </div>
