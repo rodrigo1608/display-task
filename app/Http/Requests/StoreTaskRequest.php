@@ -28,8 +28,7 @@ class StoreTaskRequest extends FormRequest
         return [
             'start' => ['required', 'date_format:H:i'],
             'end' => ['required', 'date_format:H:i', 'after:start'],
-            'time' => ['date_format:H:i'],
-            // 'before:start'
+            'time' => ['date_format:H:i', 'before:start'],
             'title' => 'min:3|max:50',
             'task-attachments' => 'image',
             'description' => 'required'
@@ -48,7 +47,7 @@ class StoreTaskRequest extends FormRequest
             'end.date_format' =>  $defaultTimeFeedback,
             'end.after' => 'O horario de término deve ser posterior a de início.',
             'time.date_format' => $defaultTimeFeedback,
-            'time.date_format' => 'O horário da notificação deve ser anterior ao horário de início.',
+            'time.before' => 'O horário da notificação deve ser anterior ao horário de início da tarefa.',
             'title.min' => 'Ops! Seu título precisa de pelo menos 3 caracteres para fazer sentido',
             'title.max' => 'Seu título está muito longo, guarde um pouco para mensagem de notificação',
             'description.required' => 'Descrição é importante para que todos os participantes entendam o propósito, as etapas e outros detalhes da tarefa.',

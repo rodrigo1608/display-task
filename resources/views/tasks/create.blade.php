@@ -175,7 +175,7 @@
                                             (Opcional)</label>
 
                                         <input id="local" type="text" name="local" class="form-control fs-6"
-                                            name="local" value={{ old('local') }}>
+                                            name="local" value="{{ old('local') }}">
 
                                     </div>
                                 </div>
@@ -188,7 +188,7 @@
                                             notificação</label>
 
                                         <input id="custom-alert-time" type="time" name="time"
-                                            class="form-control fs-6 m-0 text-center" name="time"
+                                            class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
                                             value="{{ old('time') }}">
 
                                         @error('time')
@@ -254,7 +254,8 @@
                                         <label for="title" class="poppins-regular fs-6">Título </label>
 
                                         <input id="title" type="text"
-                                            class="form-control fs-6 @error('title') is-invalid @enderror" name="title">
+                                            class="form-control fs-6 @error('title') is-invalid @enderror" name="title"
+                                            value="{{ old('title') }}">
 
                                         @error('title')
                                             <div class="invalid-feedback">
@@ -269,9 +270,9 @@
                                 <div class="row mt-3">
 
                                     <div class="">
-                                        <label for="titulo" class="fs-6">Descrição</label>
-                                        <textarea name="description" id="" cols="30" rows="5"
-                                            class="form-control roboto @error('description') is-invalid @enderror"></textarea>
+                                        <label for="description" class="fs-6">Descrição</label>
+                                        <textarea name="description" id="description" cols="30" rows="5"
+                                            class="form-control roboto @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
                                         @error('description')
                                             <div class="invalid-feedback">
                                                 <strong>{{ $message }}</strong>
