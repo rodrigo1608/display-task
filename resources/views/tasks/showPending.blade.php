@@ -124,8 +124,6 @@
                                     @csrf
                                     @method('PUT')
 
-                                    <input type="hidden" name="user_id" value="{{ auth()->id() }}">
-
                                     <div class="row d-flex align-items-center mb-5">
 
                                         <p class="poppins-semibold col-md-2 mt-4">Duração: </p>

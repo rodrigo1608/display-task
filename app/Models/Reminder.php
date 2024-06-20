@@ -30,7 +30,7 @@ class Reminder extends Model
 
     public function task()
     {
-        return $this->belongsTo(User::class, 'task_id');
+        return $this->belongsTo(Task::class, 'task_id');
     }
 
     public function recurring()

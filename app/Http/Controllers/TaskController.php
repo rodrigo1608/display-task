@@ -339,7 +339,29 @@ class TaskController extends Controller
     {
 
         $currentUserID = auth()->id();
-        dd($request->all());
+
+        $currentTask = Task::find($id);
+
+        $currentTaskRecurring = $currentTask->reminder->recurring;
+
+        $recurrings = Recurring::all();
+
+        $currentUserRecurrings = [];
+
+
+        foreach ($recurrings as $index => $recurring) {
+
+            $currentUserRecurrings[$index] = $recurring->reminder->task->creator->id;
+
+            // if ($recurring->reminder->task) {
+            //     dd($recurring->reminder->task);
+            // }
+        };
+
+
+
+
+        dd($currentUserRecurrings);
 
         $startTime = $request->start ? date('H:i', strtotime($request->start)) : null;
         $endTime = $request->end ? date('H:i', strtotime($request->end)) : null;
