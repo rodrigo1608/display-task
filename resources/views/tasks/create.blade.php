@@ -34,9 +34,8 @@
                                     <div class="col-3 d-flex justify-content-end">
 
                                         <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                            value="{{ Carbon\Carbon::now()->format('Y-m-d') }}"
+                                            value="{{ old('specific_date', Carbon\Carbon::now()->format('Y-m-d')) }}"
                                             min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
-                                        {{--  --}}
                                     </div>
 
                                 </div>
@@ -48,7 +47,7 @@
 
                                         <input type="checkbox" name="sunday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-sunday"
-                                            autocomplete="off">
+                                            {{ old('sunday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex me-3 mt-4 border-2"
@@ -61,7 +60,7 @@
 
                                         <input type="checkbox" name="monday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-monday"
-                                            autocomplete="off">
+                                            {{ old('monday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -73,7 +72,7 @@
                                     <div class="">
                                         <input type="checkbox" name="tuesday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-tuesday"
-                                            autocomplete="off">
+                                            {{ old('tuesday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -85,7 +84,7 @@
                                     <div class="">
                                         <input type="checkbox" name="wednesday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-wednesday"
-                                            autocomplete="off">
+                                            {{ old('wednesday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -98,7 +97,7 @@
 
                                         <input type="checkbox" name="thursday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-thursday"
-                                            autocomplete="off">
+                                            {{ old('thursday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -111,7 +110,7 @@
 
                                         <input type="checkbox" name="friday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-friday"
-                                            autocomplete="off">
+                                            {{ old('friday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -124,7 +123,7 @@
 
                                         <input type="checkbox" name="saturday" value="true"
                                             class="btn-check check-box-input" id="btn-check-outlined-saturday"
-                                            autocomplete="off">
+                                            {{ old('saturday') == 'true' ? 'checked' : '' }}>
 
                                         <label
                                             class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
