@@ -228,10 +228,11 @@ class TaskController extends Controller
 
         $duration = $task->durations->first();
 
-        $startTime = $duration->start_time ? date('H:i', strtotime($duration->start_time)) : null;
+        $startTime = $duration->start ? date('H:i', strtotime($duration->start)) : null;
 
-        $endTime = $duration->end_time ? date('H:i', strtotime($duration->end_time)) : null;
+        $endTime = $duration->end ? date('H:i', strtotime($duration->end)) : null;
 
+        //rodrigo
         // $startTime = Carbon::parse($duration->start_time)->format('H:i');
 
         $recurring = $task->reminder->recurring;
@@ -337,6 +338,8 @@ class TaskController extends Controller
 
     public function acceptPendingTask(SetPendingTaskDuration $request, string $id)
     {
+        //Rodrigo
+        // dd($request->all());
 
         $currentUserID = auth()->id();
 
@@ -344,24 +347,48 @@ class TaskController extends Controller
 
         $currentTaskRecurring = $currentTask->reminder->recurring;
 
-        $recurrings = Recurring::all();
+        //Rodrigo
+        // dd($currentTaskRecurring);
 
-        $currentUserRecurrings = [];
+        $currentUserRecurrences = Recurring::where('available', 'true')
+            ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
+                $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
+                    $taskQuery->where('created_by', $currentUserID)->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
+                        $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
+                    });
+                });
+            })
+            ->get();
 
+        //Rodrigo
+        // dd($currentUserRecurrences);
 
-        foreach ($recurrings as $index => $recurring) {
+        $currentTaskDuration = ["start" => $request->start, 'end' => $request->end]; // Aqui você precisa definir as durações da tarefa atual
 
-            $currentUserRecurrings[$index] = $recurring->reminder->task->creator->id;
+        foreach ($currentUserRecurrences as $userRecurrence) {
+            // Verificar se há alguma duração que conflita dentro desta recorrência
 
-            // if ($recurring->reminder->task) {
-            //     dd($recurring->reminder->task);
-            // }
-        };
+            $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDurationFirst) use ($currentTaskDuration) {
 
+                $queryUserTasksDurationFirst->where('start', '>=', $currentTaskDuration['start'])
+                    ->where('start', '<', $currentTaskDuration['end'])
+                    ->orWhere(function ($queryUserTasksDurationSecond) use ($currentTaskDuration) {
 
+                        $queryUserTasksDurationSecond->where('end', '>', $currentTaskDuration['start'])
+                            ->where('end', '<=', $currentTaskDuration['end']);
+                    })
+                    ->orWhere(function ($queryUserTasksDurationThird) use ($currentTaskDuration) {
+                        $queryUserTasksDurationThird->where('start', '<=', $currentTaskDuration['start'])
+                            ->where('end', '>=', $currentTaskDuration['end']);
+                    });
+            })->exists();
 
-
-        dd($currentUserRecurrings);
+            if ($conflictingDuration) {
+                // Retorne um erro de validação ou faça algo para lidar com a sobreposição
+                // Por exemplo:
+                throw new \Exception('As durações propostas se sobrepõem com uma tarefa existente.');
+            }
+        }
 
         $startTime = $request->start ? date('H:i', strtotime($request->start)) : null;
         $endTime = $request->end ? date('H:i', strtotime($request->end)) : null;
@@ -377,7 +404,8 @@ class TaskController extends Controller
             $query->where('user_id', $currentUserID);
         })->get();
 
-        dd($currentUserDurations);
+        //Rodrigo
+        // dd($currentUserDurations);
 
         // Verificar conflitos de horário
 
@@ -385,34 +413,34 @@ class TaskController extends Controller
 
         // dd($myTasks);
 
-        foreach ($myTasks as $task) {
+        // foreach ($myTasks as $task) {
 
-            dd($task->reminder->recurring);
+        //     dd($task->reminder->recurring);
 
-            foreach ($task->durations as $duration) {
+        //     foreach ($task->durations as $duration) {
 
-                $overlappingTimeCheck = ($startTime >= $duration->start && $startTime < $duration->end) ||
-                    ($endTime > $duration->start && $endTime <= $duration->end) ||
-                    ($startTime <= $duration->start && $endTime >= $duration->end);
+        //         $overlappingTimeCheck = ($startTime >= $duration->start && $startTime < $duration->end) ||
+        //             ($endTime > $duration->start && $endTime <= $duration->end) ||
+        //             ($startTime <= $duration->start && $endTime >= $duration->end);
 
-                if ($duration->user_id === $currentUserID) {
-                    if ($overlappingTimeCheck) {
-                        // Conflito encontrado
-                        return redirect('home')->withErrors(['conflict' => 'Você já possui um compromisso nesse horário.']);
-                    }
-                };
-            }
-        }
+        //         if ($duration->user_id === $currentUserID) {
+        //             if ($overlappingTimeCheck) {
+        //                 // Conflito encontrado
+        //                 return redirect('home')->withErrors(['conflict' => 'Você já possui um compromisso nesse horário.']);
+        //             }
+        //         };
+        //     }
+        // }
 
         $duration = Duration::create([
 
             'start' => $startTime,
             'end' => $endTime,
             'task_id' => $id,
-            'user_id' => $request->user_id
+            'user_id' => $currentUserID
         ]);
 
-        $participant = Participant::where('user_id', $request->user_id)->where('task_id', $id)->first();
+        $participant = Participant::where('user_id', $currentUserID)->where('task_id', $id)->first();
         $participant->status = 'accepted';
 
         $participant->save();
