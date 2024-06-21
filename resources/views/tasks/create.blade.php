@@ -169,6 +169,21 @@
 
                                     </div>
 
+                                    <!-- Exibir mensagem de erro -->
+                                    @if ($errors->has('conflictingDuration'))
+                                        <div class="alert alert-danger my-4">
+                                            <p>As durações propostas estão se sobrepondo com uma tarefa já criada.</p>
+                                            @php
+                                                $errors->first('conflictingDuration');
+                                            @endphp
+                                            <p> Nome da tarefa:
+                                                <span class='poppins-semibold'>
+                                                    {{ $errors->first('conflictingDuration') }}</span>
+                                            </p>
+
+                                        </div>
+                                    @endif
+
                                     <div class="col-md-4 offset-md-1">
 
                                         <label for="local" class="poppins-regular fs-6 me-3">Local
@@ -246,7 +261,9 @@
                                             </div>
 
                                         </div>
+
                                     </div>
+
                                 </div>
 
                                 {{-- Título da tarefa --}}

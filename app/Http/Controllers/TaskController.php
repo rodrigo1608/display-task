@@ -66,13 +66,60 @@ class TaskController extends Controller
         // rodrigo
         // dd($request->all());
 
+        $currentUserID = auth()->id();
+
+        $currentUserRecurrences = Recurring::where('available', 'true')
+            ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
+                $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
+                    $taskQuery->where('created_by', $currentUserID)->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
+                        $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
+                    });
+                });
+            })->get();
+
+        // Rodrigo
+        // dd($currentUserRecurrences);
+
+        $taskDuration = ["start" => $request->start, 'end' => $request->end];
+
+        //Rodrigo
+        // dd($taskDuration);
+
+        // Verificar se há alguma duração que conflita dentro desta recorrência
+        foreach ($currentUserRecurrences as $userRecurrence) {
+
+            $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDurationFirst) use ($taskDuration) {
+
+                $queryUserTasksDurationFirst->where('start', '>=', $taskDuration['start'])
+                    ->where('start', '<', $taskDuration['end'])
+                    ->orWhere(function ($queryUserTasksDurationSecond) use ($taskDuration) {
+
+                        $queryUserTasksDurationSecond->where('end', '>', $taskDuration['start'])
+                            ->where('end', '<=', $taskDuration['end']);
+                    })
+                    ->orWhere(function ($queryUserTasksDurationThird) use ($taskDuration) {
+                        $queryUserTasksDurationThird->where('start', '<=', $taskDuration['start'])
+                            ->where('end', '>=', $taskDuration['end']);
+                    });
+            })->exists();
+
+            if ($conflictingDuration) {
+
+                return redirect()->back()->withErrors([
+                    'conflictingDuration' =>
+                    $userRecurrence->reminder->task->title,
+
+                ])->withInput();
+            }
+        }
+
         $task = Task::create([
 
             'title' => $request->title,
 
             'local' => $request->local ?? null,
 
-            'created_by' => auth()->id(),
+            'created_by' => $currentUserID,
         ]);
 
         $reminder = Reminder::create([
@@ -153,7 +200,7 @@ class TaskController extends Controller
 
         ];
 
-        Recurring::create($recurringData);
+        $recurring = Recurring::create($recurringData);
 
         NotificationTime::create($notificationData);
 
@@ -196,7 +243,6 @@ class TaskController extends Controller
 
             //Rodrigo
             // dd($hasAnyParticipant);
-
 
             $creator = User::where('id', $task->created_by)->first();
 
@@ -384,9 +430,7 @@ class TaskController extends Controller
             })->exists();
 
             if ($conflictingDuration) {
-                // Retorne um erro de validação ou faça algo para lidar com a sobreposição
-                // Por exemplo:
-                throw new \Exception('As durações propostas se sobrepõem com uma tarefa existente.');
+                return redirect()->back()->withErrors(['conflictingDuration' => 'As durações propostas se sobrepõem com a tarefa' . $userRecurrence->reminder->title]);
             }
         }
 
