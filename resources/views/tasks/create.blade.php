@@ -216,9 +216,12 @@
 
                                                         <p>Local:{{ $conflictingTask->local }}</p>
 
-                                                        <p>Dono: {{ $conflictingTask->createdBy->name }}</p>
+                                                        <p>Dono: {{ $conflictingTask->owner }}</p>
 
-                                                        <p>Descrição: {{ $description }}</p>
+                                                        <p>Telefone: {{ $conflictingTask->owner_telehpone }}</p>
+                                                        <p>Email: {{ $conflictingTask->owner_email }}</p>
+                                                        <p>Início: {{ $conflictingTask->start }}</p>
+                                                        <p>Até: {{ $conflictingTask->end }}</p>
                                                     </div>
 
                                                     <div class="modal-footer">

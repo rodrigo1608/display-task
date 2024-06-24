@@ -29,12 +29,6 @@ class TaskController extends Controller
         $this->middleware(['auth', 'verified']);
     }
 
-
-    public function getFormatedTelephone($user)
-    {
-        $user->telephone = '(' . substr($user->telephone, 0, 2) . ') ' . substr($user->telephone, 2, 1) . ' ' . substr($user->telephone, 3);
-    }
-
     /**
      * Display a listing of the resource.
      */
@@ -95,9 +89,11 @@ class TaskController extends Controller
         // Verificar se há alguma duração que conflita dentro desta recorrência
         foreach ($currentUserRecurrences as $userRecurrence) {
 
-            $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDuration) use ($taskDuration) {
+            $userTasksDuration = $userRecurrence->reminder->task->durations();
 
-                $queryUserTasksDuration->where('start', '>=', $taskDuration['start'])
+            $conflictingDuration = $userTasksDuration->where(function ($userTasksDurationQuery) use ($taskDuration) {
+
+                $userTasksDurationQuery->where('start', '>=', $taskDuration['start'])
                     ->where('start', '<', $taskDuration['end'])
                     ->orWhere(function ($startOverlapQuery) use ($taskDuration) {
 
@@ -114,20 +110,22 @@ class TaskController extends Controller
 
                 $conflictingTask = $userRecurrence->reminder->task;
 
-                $conflictingTaskOwner = $conflictingTask->creator;
+                $conflictingTask['owner'] = $conflictingTask->creator->name . ' ' . $conflictingTask->creator->lastname;
 
-                $conflictingTaskOwner->telephone = $this->getFormatedTelephone($conflictingTaskOwner);
+                $conflictingTask['owner_telehpone'] =  getFormatedTelephone($conflictingTask->creator);
 
-                $conflictingduration =  $conflictingTask->durations->first();
+                $conflictingTask['owner_email'] =  $conflictingTask->creator->email;
 
-                $startTime = $conflictingduration->start ? date('H:i', strtotime($conflictingduration->start)) : null;
+                $conflictingDuration =  $conflictingTask->durations->first();
 
-                $endTime = $conflictingduration->end ? date('H:i', strtotime($conflictingduration->end)) : null;
+                $conflictingTask['start'] = date('H:i', strtotime($conflictingDuration->start));
 
+                $conflictingTask['end'] =  date('H:i', strtotime($conflictingDuration->end));
 
+                // Rodrigo
+                // dd($conflictingTask->getAttributes());
 
-
-                session()->flash('conflictingTask', $userRecurrence->reminder->task);
+                session()->flash('conflictingTask',  $conflictingTask);
 
                 return redirect()->back()->withErrors([
                     'conflictingDuration' =>
@@ -289,7 +287,7 @@ class TaskController extends Controller
 
         $createdBy =  $task->creator ?? null;
 
-        $createdBy->telephone = '(' . substr($createdBy->telephone, 0, 2) . ') ' . substr($createdBy->telephone, 2, 1) . ' ' . substr($createdBy->telephone, 3);
+        $createdBy->telephone = getFormatedTelephone($createdBy);
 
         $description = $task->feedbacks->first()->feedback;
 
@@ -313,23 +311,7 @@ class TaskController extends Controller
 
         if (is_null($recurring->specific_date)) {
 
-            $daysOfWeek = [
-
-                'sunday' => 'domingo',
-
-                'monday' => 'segunda',
-
-                'tuesday' => 'terça',
-
-                'wednesday' => 'quarta',
-
-                'thursday' => 'quinta',
-
-                'friday' => 'sexta',
-
-                'saturday' => 'sábado',
-
-            ];
+            $daysOfWeek = getDaysOfWeekInPortuguese();
 
             $repeatingDays = [];
 

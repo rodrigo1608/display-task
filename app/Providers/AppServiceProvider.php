@@ -43,7 +43,6 @@ class AppServiceProvider extends ServiceProvider
 
             $view->with('user', $user);
 
-
             $view->with('pendingTasks',   $pendingTasks);
         });
     }
