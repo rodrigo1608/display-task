@@ -28,6 +28,13 @@ class TaskController extends Controller
     {
         $this->middleware(['auth', 'verified']);
     }
+
+
+    public function getFormatedTelephone($user)
+    {
+        $user->telephone = '(' . substr($user->telephone, 0, 2) . ') ' . substr($user->telephone, 2, 1) . ' ' . substr($user->telephone, 3);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -88,27 +95,43 @@ class TaskController extends Controller
         // Verificar se há alguma duração que conflita dentro desta recorrência
         foreach ($currentUserRecurrences as $userRecurrence) {
 
-            $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDurationFirst) use ($taskDuration) {
+            $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDuration) use ($taskDuration) {
 
-                $queryUserTasksDurationFirst->where('start', '>=', $taskDuration['start'])
+                $queryUserTasksDuration->where('start', '>=', $taskDuration['start'])
                     ->where('start', '<', $taskDuration['end'])
-                    ->orWhere(function ($queryUserTasksDurationSecond) use ($taskDuration) {
+                    ->orWhere(function ($startOverlapQuery) use ($taskDuration) {
 
-                        $queryUserTasksDurationSecond->where('end', '>', $taskDuration['start'])
+                        $startOverlapQuery->where('end', '>', $taskDuration['start'])
                             ->where('end', '<=', $taskDuration['end']);
                     })
-                    ->orWhere(function ($queryUserTasksDurationThird) use ($taskDuration) {
-                        $queryUserTasksDurationThird->where('start', '<=', $taskDuration['start'])
+                    ->orWhere(function ($intervalOverlapQuery) use ($taskDuration) {
+                        $intervalOverlapQuery->where('start', '<=', $taskDuration['start'])
                             ->where('end', '>=', $taskDuration['end']);
                     });
             })->exists();
 
             if ($conflictingDuration) {
 
+                $conflictingTask = $userRecurrence->reminder->task;
+
+                $conflictingTaskOwner = $conflictingTask->creator;
+
+                $conflictingTaskOwner->telephone = $this->getFormatedTelephone($conflictingTaskOwner);
+
+                $conflictingduration =  $conflictingTask->durations->first();
+
+                $startTime = $conflictingduration->start ? date('H:i', strtotime($conflictingduration->start)) : null;
+
+                $endTime = $conflictingduration->end ? date('H:i', strtotime($conflictingduration->end)) : null;
+
+
+
+
+                session()->flash('conflictingTask', $userRecurrence->reminder->task);
+
                 return redirect()->back()->withErrors([
                     'conflictingDuration' =>
                     $userRecurrence->reminder->task->title,
-
                 ])->withInput();
             }
         }
@@ -283,6 +306,9 @@ class TaskController extends Controller
 
         $recurring = $task->reminder->recurring;
 
+        //rodrigo
+        // dd($recurring);
+
         $recurringMessage = '';
 
         if (is_null($recurring->specific_date)) {
@@ -315,6 +341,9 @@ class TaskController extends Controller
                 }
             }
 
+            //rodrigo
+            // dd($repeatingDays);
+
             $numberOfDays = count($repeatingDays);
 
             if ($numberOfDays == 7) {
@@ -325,6 +354,9 @@ class TaskController extends Controller
                 $lastDay = array_pop($repeatingDays);
 
                 $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $repeatingDays);
+
+                // rodrigo
+                // dd($recurringMessage);
 
                 if ($numberOfDays > 1) {
 
@@ -338,17 +370,19 @@ class TaskController extends Controller
             $formatedDate = '<strong>' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</strong>';
             $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate ";
         }
+
         return $view === 'pending'
             ?  view('tasks/showPending', compact('attachments', 'createdBy', 'description', 'endTime', 'recurringMessage', 'startTime', 'task'))
             :  view('tasks/show', compact('attachments', 'createdBy', 'description', 'endTime', 'recurringMessage', 'startTime', 'task'));
     }
 
-    public function showPending(string $id)
-    {
-        $task = Task::find($id);
+    // public function showPending(string $id)
+    // {
+    //     $task = Task::find($id);
 
-        return view('tasks/showPending', compact('task'));
-    }
+    //     return view('tasks/showPending', compact('task'));
+    // }
+
     /**
      * Show the form for editing the specified resource.
      */
@@ -403,8 +437,7 @@ class TaskController extends Controller
                         $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
                     });
                 });
-            })
-            ->get();
+            })->get();
 
         //Rodrigo
         // dd($currentUserRecurrences);
@@ -430,7 +463,11 @@ class TaskController extends Controller
             })->exists();
 
             if ($conflictingDuration) {
-                return redirect()->back()->withErrors(['conflictingDuration' => 'As durações propostas se sobrepõem com a tarefa' . $userRecurrence->reminder->title]);
+                return redirect()->back()->withErrors([
+                    'conflictingDuration' =>
+                    $userRecurrence->reminder->task->title,
+
+                ])->withInput();
             }
         }
 

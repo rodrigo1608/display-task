@@ -168,21 +168,6 @@
 
                                     </div>
 
-                                    <!-- Exibir mensagem de erro -->
-                                    @if ($errors->has('conflictingDuration'))
-                                        <div class="alert alert-danger my-4">
-                                            <p>As durações propostas estão se sobrepondo com uma tarefa já criada.</p>
-                                            @php
-                                                $errors->first('conflictingDuration');
-                                            @endphp
-                                            <p> Nome da tarefa:
-                                                <span class='poppins-semibold'>
-                                                    {{ $errors->first('conflictingDuration') }}</span>
-                                            </p>
-
-                                        </div>
-                                    @endif
-
                                     <div class="col-md-4 offset-md-1">
 
                                         <label for="local" class="poppins-regular fs-6 me-3">Local
@@ -193,6 +178,60 @@
 
                                     </div>
                                 </div>
+
+                                <!-- Exibir mensagem de erro de conflito de duração da tarefa -->
+
+                                @if ($errors->has('conflictingDuration'))
+                                    <div class="alert alert-danger my-4">
+                                        <p>As durações propostas estão se sobrepondo com uma tarefa já criada.</p>
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="conflictingModal"
+                                        data-bs-target="#conflictingModal">
+                                        Clique para ver os detalhes da tarefa
+                                    </button>
+
+                                    <!-- Modal -->
+
+                                    @if (session()->has('conflictingTask'))
+                                        @php
+                                            $conflictingTask = session('conflictingTask');
+                                        @endphp
+
+                                        <div class="modal fade" id="conflictingModal" tabindex="-1"
+                                            aria-labelledby="conflictingModal" aria-hidden="true">
+
+                                            <div class="modal-dialog">
+
+                                                <div class="modal-content">
+
+                                                    <div class="modal-header">
+
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        <h1>{{ $conflictingTask->title }}</h1>
+
+                                                        <p>Local:{{ $conflictingTask->local }}</p>
+
+                                                        <p>Dono: {{ $conflictingTask->createdBy->name }}</p>
+
+                                                        <p>Descrição: {{ $description }}</p>
+                                                    </div>
+
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-primary">Save
+                                                            changes</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endif
 
                                 <div class="row d-flex align-items-start mt-5">
 

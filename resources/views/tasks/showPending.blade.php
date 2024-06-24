@@ -134,7 +134,7 @@
 
                                             <input id="start" type="time" name="start"
                                                 class="form-control fs-6 @error('start') is-invalid @enderror text-center"
-                                                value="{{ old('start') }}">
+                                                value="{{ old('start') ?? $startTime }}">
 
                                             @error('start')
                                                 <div class="invalid-feedback position-absolute">
@@ -149,8 +149,7 @@
 
                                             <input id="end" type="time" name="end"
                                                 class="form-control fs-6 @error('end') is-invalid @enderror text-center"
-                                                value="{{ old('end') }}">
-
+                                                value="{{ old('end') ?? $endTime }}">
                                             @error('end')
                                                 <div class="invalid-feedback position-absolute">
                                                     <strong>{{ $message }}</strong>
@@ -158,6 +157,21 @@
                                             @enderror
 
                                         </div>
+
+                                        <!-- Exibir mensagem de erro -->
+                                        @if ($errors->has('conflictingDuration'))
+                                            <div class="alert alert-danger my-4">
+                                                <p>As durações propostas estão se sobrepondo com uma tarefa já criada.</p>
+                                                @php
+                                                    $errors->first('conflictingDuration');
+                                                @endphp
+                                                <p> Nome da tarefa:
+                                                    <span class='poppins-semibold'>
+                                                        {{ $errors->first('conflictingDuration') }}</span>
+                                                </p>
+
+                                            </div>
+                                        @endif
 
                                         <div class="d-flex col-md-3 offset-1 justify-content-end mt-4">
                                             <button type="button"
