@@ -49,25 +49,25 @@
 
                                 <div class="row mt-4">
                                     <p class="poppins-semibold col-md-2">Responsável: </p>
-                                    <p class="roboto col-md-4">{{ $createdBy->name }} {{ $createdBy->lastname }}</p>
-                                    <p class="roboto col-md-2">{{ $createdBy->telephone }} </p>
-                                    <p class="roboto col-md-3">{{ $createdBy->email }} </p>
+                                    <p class="roboto col-md-4">{{ $task->creator }}</p>
+                                    <p class="roboto col-md-2">{{ $task->creator_telephone }} </p>
+                                    <p class="roboto col-md-3">{{ $task->creator_email }} </p>
                                 </div>
 
                                 <div class="row mt-3">
                                     <p class="poppins-semibold col-md-2">Descrição: </p>
-                                    <p class="roboto col-md-8">{{ $description }}</p>
+                                    <p class="roboto col-md-8">{{ $task->description }}</p>
                                 </div>
 
                                 @php
-                                    $hasAnyAttachment = isset($attachments) && !empty($attachments);
+                                    $hasAnyAttachment = isset($task->attachments) && !empty($task->attachments);
                                 @endphp
 
                                 @if ($hasAnyAttachment)
                                     <p class="poppins-semibold col-md-3">Anexos:</p>
                                     <div class="d-flex w-50 flex-row flex-wrap">
 
-                                        @foreach ($attachments as $index => $attachment)
+                                        @foreach ($task->attachments as $index => $attachment)
                                             {{-- @dd($attachment) --}}
 
                                             <!-- Button trigger modal -->
@@ -113,7 +113,7 @@
 
                                 <div class="row mt-3">
                                     <p class="poppins-semibold col-md-2">Recorrencia: </p>
-                                    <p class="roboto col-md-8">{!! $recurringMessage !!}</p>
+                                    <p class="roboto col-md-8">{!! $task->recurringMessage !!}</p>
                                 </div>
 
                             </div>
@@ -134,7 +134,7 @@
 
                                             <input id="start" type="time" name="start"
                                                 class="form-control fs-6 @error('start') is-invalid @enderror text-center"
-                                                value="{{ old('start') ?? $startTime }}">
+                                                value="{{ old('start') ?? $task->start }}">
 
                                             @error('start')
                                                 <div class="invalid-feedback position-absolute">
@@ -149,7 +149,7 @@
 
                                             <input id="end" type="time" name="end"
                                                 class="form-control fs-6 @error('end') is-invalid @enderror text-center"
-                                                value="{{ old('end') ?? $endTime }}">
+                                                value="{{ old('end') ?? $task->end }}">
                                             @error('end')
                                                 <div class="invalid-feedback position-absolute">
                                                     <strong>{{ $message }}</strong>

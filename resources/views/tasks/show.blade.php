@@ -55,15 +55,22 @@
 
                         <p>Local: {{ $task->local }}</p>
 
-                        <p>Dono: {{ $createdBy->name }}</p>
+                        <p>Dono: {{ $task->creator }}</p>
 
-                        <p>Descrição: {{ $description }}</p>
+                        <p>Dono telefone: {{ $task->creator_telephone }}</p>
+
+                        <p>Dono email: {{ $task->creator_telephone }}</p>
+
+                        <p>Dono email: {{ $task->creator_email }}</p>
+
+                        <p>Descrição: {{ $task->description }}</p>
 
                         <p>Anexos:</p>
 
                         <div class="d-flex w-50 flex-row flex-wrap">
 
-                            @foreach ($attachments as $index => $attachment)
+                            @foreach ($task->attachments as $index => $attachment)
+                                {{-- rodrigo --}}
                                 {{-- @dd($attachment) --}}
 
                                 <!-- Button trigger modal -->
@@ -104,12 +111,10 @@
                             @endforeach
                         </div>
 
-                        <p>Começa em: {{ $startTime }}</p>
-                        <p>Termina em: {{ $endTime }}</p>
+                        <p>Começa em: {{ $task->start }}</p>
+                        <p>Termina em: {{ $task->end }}</p>
 
-                        <p>{{ $recurringMessage }}</p>
-
-
+                        <p>{!! $task->recurringMessage !!}</p>
 
                     </div>
                 </div>

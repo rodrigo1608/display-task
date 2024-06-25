@@ -287,17 +287,21 @@ class TaskController extends Controller
 
         $createdBy =  $task->creator ?? null;
 
-        $createdBy->telephone = getFormatedTelephone($createdBy);
+        $task['creator'] = $createdBy->name . ' ' . $createdBy->lastname;
 
-        $description = $task->feedbacks->first()->feedback;
+        $task['creator_telephone'] = getFormatedTelephone($createdBy);
 
-        $attachments = $task->feedbacks->first()->attachments->all();
+        $task['creator_email'] = $createdBy->email;
+
+        $task['description'] = $task->feedbacks->first()->feedback;
+
+        $task['attachments'] = $task->feedbacks->first()->attachments->all();
 
         $duration = $task->durations->first();
 
-        $startTime = $duration->start ? date('H:i', strtotime($duration->start)) : null;
+        $task['start'] = $duration->start ? date('H:i', strtotime($duration->start)) : null;
 
-        $endTime = $duration->end ? date('H:i', strtotime($duration->end)) : null;
+        $task['end'] = $duration->end ? date('H:i', strtotime($duration->end)) : null;
 
         //rodrigo
         // $startTime = Carbon::parse($duration->start_time)->format('H:i');
@@ -307,55 +311,13 @@ class TaskController extends Controller
         //rodrigo
         // dd($recurring);
 
-        $recurringMessage = '';
+        $task['recurringMessage'] = getRecurringMessage($recurring);
 
-        if (is_null($recurring->specific_date)) {
-
-            $daysOfWeek = getDaysOfWeekInPortuguese();
-
-            $repeatingDays = [];
-
-            foreach ($daysOfWeek as $key => $day) {
-
-                if ($recurring->$key === 'true') {
-
-                    $repeatingDays[] = $day;
-                }
-            }
-
-            //rodrigo
-            // dd($repeatingDays);
-
-            $numberOfDays = count($repeatingDays);
-
-            if ($numberOfDays == 7) {
-
-                $recurringMessage = 'Irá se repetir todos os dias.';
-            } else {
-
-                $lastDay = array_pop($repeatingDays);
-
-                $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $repeatingDays);
-
-                // rodrigo
-                // dd($recurringMessage);
-
-                if ($numberOfDays > 1) {
-
-                    $recurringMessage .= ' e ' . $lastDay . '.';
-                } else {
-
-                    $recurringMessage .= '.';
-                }
-            }
-        } else {
-            $formatedDate = '<strong>' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</strong>';
-            $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate ";
-        }
+        // dd($task->getAttributes());
 
         return $view === 'pending'
-            ?  view('tasks/showPending', compact('attachments', 'createdBy', 'description', 'endTime', 'recurringMessage', 'startTime', 'task'))
-            :  view('tasks/show', compact('attachments', 'createdBy', 'description', 'endTime', 'recurringMessage', 'startTime', 'task'));
+            ?  view('tasks/showPending', compact('task'))
+            :  view('tasks/show', compact('task'));
     }
 
     // public function showPending(string $id)
