@@ -89,9 +89,12 @@ class TaskController extends Controller
         // Verificar se há alguma duração que conflita dentro desta recorrência
         foreach ($currentUserRecurrences as $userRecurrence) {
 
-            $userTasksDuration = $userRecurrence->reminder->task->durations();
+            $userTaskDurations = $userRecurrence->reminder->task->durations();
 
-            $conflictingDuration = $userTasksDuration->where(function ($userTasksDurationQuery) use ($taskDuration) {
+            // rodrigo
+            // dd($userTaskDurations->get());
+
+            $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($taskDuration) {
 
                 $userTasksDurationQuery->where('start', '>=', $taskDuration['start'])
                     ->where('start', '<', $taskDuration['end'])
@@ -110,22 +113,32 @@ class TaskController extends Controller
 
                 $conflictingTask = $userRecurrence->reminder->task;
 
-                $conflictingTask['owner'] = $conflictingTask->creator->name . ' ' . $conflictingTask->creator->lastname;
+                $conflictingTaskToArray =  $conflictingTask->toArray();
 
-                $conflictingTask['owner_telehpone'] =  getFormatedTelephone($conflictingTask->creator);
+                $conflictingTaskToArray['owner'] = $conflictingTask->creator->name . ' ' . $conflictingTask->creator->lastname;
 
-                $conflictingTask['owner_email'] =  $conflictingTask->creator->email;
+                $conflictingTaskToArray['owner_telehpone'] =  getFormatedTelephone($conflictingTask->creator);
+
+                $conflictingTaskToArray['owner_email'] =  $conflictingTask->creator->email;
 
                 $conflictingDuration =  $conflictingTask->durations->first();
 
-                $conflictingTask['start'] = date('H:i', strtotime($conflictingDuration->start));
+                $conflictingTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
 
-                $conflictingTask['end'] =  date('H:i', strtotime($conflictingDuration->end));
+                $conflictingTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
+
+                $recurring = $conflictingTask->reminder->recurring;
+
+                //rodrigo
+                // dd($recurring);
+
+                $conflictingTaskToArray['recurringMessage'] = getRecurringMessage($recurring);
 
                 // Rodrigo
-                // dd($conflictingTask->getAttributes());
+                // dd($conflictingTaskToArray);
 
-                session()->flash('conflictingTask',  $conflictingTask);
+                session()->flash('conflictingTask',  $conflictingTaskToArray);
+                // dd(session()->get('conflictingTask'));
 
                 return redirect()->back()->withErrors([
                     'conflictingDuration' =>

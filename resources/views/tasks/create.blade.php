@@ -181,59 +181,74 @@
 
                                 <!-- Exibir mensagem de erro de conflito de duração da tarefa -->
 
+                                @php
+                                    $conflictingTask = session()->get('conflictingTask');
+                                @endphp
+
                                 @if ($errors->has('conflictingDuration'))
-                                    <div class="alert alert-danger my-4">
-                                        <p>As durações propostas estão se sobrepondo com uma tarefa já criada.</p>
-                                    </div>
+                                    <div class="alert border-danger my-4 border border-2 bg-transparent">
 
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="conflictingModal"
-                                        data-bs-target="#conflictingModal">
-                                        Clique para ver os detalhes da tarefa
-                                    </button>
+                                        <p class="text-danger">As durações propostas estão se sobrepondo com uma tarefa já
+                                            criada.</p>
 
-                                    <!-- Modal -->
+                                        <h1></h1>
 
-                                    @if (session()->has('conflictingTask'))
-                                        @php
-                                            $conflictingTask = session('conflictingTask');
-                                        @endphp
+                                        <div class="accordion accordion-flush" id="accordionFlushExample">
 
-                                        <div class="modal fade" id="conflictingModal" tabindex="-1"
-                                            aria-labelledby="conflictingModal" aria-hidden="true">
+                                            <div class="accordion-item">
 
-                                            <div class="modal-dialog">
+                                                <h2 class="accordion-header">
+                                                    <button class="accordion-button text-danger collapsed btn-danger"
+                                                        type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                                        aria-controls="flush-collapseOne">
+                                                        <p class="poppins-semibold">Clique para ver os detalhes
+                                                        </p>
+                                                    </button>
+                                                </h2>
 
-                                                <div class="modal-content">
+                                                <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                                    data-bs-parent="#accordionFlushExample">
+                                                    <div class="accordion-body">
+                                                        <p class=""><span class="poppins-semibold">Tarefa
+                                                                conflitante:</span>
 
-                                                    <div class="modal-header">
+                                                            {{ $conflictingTask['title'] }}
+                                                        </p>
+                                                        <p>
+                                                            <span class="poppins-semibold">
+                                                                Local:
+                                                            </span>
+                                                            {{ $conflictingTask['local'] }}
+                                                        </p>
 
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
+                                                        <p> <span class="poppins-semibold">
+                                                                Criado por:
+                                                            </span> {{ $conflictingTask['owner'] }} </p>
 
-                                                    <div class="modal-body">
-                                                        <h1>{{ $conflictingTask->title }}</h1>
+                                                        <p>
+                                                            <span class="poppins-semibold">
+                                                                Contato:
+                                                            </span> {{ $conflictingTask['owner_telehpone'] }}
+                                                        </p>
+                                                        <p>
+                                                            <span class="poppins-semibold">
+                                                                email:
+                                                            </span>{{ $conflictingTask['owner_email'] }}
+                                                        </p>
 
-                                                        <p>Local:{{ $conflictingTask->local }}</p>
+                                                        <p> <span class="poppins-semibold">
+                                                                Início:
+                                                            </span>{{ $conflictingTask['start'] }}</p>
 
-                                                        <p>Dono: {{ $conflictingTask->owner }}</p>
-
-                                                        <p>Telefone: {{ $conflictingTask->owner_telehpone }}</p>
-                                                        <p>Email: {{ $conflictingTask->owner_email }}</p>
-                                                        <p>Início: {{ $conflictingTask->start }}</p>
-                                                        <p>Até: {{ $conflictingTask->end }}</p>
-                                                    </div>
-
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Close</button>
-                                                        <button type="button" class="btn btn-primary">Save
-                                                            changes</button>
+                                                        <p><span class="poppins-semibold">
+                                                                Fim:
+                                                            </span> {{ $conflictingTask['end'] }}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endif
+                                    </div>
                                 @endif
 
                                 <div class="row d-flex align-items-start mt-5">
