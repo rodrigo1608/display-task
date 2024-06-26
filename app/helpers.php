@@ -114,3 +114,34 @@ if (!function_exists('getRecurringMessage')) {
         return $recurringMessage;
     }
 }
+
+
+if (!function_exists('getParticipantsEmail')) {
+
+    function getParticipantsEmail($request)
+    {
+
+        $participants = [];
+
+        foreach ($request->all() as $key => $value) {
+            if (strpos($key, 'participant') === 0) {
+                $participants[] = $value;
+            }
+        }
+
+        return   $participants;
+    }
+}
+
+if (!function_exists('getWeekDayName')) {
+
+    function getWeekDayName($date)
+    {
+        $carbonDate = Carbon::parse($date);
+
+
+        $dayName = $carbonDate->englishDayOfWeek;
+
+        dd($dayName);
+    }
+}

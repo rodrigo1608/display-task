@@ -69,6 +69,8 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
+        $currentUserRecurrences = Recurring::where('available', 'true')->get();
+
         $currentUserRecurrences = Recurring::where('available', 'true')
             ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
                 $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
@@ -77,6 +79,26 @@ class TaskController extends Controller
                     });
                 });
             })->get();
+
+        // $currentUserRecurrences = Recurring::where('available', 'true')
+        //     ->where(function ($query) use ($currentUserID, $request) {
+        //         $query->where('specific_date', $request->specific_date)
+        //             ->orWhere(function ($query) use ($request) {
+        //                 $query->where('monday', $request->monday)
+        //                     ->orWhere('tuesday', $request->tuesday)
+        //                     ->orWhere('wednesday', $request->wednesday)
+        //                     ->orWhere('thursday', $request->thursday)
+        //                     ->orWhere('friday', $request->friday)
+        //                     ->orWhere('saturday', $request->saturday);
+        //             });
+        //     })
+        //     ->whereHas('reminder.task', function ($taskQuery) use ($currentUserID) {
+        //         $taskQuery->where('created_by', $currentUserID)
+        //             ->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
+        //                 $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
+        //             });
+        //     })
+        //     ->get();
 
         // Rodrigo
         // dd($currentUserRecurrences);
@@ -89,25 +111,59 @@ class TaskController extends Controller
         // Verificar se há alguma duração que conflita dentro desta recorrência
         foreach ($currentUserRecurrences as $userRecurrence) {
 
+            // dd($userRecurrence->specific_date);
+
+            $taskRecurrenceIsASpecificDate = isset($request->specific_date);
+            dd($request->all());
+            dd($taskRecurrenceIsASpecificDate);
+
+            if ($taskRecurrenceIsASpecificDate) {
+
+                $date = $userRecurrence->specific_date;
+
+                $carbonDate = Carbon::parse($date);
+
+                $dayName = $carbonDate->englishDayOfWeek;
+
+                dd($dayName);
+            }
+
             $userTaskDurations = $userRecurrence->reminder->task->durations();
 
-            // rodrigo
-            // dd($userTaskDurations->get());
-
-            $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($taskDuration) {
-
-                $userTasksDurationQuery->where('start', '>=', $taskDuration['start'])
-                    ->where('start', '<', $taskDuration['end'])
-                    ->orWhere(function ($startOverlapQuery) use ($taskDuration) {
-
-                        $startOverlapQuery->where('end', '>', $taskDuration['start'])
-                            ->where('end', '<=', $taskDuration['end']);
+            $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($request) {
+                $userTasksDurationQuery->where('start', '>=', $request->start)
+                    ->where('start', '<', $request->end)
+                    ->orWhere(function ($startOverlapQuery) use ($request) {
+                        $startOverlapQuery->where('end', '>', $request->start)
+                            ->where('end', '<=', $request->end);
                     })
-                    ->orWhere(function ($intervalOverlapQuery) use ($taskDuration) {
-                        $intervalOverlapQuery->where('start', '<=', $taskDuration['start'])
-                            ->where('end', '>=', $taskDuration['end']);
+                    ->orWhere(function ($intervalOverlapQuery) use ($request) {
+                        $intervalOverlapQuery->where('start', '<=', $request->start)
+                            ->where('end', '>=', $request->end);
                     });
             })->exists();
+
+            // foreach ($currentUserRecurrences as $userRecurrence) {
+
+            //     $userTaskDurations = $userRecurrence->reminder->task->durations();
+
+            //     // rodrigo
+            //     // dd($userRecurrence);
+
+            //     $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($taskDuration) {
+
+            //         $userTasksDurationQuery->where('start', '>=', $taskDuration['start'])
+            //             ->where('start', '<', $taskDuration['end'])
+            //             ->orWhere(function ($startOverlapQuery) use ($taskDuration) {
+
+            //                 $startOverlapQuery->where('end', '>', $taskDuration['start'])
+            //                     ->where('end', '<=', $taskDuration['end']);
+            //             })
+            //             ->orWhere(function ($intervalOverlapQuery) use ($taskDuration) {
+            //                 $intervalOverlapQuery->where('start', '<=', $taskDuration['start'])
+            //                     ->where('end', '>=', $taskDuration['end']);
+            //             });
+            //     })->exists();
 
             if ($conflictingDuration) {
 
@@ -263,10 +319,10 @@ class TaskController extends Controller
 
         ]);
 
-        $participantEmails = $task->participants()->pluck('users.email');
+        $participantsEmail = getParticipantsEmail($request);
 
         //Rodrigo
-        // dd($participantEmails);
+        // dd($participantsEmail);
 
         $hasAnyParticipant = !empty($participantEmails);
 
@@ -282,7 +338,7 @@ class TaskController extends Controller
 
             $creatorName = "$creator->name $creator->lastname";
 
-            Mail::to($participantEmails)->send(new TaskInvitationMail($task, $creatorName));
+            Mail::to($participantsEmail)->send(new TaskInvitationMail($task, $creatorName));
         }
 
         return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
