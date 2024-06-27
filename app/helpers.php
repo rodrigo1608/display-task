@@ -139,9 +139,8 @@ if (!function_exists('getWeekDayName')) {
     {
         $carbonDate = Carbon::parse($date);
 
-
         $dayName = $carbonDate->englishDayOfWeek;
 
-        dd($dayName);
+        return $dayName;
     }
 }
