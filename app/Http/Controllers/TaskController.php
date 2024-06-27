@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\TaskInvitationMail;
+use App\Helpers\QueryHelpers;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\SetPendingTaskDuration;
 // use App\Models\NotificationTime;
@@ -69,23 +70,47 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
-        $taskDuration = ["start" => $request->start, 'end' => $request->end];
-
         $hasTaskASpecificDate = isset($request->specific_date);
 
         if ($hasTaskASpecificDate) {
 
-            $taskWeekDay =  getWeekDayName($request->specific_date);
+            $weekDayOfSpecificDate =  getWeekDayName($request->specific_date);
 
-            Task::whereHas('reminders', function ($taskQuery) use ($request) {
+            $spercificDateTaskDurationConflictingBuilder = Task::whereHas('reminder', function ($taskReminderQuery) use ($request, $weekDayOfSpecificDate) {
 
-                $taskQuery->whereHas('recurrings', function ($taskReminderQuery) use ($request) {
+                $taskReminderQuery->whereHas('recurring', function ($taskReminderRecurringQuery) use ($request, $weekDayOfSpecificDate) {
 
-                    $taskReminderQuery->where('specific_date', $request->specific_date);
+                    $taskReminderRecurringQuery->where('specific_date', $request->specific_date)->orWhere($weekDayOfSpecificDate, 'true');
                 });
+            })->whereHas('durations', function ($specificDateTaskQuery) use ($request) {
+
+                addDurationOverlapQuery($specificDateTaskQuery, $request);
             });
 
-            dd($taskWeekDay);
+
+            $spercificDateTask = $spercificDateTaskDurationConflictingBuilder->first();
+            $spercificDateTaskDurationExist = $spercificDateTaskDurationConflictingBuilder->exists();
+
+            // dd($spercificDateTask->reminder->recurring);
+
+            if ($spercificDateTaskDurationExist) {
+
+                // dd($spercificDateTaskDurationExist);
+
+                $spercificDateTaskInArray = getTaskInArray($spercificDateTask, $spercificDateTask->reminder->recurring);
+
+                session()->flash('conflictingTask',  $spercificDateTaskInArray);
+
+                // dd(session()->get('conflictingTask'));
+
+                return redirect()->back()->withErrors([
+
+                    'conflictingDuration' =>
+                    $spercificDateTask->title,
+
+                ])->withInput();
+            }
+        } else if(){
         }
 
         // $specific_date)
@@ -97,14 +122,14 @@ class TaskController extends Controller
         //Rodrigo
         // dd($request->specific_date);
 
-        $currentUserRecurrences = Recurring::where('available', 'true')
-            ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
-                $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
-                    $taskQuery->where('created_by', $currentUserID)->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
-                        $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
-                    });
-                });
-            })->get();
+        // $currentUserRecurrences = Recurring::where('available', 'true')
+        //     ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
+        //         $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
+        //             $taskQuery->where('created_by', $currentUserID)->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
+        //                 $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
+        //             });
+        //         });
+        //     })->get();
 
         // $currentUserRecurrences = Recurring::where('available', 'true')
         //     ->where(function ($query) use ($currentUserID, $request) {
@@ -129,105 +154,106 @@ class TaskController extends Controller
         // Rodrigo
         // dd($currentUserRecurrences);
 
-        $taskDuration = ["start" => $request->start, 'end' => $request->end];
+        // $taskDuration = ["start" => $request->start, 'end' => $request->end];
+
+
 
         //Rodrigo
         // dd($taskDuration);
 
-        $idTaskRecurrenceASpecificDate = isset($request->specific_date);
+        // $idTaskRecurrenceASpecificDate = isset($request->specific_date);
 
-        $weekDayOfCurrentTask = "";
+        // $weekDayOfCurrentTask = "";
 
-        if ($idTaskRecurrenceASpecificDate) {
-            $weekDayOfCurrentTask = getWeekDayName($request->specific_date);
-        }
+        // if ($idTaskRecurrenceASpecificDate) {
+        //     $weekDayOfCurrentTask = getWeekDayName($request->specific_date);
+        // }
 
         // Verificar se há alguma duração que conflita dentro desta recorrência
-        foreach ($currentUserRecurrences as $userRecurrence) {
+        // foreach ($currentUserRecurrences as $userRecurrence) {
 
-            // dd($userRecurrence->specific_date);
+        // dd($userRecurrence->specific_date);
 
-            // dd($taskRecurrenceIsASpecificDate);
+        // dd($taskRecurrenceIsASpecificDate);
 
-            // if ($taskRecurrenceIsASpecificDate) {
+        // if ($taskRecurrenceIsASpecificDate) {
 
-            //     $date = $userRecurrence->specific_date;
+        //     $date = $userRecurrence->specific_date;
 
-            //     $carbonDate = Carbon::parse($date);
+        //     $carbonDate = Carbon::parse($date);
 
-            //     $dayName = $carbonDate->englishDayOfWeek;
+        //     $dayName = $carbonDate->englishDayOfWeek;
 
-            //     dd($dayName);
-            // }
+        //     dd($dayName);
+        // }
 
-            $userTaskDurations = $userRecurrence->reminder->task->durations();
+        // $userTaskDurations = $userRecurrence->reminder->task->durations();
 
+        // $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($request) {
+        //     $userTasksDurationQuery->where('start', '>=', $request->start)
+        //         ->where('start', '<', $request->end)
+        //         ->orWhere(function ($startOverlapQuery) use ($request) {
+        //             $startOverlapQuery->where('end', '>', $request->start)
+        //                 ->where('end', '<=', $request->end);
+        //         })
+        //         ->orWhere(function ($intervalOverlapQuery) use ($request) {
+        //             $intervalOverlapQuery->where('start', '<=', $request->start)
+        //                 ->where('end', '>=', $request->end);
+        //         });
+        // })->exists();
 
-            // $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($request) {
-            //     $userTasksDurationQuery->where('start', '>=', $request->start)
-            //         ->where('start', '<', $request->end)
-            //         ->orWhere(function ($startOverlapQuery) use ($request) {
-            //             $startOverlapQuery->where('end', '>', $request->start)
-            //                 ->where('end', '<=', $request->end);
-            //         })
-            //         ->orWhere(function ($intervalOverlapQuery) use ($request) {
-            //             $intervalOverlapQuery->where('start', '<=', $request->start)
-            //                 ->where('end', '>=', $request->end);
-            //         });
-            // })->exists();
+        // foreach ($currentUserRecurrences as $userRecurrence) {
 
-            // foreach ($currentUserRecurrences as $userRecurrence) {
+        //     $userTaskDurations = $userRecurrence->reminder->task->durations();
 
-            //     $userTaskDurations = $userRecurrence->reminder->task->durations();
+        //     // rodrigo
+        //     // dd($userRecurrence);
 
-            //     // rodrigo
-            //     // dd($userRecurrence);
+        //     $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($taskDuration) {
 
-            //     $conflictingDuration = $userTaskDurations->where(function ($userTasksDurationQuery) use ($taskDuration) {
+        //         $userTasksDurationQuery->where('start', '>=', $taskDuration['start'])
+        //             ->where('start', '<', $taskDuration['end'])
+        //             ->orWhere(function ($startOverlapQuery) use ($taskDuration) {
 
-            //         $userTasksDurationQuery->where('start', '>=', $taskDuration['start'])
-            //             ->where('start', '<', $taskDuration['end'])
-            //             ->orWhere(function ($startOverlapQuery) use ($taskDuration) {
+        //                 $startOverlapQuery->where('end', '>', $taskDuration['start'])
+        //                     ->where('end', '<=', $taskDuration['end']);
+        //             })
+        //             ->orWhere(function ($intervalOverlapQuery) use ($taskDuration) {
+        //                 $intervalOverlapQuery->where('start', '<=', $taskDuration['start'])
+        //                     ->where('end', '>=', $taskDuration['end']);
+        //             });
+        //     })->exists();
 
-            //                 $startOverlapQuery->where('end', '>', $taskDuration['start'])
-            //                     ->where('end', '<=', $taskDuration['end']);
-            //             })
-            //             ->orWhere(function ($intervalOverlapQuery) use ($taskDuration) {
-            //                 $intervalOverlapQuery->where('start', '<=', $taskDuration['start'])
-            //                     ->where('end', '>=', $taskDuration['end']);
-            //             });
-            //     })->exists();
+        // if ($conflictingDuration) {
 
-            // if ($conflictingDuration) {
+        //     $conflictingTask = $userRecurrence->reminder->task;
 
-            //     $conflictingTask = $userRecurrence->reminder->task;
+        //     $conflictingTaskToArray =  $conflictingTask->toArray();
 
-            //     $conflictingTaskToArray =  $conflictingTask->toArray();
+        //     $conflictingTaskToArray['owner'] = $conflictingTask->creator->name . ' ' . $conflictingTask->creator->lastname;
 
-            //     $conflictingTaskToArray['owner'] = $conflictingTask->creator->name . ' ' . $conflictingTask->creator->lastname;
+        //     $conflictingTaskToArray['owner_telehpone'] =  getFormatedTelephone($conflictingTask->creator);
 
-            //     $conflictingTaskToArray['owner_telehpone'] =  getFormatedTelephone($conflictingTask->creator);
+        //     $conflictingTaskToArray['owner_email'] =  $conflictingTask->creator->email;
 
-            //     $conflictingTaskToArray['owner_email'] =  $conflictingTask->creator->email;
+        //     $conflictingDuration =  $conflictingTask->durations->first();
 
-            //     $conflictingDuration =  $conflictingTask->durations->first();
+        //     $conflictingTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
 
-            //     $conflictingTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
+        //     $conflictingTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
 
-            //     $conflictingTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
+        //     $recurring = $conflictingTask->reminder->recurring;
 
-            //     $recurring = $conflictingTask->reminder->recurring;
+        //rodrigo
+        // dd($recurring);
 
-                //rodrigo
-                // dd($recurring);
+        // $conflictingTaskToArray['recurringMessage'] = getRecurringMessage($recurring);
 
-                // $conflictingTaskToArray['recurringMessage'] = getRecurringMessage($recurring);
+        // Rodrigo
+        // dd($conflictingTaskToArray);
 
-                // Rodrigo
-                // dd($conflictingTaskToArray);
-
-                // session()->flash('conflictingTask',  $conflictingTaskToArray);
-                // dd(session()->get('conflictingTask'));
+        // session()->flash('conflictingTask',  $conflictingTaskToArray);
+        // dd(session()->get('conflictingTask'));
 
         //         return redirect()->back()->withErrors([
         //             'conflictingDuration' =>

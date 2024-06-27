@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 
 if (!function_exists('human_case')) {
 
@@ -64,7 +65,6 @@ if (!function_exists('getRepeatingDays')) {
                 $repeatingDays[] = $day;
             }
         }
-
         return $repeatingDays;
     }
 }
@@ -115,7 +115,6 @@ if (!function_exists('getRecurringMessage')) {
     }
 }
 
-
 if (!function_exists('getParticipantsEmail')) {
 
     function getParticipantsEmail($request)
@@ -142,5 +141,47 @@ if (!function_exists('getWeekDayName')) {
         $dayName = $carbonDate->englishDayOfWeek;
 
         return $dayName;
+    }
+}
+
+if (!function_exists('addDurationOverlapQuery')) {
+
+    function addDurationOverlapQuery(Builder $query, $request)
+    {
+        return $query->where('start', '>=', $request->start)
+            ->where('start', '<', $request->end)
+            ->orWhere(function ($startOverlapQuery) use ($request) {
+                $startOverlapQuery->where('end', '>', $request->start)
+                    ->where('end', '<=', $request->end);
+            })
+            ->orWhere(function ($intervalOverlapQuery) use ($request) {
+                $intervalOverlapQuery->where('start', '<=', $request->start)
+                    ->where('end', '>=', $request->end);
+            });
+    }
+}
+
+if (!function_exists('getTaskInArray')) {
+
+    function getTaskInArray($spercificDateTask, $recurring)
+    {
+
+        $spercificDateTaskToArray =  $spercificDateTask->toArray();
+
+        $spercificDateTaskToArray['owner'] = $spercificDateTask->creator->name . ' ' . $spercificDateTask->creator->lastname;
+
+        $spercificDateTaskToArray['owner_telehpone'] =  getFormatedTelephone($spercificDateTask->creator);
+
+        $spercificDateTaskToArray['owner_email'] =  $spercificDateTask->creator->email;
+
+        $conflictingDuration =  $spercificDateTask->durations->first();
+
+        $spercificDateTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
+
+        $spercificDateTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
+
+        $spercificDateTaskToArray['recurringMessage'] = getRecurringMessage($recurring);
+
+        return   $spercificDateTaskToArray;
     }
 }
