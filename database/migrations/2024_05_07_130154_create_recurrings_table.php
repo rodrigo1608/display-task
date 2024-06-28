@@ -17,6 +17,8 @@ return new class extends Migration
 
             $table->date('specific_date')->nullable();
 
+            $table->string('specific_date_weekday', 10)->nullable();
+
             $table->enum('sunday', ['true', 'false'])->default('false');
 
             $table->enum('monday', ['true', 'false'])->default('false');

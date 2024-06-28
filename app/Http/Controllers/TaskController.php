@@ -70,13 +70,27 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
-        $hasTaskASpecificDate = isset($request->specific_date);
+        $hasSpecificDateInRequest = isset($request->specific_date);
 
-        if ($hasTaskASpecificDate) {
+        $hasSundayRecurrenceInRequest = isset($request->sunday);
+
+        $hasMondayRecurrenceInRequest = isset($request->monday);
+
+        $hasTuesdayRecurrenceInRequest = isset($request->tuesday);
+
+        $hasWednesdayRecurrenceInRequest = isset($request->wednesday);
+
+        $hasThursdayRecurrenceInRequest = isset($request->thursday);
+
+        $hasFridayRecurrenceInRequest = isset($request->friday);
+
+        $hasSaturdayRecurrenceInRequest = isset($request->saturday);
+
+        if ($hasSpecificDateInRequest) {
 
             $weekDayOfSpecificDate =  getWeekDayName($request->specific_date);
 
-            $spercificDateTaskDurationConflictingBuilder = Task::whereHas('reminder', function ($taskReminderQuery) use ($request, $weekDayOfSpecificDate) {
+            $spercificDateConflictingTaskBuilder = Task::whereHas('reminder', function ($taskReminderQuery) use ($request, $weekDayOfSpecificDate) {
 
                 $taskReminderQuery->whereHas('recurring', function ($taskReminderRecurringQuery) use ($request, $weekDayOfSpecificDate) {
 
@@ -87,17 +101,17 @@ class TaskController extends Controller
                 addDurationOverlapQuery($specificDateTaskQuery, $request);
             });
 
+            $spercificDateConflictingTask = $spercificDateConflictingTaskBuilder->first();
+            $spercificDateConflictingTaskExist = $spercificDateConflictingTaskBuilder->exists();
 
-            $spercificDateTask = $spercificDateTaskDurationConflictingBuilder->first();
-            $spercificDateTaskDurationExist = $spercificDateTaskDurationConflictingBuilder->exists();
-
+            // rodrigo
             // dd($spercificDateTask->reminder->recurring);
 
-            if ($spercificDateTaskDurationExist) {
+            if ($spercificDateConflictingTaskExist) {
 
-                // dd($spercificDateTaskDurationExist);
+                // dd($spercificDateTaskConflictingExist);
 
-                $spercificDateTaskInArray = getTaskInArray($spercificDateTask, $spercificDateTask->reminder->recurring);
+                $spercificDateTaskInArray = getTaskInArray($spercificDateConflictingTask);
 
                 session()->flash('conflictingTask',  $spercificDateTaskInArray);
 
@@ -106,12 +120,74 @@ class TaskController extends Controller
                 return redirect()->back()->withErrors([
 
                     'conflictingDuration' =>
-                    $spercificDateTask->title,
+                    $spercificDateConflictingTask->title,
 
                 ])->withInput();
             }
-        } else if(){
         }
+
+        if ($hasSundayRecurrenceInRequest) {
+
+            $sundayConflictingTaskBuilder =  Task::whereHas('reminder', function ($taskReminderQuery) {
+                getRecurringTask($taskReminderQuery, 'sunday');
+            })->whereHas('durations', function ($specificDateTaskQuery) use ($request) {
+
+                addDurationOverlapQuery($specificDateTaskQuery, $request);
+            });
+
+            $sundayConflictingTask = $sundayConflictingTaskBuilder->first();
+            // rodrigo
+            // dd($sundayConflictingTask);
+
+            $sundayConflictingTaskExist = $sundayConflictingTaskBuilder->exists();
+            // rodrigo
+            // dd($sundayConflictingTaskExist);
+
+            $sundayConflitingTask = $sundayConflictingTaskBuilder->first();
+            $sundayConflictingTaskExist = $sundayConflictingTaskBuilder->exists();
+
+            if ($sundayConflictingTaskExist) {
+                // rodrigo
+                // dd($spercificDateTaskConflictingExist);
+
+                $sundayConflitingTaskInArray = getTaskInArray($sundayConflitingTask);
+
+                session()->flash('conflictingTask',  $sundayConflitingTaskInArray);
+                // rodrigo
+                // dd(session()->get('conflictingTask'));
+
+                return redirect()->back()->withErrors([
+
+                    'conflictingDuration' =>
+                    $sundayConflitingTask->title,
+
+                ])->withInput();
+            }
+        }
+
+        // $hasMondayRecurrenceInRequest:
+
+
+
+        // $hasTuesdayRecurrenceInRequest:
+
+
+
+        // $hasWednesdayRecurrenceInRequest:
+
+
+
+        // $hasThursdayRecurrenceInRequest:
+
+
+
+        // $hasFridayRecurrenceInRequest:
+
+
+
+        // $hasSaturdayRecurrenceInRequest:
+
+
 
         // $specific_date)
         //     ->where('created_by', $currentUserID)->orWhereHas('paticipating', function ($query) use ($currentUserID) {
@@ -330,6 +406,8 @@ class TaskController extends Controller
         $recurringData = [
 
             'specific_date' => $request->specific_date ?? null,
+
+            'specific_date_weekday' => getWeekDayName($request->specific_date) ?? null,
 
             'sunday' => $request->sunday ?? 'false',
 

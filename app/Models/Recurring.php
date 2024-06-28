@@ -29,6 +29,8 @@ class Recurring extends Model
 
         'specific_date',
 
+        'specific_date_weekday',
+
         'reminder_id',
 
     ];

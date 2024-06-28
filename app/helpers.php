@@ -144,6 +144,17 @@ if (!function_exists('getWeekDayName')) {
     }
 }
 
+if (!function_exists('getRecurringTask')) {
+
+    function getRecurringTask(Builder $query, $weekDay)
+    {
+        return $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($weekDay) {
+
+            $taskReminderRecurringQuery->where('specific_date_weekday',  $weekDay)->orWhere($weekDay, 'true');
+        });
+    }
+}
+
 if (!function_exists('addDurationOverlapQuery')) {
 
     function addDurationOverlapQuery(Builder $query, $request)
@@ -163,7 +174,7 @@ if (!function_exists('addDurationOverlapQuery')) {
 
 if (!function_exists('getTaskInArray')) {
 
-    function getTaskInArray($spercificDateTask, $recurring)
+    function getTaskInArray($spercificDateTask)
     {
 
         $spercificDateTaskToArray =  $spercificDateTask->toArray();
@@ -180,7 +191,7 @@ if (!function_exists('getTaskInArray')) {
 
         $spercificDateTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
 
-        $spercificDateTaskToArray['recurringMessage'] = getRecurringMessage($recurring);
+        $spercificDateTaskToArray['recurringMessage'] = getRecurringMessage($spercificDateTask->reminder->recurring);
 
         return   $spercificDateTaskToArray;
     }
