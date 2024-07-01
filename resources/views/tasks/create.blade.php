@@ -237,13 +237,15 @@
                                                             </span>{{ $conflictingTask['owner_email'] }}
                                                         </p>
 
-                                                        <p> <span class="poppins-semibold">
-                                                                Início:
-                                                            </span>{{ $conflictingTask['start'] }}</p>
-
                                                         <p><span class="poppins-semibold">
-                                                                Fim:
-                                                            </span> {{ $conflictingTask['end'] }}</p>
+
+                                                            </span> {!! $conflictingTask['recurringMessage'] !!}</p>
+
+                                                        <p> <span class="poppins-semibold">
+                                                                das {{ $conflictingTask['start'] }} às
+                                                                {{ $conflictingTask['end'] }}
+                                                            </span></p>
+
                                                     </div>
                                                 </div>
                                             </div>

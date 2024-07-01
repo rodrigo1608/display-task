@@ -70,46 +70,11 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
-        // dd(Task::find(26)->reminder->recurring);
-
-        // $hasSpecificDateInRequest = isset($request->specific_date);
-
-        // $hasSundayRecurrenceInRequest = isset($request->sunday);
-
-        // $hasMondayRecurrenceInRequest = isset($request->monday);
-
-        // $hasTuesdayRecurrenceInRequest = isset($request->tuesday);
-
-        // $hasWednesdayRecurrenceInRequest = isset($request->wednesday);
-
-        // $hasThursdayRecurrenceInRequest = isset($request->thursday);
-
-        // $hasFridayRecurrenceInRequest = isset($request->friday);
-
-        // $hasSaturdayRecurrenceInRequest = isset($request->saturday);
-
-        // dd($request->all());
-
-        // $mafales = Task::where('id', 12);
-
-        // dd($mafales->first());
-
-        // $specificDateConflict = getConflictingTask($request, 'specific_date');
-        // $sundayConflict = getConflictingTask($request, 'sunday');
-        // $mondayConflict = getConflictingTask($request, 'monday');
-        // $tuesdayConflict = getConflictingTask($request, 'tuesday');
-        // $wednesdayConflict = getConflictingTask($request, 'wednesday');
-        // $thursdayConflict = getConflictingTask($request, 'thursday');
-        // $fridayConflict = getConflictingTask($request, 'friday');
-        // $saturdayConflict = getConflictingTask($request, 'saturday');
-
         $recurrencePatterns = ['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
         $recurrencePatterns = array_filter($recurrencePatterns, function ($pattern) use ($request) {
             return array_key_exists($pattern, $request->all()) && $request->{$pattern} !== null;
         });
-
-        // Itera sobre cada padrão de recorrência para verificar conflitos
 
         foreach ($recurrencePatterns as $pattern) {
 
