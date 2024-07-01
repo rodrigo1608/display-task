@@ -53,7 +53,7 @@ class HomeController extends Controller
 
         $currentUserID = $currentUser->id;
 
-        $currentUser->telephone = '(' . substr($currentUser->telephone, 0, 2) . ') ' . substr($currentUser->telephone, 2, 1) . ' ' . substr($currentUser->telephone, 3);
+        $currentUser->telephone = getFormatedTelephone($currentUser);
 
         $myTasksBuilder = Task::whereHas('participants', function ($query) use ($currentUserID) {
 
