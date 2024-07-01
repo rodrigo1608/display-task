@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use App\Models\Task;
 use Illuminate\Database\Eloquent\Builder;
 
 if (!function_exists('human_case')) {
@@ -14,7 +15,6 @@ if (!function_exists('human_case')) {
 if (!function_exists('getDaysOfWeekInPortuguese')) {
 
     function getDaysOfWeekInPortuguese()
-
     {
         return [
             'sunday' => 'domingo',
@@ -27,7 +27,6 @@ if (!function_exists('getDaysOfWeekInPortuguese')) {
         ];
     }
 }
-
 
 if (!function_exists('setTask')) {
 
@@ -138,7 +137,7 @@ if (!function_exists('getWeekDayName')) {
     {
         $carbonDate = Carbon::parse($date);
 
-        $dayName = $carbonDate->englishDayOfWeek;
+        $dayName = strtolower($carbonDate->englishDayOfWeek);
 
         return $dayName;
     }
@@ -146,12 +145,29 @@ if (!function_exists('getWeekDayName')) {
 
 if (!function_exists('getRecurringTask')) {
 
-    function getRecurringTask(Builder $query, $weekDay)
+    function getRecurringTask(Builder $query, $recurrencePattern, $specificDate = null)
     {
-        return $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($weekDay) {
+        $weekDayOfSpecificDate = null;
 
-            $taskReminderRecurringQuery->where('specific_date_weekday',  $weekDay)->orWhere($weekDay, 'true');
-        });
+        $hasSpecificDate = $specificDate !== null;
+
+
+        if ($hasSpecificDate) {
+
+            $weekDayOfSpecificDate =  getWeekDayName($specificDate);
+        }
+
+        return $specificDate !== null
+            ?
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($specificDate,    $weekDayOfSpecificDate) {
+
+                $taskReminderRecurringQuery->where('specific_date', $specificDate)->orWhere($weekDayOfSpecificDate, 'true');
+            })
+            :
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
+
+                $taskReminderRecurringQuery->where('specific_date_weekday',   $recurrencePattern)->orWhere($recurrencePattern, 'true');
+            });
     }
 }
 
@@ -174,25 +190,190 @@ if (!function_exists('addDurationOverlapQuery')) {
 
 if (!function_exists('getTaskInArray')) {
 
-    function getTaskInArray($spercificDateTask)
+    function getTaskInArray($conflitingTask)
     {
 
-        $spercificDateTaskToArray =  $spercificDateTask->toArray();
+        $conflitingTaskToArray =  $conflitingTask->toArray();
 
-        $spercificDateTaskToArray['owner'] = $spercificDateTask->creator->name . ' ' . $spercificDateTask->creator->lastname;
+        $conflitingTaskToArray['owner'] = $conflitingTask->creator->name . ' ' . $conflitingTask->creator->lastname;
 
-        $spercificDateTaskToArray['owner_telehpone'] =  getFormatedTelephone($spercificDateTask->creator);
+        $conflitingTaskToArray['owner_telehpone'] =  getFormatedTelephone($conflitingTask->creator);
 
-        $spercificDateTaskToArray['owner_email'] =  $spercificDateTask->creator->email;
+        $conflitingTaskToArray['owner_email'] =  $conflitingTask->creator->email;
 
-        $conflictingDuration =  $spercificDateTask->durations->first();
+        $conflictingDuration =  $conflitingTask->durations->first();
 
-        $spercificDateTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
+        $conflitingTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
 
-        $spercificDateTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
+        $conflitingTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
 
-        $spercificDateTaskToArray['recurringMessage'] = getRecurringMessage($spercificDateTask->reminder->recurring);
+        $conflitingTaskToArray['recurringMessage'] = getRecurringMessage($conflitingTask->reminder->recurring);
 
-        return   $spercificDateTaskToArray;
+        return   $conflitingTaskToArray;
     }
 }
+
+if (!function_exists('getConflictingTask')) {
+
+    function getConflictingTask($request, $recurrencePattern)
+    {
+
+        $userID = auth()->id();
+
+        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])
+            ->where(function ($query) use ($userID) {
+                $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+
+                    $query->where('user_id', $userID);
+                });
+            })->whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $request) {
+
+                $recurrencePattern === 'specific_date'
+                    ? getRecurringTask($taskReminderQuery,  $recurrencePattern, $request->specific_date)
+                    : getRecurringTask($taskReminderQuery,  $recurrencePattern);
+            })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($request) {
+                addDurationOverlapQuery($taskRecurringsDurtionQuery, $request);
+            });
+
+        $conflictingTask = $conflictingTaskBuilder->first() ?? null;
+
+        $hasConflictingTask = $conflictingTaskBuilder->exists();
+
+        // dd($hasConflictingTask);
+
+        if ($hasConflictingTask) {
+
+            $conflictingTaskInArray = getTaskInArray($conflictingTask);
+
+            // dd($conflictingTaskInArray);
+
+            session()->flash('conflictingTask',  $conflictingTaskInArray);
+
+            return redirect()->back()->withErrors([
+
+                'conflictingDuration' =>
+                $conflictingTask->title,
+
+            ])->withInput();
+        }
+    }
+}
+
+// if (!function_exists('getConflictingTask')) {
+
+//     function getConflictingTask($request, $recurrencePattern)
+//     {
+//         // $recurrencePatternExist = isset($request->{$recurrencePattern});
+
+//         $conflictingTaskBuilder =  Task::whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $request) {
+
+//             $recurrencePattern = 'specific_date'
+//                 ? getRecurringTask($taskReminderQuery,  $recurrencePattern, $request->specific_date)
+//                 : getRecurringTask($taskReminderQuery,  $recurrencePattern);
+//         })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($request) {
+
+//             addDurationOverlapQuery($taskRecurringsDurtionQuery, $request);
+//         });
+
+//         $conflictingTask = $conflictingTaskBuilder->first() ?? null;
+
+//         $hasConflictingTask = $conflictingTaskBuilder->exists();
+
+//         // dd($hasConflictingTask);
+
+//         if ($hasConflictingTask) {
+
+//             $conflictingTaskInArray = getTaskInArray($conflictingTask);
+
+//             // dd($conflictingTaskInArray);
+
+//             session()->flash('conflictingTask',  $conflictingTaskInArray);
+
+//             return redirect()->back()->withErrors([
+
+//                 'conflictingDuration' =>
+//                 $conflictingTask->title,
+
+//             ])->withInput();
+//         }
+//     }
+// }
+
+
+
+
+
+// if (!function_exists('getConflictingTask')) {
+
+//     function getConflictingTask($request, $recurrencePattern)
+//     {
+//         // $recurrencePatternExist = isset($request->{$recurrencePattern});
+
+//         $conflictingTaskBuilder =  Task::whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $request) {
+
+//             $recurrencePattern === 'specific_date'
+
+//                 ? getRecurringTask($taskReminderQuery,  $recurrencePattern, $request->specific_date)
+
+//                 : getRecurringTask($taskReminderQuery,  $recurrencePattern);
+//         })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($request) {
+
+//             addDurationOverlapQuery($taskRecurringsDurtionQuery, $request);
+//         });
+
+//         // dd($conflictingTaskBuilder->get());
+
+//         $conflictingTask = $conflictingTaskBuilder->first() ?? null;
+
+//         $hasConflictingTask = $conflictingTaskBuilder->exists();
+
+//         if ($hasConflictingTask) {
+
+//             $conflictingTaskInArray = getTaskInArray($conflictingTask);
+
+//             session()->flash('conflictingTask',  $conflictingTaskInArray);
+
+//             return redirect()->back()->withErrors([
+
+//                 'conflictingDuration' =>
+//                 $conflictingTask->title,
+
+//             ])->withInput();
+//         }
+//     }
+// }
+
+// if (!function_exists('getConflictingTask')) {
+
+//     function getConflictingTask($request, $recurrencePattern)
+//     {
+//         // $recurrencePatternExist = isset($request->{$recurrencePattern});
+
+//         $conflictingTaskBuilder =  Task::whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $request) {
+
+//             $recurrencePattern = 'specific_date'
+//                 ? getRecurringTask($taskReminderQuery,  $recurrencePattern, $request->specifc_date)
+//                 : getRecurringTask($taskReminderQuery,  $recurrencePattern);
+//         })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($request) {
+//             addDurationOverlapQuery($taskRecurringsDurtionQuery, $request);
+//         });
+
+//         $conflictingTask = $conflictingTaskBuilder->first() ?? null;
+
+//         $hasConflictingTask = $conflictingTaskBuilder->exists();
+
+//         if ($hasConflictingTask) {
+
+//             $conflictingTaskInArray = getTaskInArray($conflictingTask);
+
+//             session()->flash('conflictingTask',  $conflictingTaskInArray);
+
+//             return redirect()->back()->withErrors([
+
+//                 'conflictingDuration' =>
+//                 $conflictingTask->title,
+
+//             ])->withInput();
+//         }
+//     }
+// }
