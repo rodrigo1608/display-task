@@ -70,7 +70,7 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
-        $recurrencePatterns = ['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $recurrencePatterns = getRecurrencePatterns($request);
 
         $recurrencePatterns = array_filter($recurrencePatterns, function ($pattern) use ($request) {
             return array_key_exists($pattern, $request->all()) && $request->{$pattern} !== null;

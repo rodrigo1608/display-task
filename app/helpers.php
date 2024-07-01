@@ -228,6 +228,16 @@ if (!function_exists('getTaskInArray')) {
 
 if (!function_exists('getConflictingTask')) {
 
+    function getRecurrencePatterns($request)
+    {
+        return array_filter(['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'], function ($pattern) use ($request) {
+            return array_key_exists($pattern, $request->all()) && $request->{$pattern} !== null;
+        });
+    }
+}
+
+if (!function_exists('getConflictingTask')) {
+
     function getConflictingTask($request, $recurrencePattern)
     {
 

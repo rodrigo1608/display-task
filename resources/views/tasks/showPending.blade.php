@@ -159,17 +159,77 @@
                                         </div>
 
                                         <!-- Exibir mensagem de erro -->
-                                        @if ($errors->has('conflictingDuration'))
-                                            <div class="alert alert-danger my-4">
-                                                <p>As durações propostas estão se sobrepondo com uma tarefa já criada.</p>
-                                                @php
-                                                    $errors->first('conflictingDuration');
-                                                @endphp
-                                                <p> Nome da tarefa:
-                                                    <span class='poppins-semibold'>
-                                                        {{ $errors->first('conflictingDuration') }}</span>
-                                                </p>
+                                        @php
+                                            $conflictingTask = session()->get('conflictingTask');
+                                        @endphp
 
+                                        @if ($errors->has('conflictingDuration'))
+                                            <div class="alert border-danger my-4 border border-2 bg-transparent">
+
+                                                <p class="text-danger">As durações propostas estão se sobrepondo com uma
+                                                    tarefa já
+                                                    criada.</p>
+
+                                                <h1></h1>
+
+                                                <div class="accordion accordion-flush" id="accordionFlushExample">
+
+                                                    <div class="accordion-item">
+
+                                                        <h2 class="accordion-header">
+                                                            <button
+                                                                class="accordion-button text-danger collapsed btn-danger"
+                                                                type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                                                aria-controls="flush-collapseOne">
+                                                                <p class="poppins-semibold">Clique para ver os detalhes
+                                                                </p>
+                                                            </button>
+                                                        </h2>
+
+                                                        <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                                            data-bs-parent="#accordionFlushExample">
+                                                            <div class="accordion-body">
+                                                                <p class=""><span class="poppins-semibold">Tarefa
+                                                                        conflitante:</span>
+
+                                                                    {{ $conflictingTask['title'] }}
+                                                                </p>
+                                                                <p>
+                                                                    <span class="poppins-semibold">
+                                                                        Local:
+                                                                    </span>
+                                                                    {{ $conflictingTask['local'] }}
+                                                                </p>
+
+                                                                <p> <span class="poppins-semibold">
+                                                                        Criado por:
+                                                                    </span> {{ $conflictingTask['owner'] }} </p>
+
+                                                                <p>
+                                                                    <span class="poppins-semibold">
+                                                                        Contato:
+                                                                    </span> {{ $conflictingTask['owner_telehpone'] }}
+                                                                </p>
+                                                                <p>
+                                                                    <span class="poppins-semibold">
+                                                                        email:
+                                                                    </span>{{ $conflictingTask['owner_email'] }}
+                                                                </p>
+
+                                                                <p><span class="poppins-semibold">
+
+                                                                    </span> {!! $conflictingTask['recurringMessage'] !!}</p>
+
+                                                                <p> <span class="poppins-semibold">
+                                                                        das {{ $conflictingTask['start'] }} às
+                                                                        {{ $conflictingTask['end'] }}
+                                                                    </span></p>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         @endif
 
