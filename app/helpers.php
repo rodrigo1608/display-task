@@ -158,23 +158,21 @@ if (!function_exists('getWeekDayName')) {
 
 if (!function_exists('getRecurringTask')) {
 
-    function getRecurringTask(Builder $query, $recurrencePattern, $specificDate = null)
+    function getRecurringTask(Builder $query, $recurrencePattern, $inputData)
     {
         $weekDayOfSpecificDate = null;
 
-        $hasSpecificDate = $specificDate !== null;
+        $hasSpecificDate = $inputData['specific_date'] !== null;
 
+        $date = $hasSpecificDate ? $inputData['specific_date'] : null;
 
-        if ($hasSpecificDate) {
+        $weekDayOfSpecificDate = $hasSpecificDate ? getWeekDayName($date) : null;
 
-            $weekDayOfSpecificDate =  getWeekDayName($specificDate);
-        }
-
-        return $specificDate !== null
+        return $hasSpecificDate
             ?
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($specificDate,    $weekDayOfSpecificDate) {
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($date,    $weekDayOfSpecificDate) {
 
-                $taskReminderRecurringQuery->where('specific_date', $specificDate)->orWhere($weekDayOfSpecificDate, 'true');
+                $taskReminderRecurringQuery->where('specific_date', $date)->orWhere($weekDayOfSpecificDate, 'true');
             })
             :
             $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
@@ -186,17 +184,18 @@ if (!function_exists('getRecurringTask')) {
 
 if (!function_exists('addDurationOverlapQuery')) {
 
-    function addDurationOverlapQuery(Builder $query, $request)
+    function addDurationOverlapQuery(Builder $query, $inputData)
     {
-        return $query->where('start', '>=', $request->start)
-            ->where('start', '<', $request->end)
-            ->orWhere(function ($startOverlapQuery) use ($request) {
-                $startOverlapQuery->where('end', '>', $request->start)
-                    ->where('end', '<=', $request->end);
+
+        return $query->where('start', '>=', $inputData['start'])
+            ->where('start', '<', $inputData['end'])
+            ->orWhere(function ($startOverlapQuery) use ($inputData) {
+                $startOverlapQuery->where('end', '>', $inputData['start'])
+                    ->where('end', '<=', $inputData['end']);
             })
-            ->orWhere(function ($intervalOverlapQuery) use ($request) {
-                $intervalOverlapQuery->where('start', '<=', $request->start)
-                    ->where('end', '>=', $request->end);
+            ->orWhere(function ($intervalOverlapQuery) use ($inputData) {
+                $intervalOverlapQuery->where('start', '<=', $inputData['start'])
+                    ->where('end', '>=', $inputData['end']);
             });
     }
 }
@@ -226,36 +225,35 @@ if (!function_exists('getTaskInArray')) {
     }
 }
 
-if (!function_exists('getConflictingTask')) {
+if (!function_exists('getRecurrencePatterns')) {
 
-    function getRecurrencePatterns($request)
+    function getRecurrencePatterns($taskDetails)
     {
-        return array_filter(['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'], function ($pattern) use ($request) {
-            return array_key_exists($pattern, $request->all()) && $request->{$pattern} !== null;
-        });
+        $recurrenceKeys = ['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+        return array_filter($taskDetails, function ($value, $key) use ($recurrenceKeys) {
+            return in_array($key, $recurrenceKeys) && ($value === "true" || ($key === 'specific_date' && $value !== null));
+        }, ARRAY_FILTER_USE_BOTH);
     }
 }
 
 if (!function_exists('getConflictingTask')) {
 
-    function getConflictingTask($request, $recurrencePattern)
+    function getConflictingTask($inputData, $recurrencePattern, $currentTaskID = null)
     {
-
         $userID = auth()->id();
 
-        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])
+        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('id', '!=', $currentTaskID)
             ->where(function ($query) use ($userID) {
                 $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
 
                     $query->where('user_id', $userID);
                 });
-            })->whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $request) {
+            })->whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $inputData) {
 
-                $recurrencePattern === 'specific_date'
-                    ? getRecurringTask($taskReminderQuery,  $recurrencePattern, $request->specific_date)
-                    : getRecurringTask($taskReminderQuery,  $recurrencePattern);
-            })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($request) {
-                addDurationOverlapQuery($taskRecurringsDurtionQuery, $request);
+                getRecurringTask($taskReminderQuery,  $recurrencePattern, $inputData);
+            })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($inputData) {
+                addDurationOverlapQuery($taskRecurringsDurtionQuery, $inputData);
             });
 
         $conflictingTask = $conflictingTaskBuilder->first() ?? null;

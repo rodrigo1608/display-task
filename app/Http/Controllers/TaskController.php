@@ -70,21 +70,31 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
-        $recurrencePatterns = getRecurrencePatterns($request);
+        $recurrencePatterns = getRecurrencePatterns($request->all());
 
-        $recurrencePatterns = array_filter($recurrencePatterns, function ($pattern) use ($request) {
-            return array_key_exists($pattern, $request->all()) && $request->{$pattern} !== null;
-        });
+        // dd($recurrencePatterns['specific_date']);
 
-        foreach ($recurrencePatterns as $pattern) {
+        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
 
-            $conflict = getConflictingTask($request, $pattern);
+        // dd($isSpecificDayPattern);
+
+        if ($isSpecificDayPattern) {
+
+            $conflict = getConflictingTask($request->all(), 'specific_date',   $recurrencePatterns['specific_date']);
 
             if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
                 return $conflict;
             }
         }
 
+        foreach (array_keys($recurrencePatterns) as $pattern) {
+
+            $conflict = getConflictingTask($request,  $pattern);
+
+            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                return $conflict;
+            }
+        }
 
         // getConflictingTask($request, 'specific_date');
         // $hasMondayRecurrenceInRequest:
@@ -92,8 +102,6 @@ class TaskController extends Controller
         // $hasTuesdayRecurrenceInRequest:
 
         // $hasWednesdayRecurrenceInRequest:
-
-
 
         // $hasThursdayRecurrenceInRequest:
 
@@ -493,51 +501,77 @@ class TaskController extends Controller
 
         $currentTask = Task::find($id);
 
-        $currentTaskRecurring = $currentTask->reminder->recurring;
+        $currentTaskRecurring = $currentTask->reminder->recurring->getAttributes();
+
+        // dd($currentTaskRecurring);
+
+        $recurrencePatterns = getRecurrencePatterns($currentTaskRecurring);
+
+        // dd($recurrencePatterns);
+
+        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
+
+        if ($isSpecificDayPattern) {
+
+            $conflict = getConflictingTask($request->all(), 'specific_date',   $recurrencePatterns['specific_date'], $id);
+
+            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                return $conflict;
+            }
+        }
+
+        foreach (array_keys($recurrencePatterns) as $pattern) {
+
+            $conflict = getConflictingTask($request,  $pattern, $id);
+
+            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                return $conflict;
+            }
+        }
 
         //Rodrigo
         // dd($currentTaskRecurring);
 
-        $currentUserRecurrences = Recurring::where('available', 'true')
-            ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
-                $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
-                    $taskQuery->where('created_by', $currentUserID)->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
-                        $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
-                    });
-                });
-            })->get();
+        // $currentUserRecurrences = Recurring::where('available', 'true')
+        //     ->whereHas('reminder', function ($reminderQuery) use ($currentUserID) {
+        //         $reminderQuery->whereHas('task', function ($taskQuery) use ($currentUserID) {
+        //             $taskQuery->where('created_by', $currentUserID)->orWhereHas('participants', function ($participantQuery) use ($currentUserID) {
+        //                 $participantQuery->where('status', 'accepted')->where('user_id', $currentUserID);
+        //             });
+        //         });
+        //     })->get();
 
         //Rodrigo
         // dd($currentUserRecurrences);
 
-        $currentTaskDuration = ["start" => $request->start, 'end' => $request->end]; // Aqui você precisa definir as durações da tarefa atual
+        // $currentTaskDuration = ["start" => $request->start, 'end' => $request->end]; // Aqui você precisa definir as durações da tarefa atual
 
-        foreach ($currentUserRecurrences as $userRecurrence) {
-            // Verificar se há alguma duração que conflita dentro desta recorrência
+        // foreach ($currentUserRecurrences as $userRecurrence) {
+        //     // Verificar se há alguma duração que conflita dentro desta recorrência
 
-            $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDurationFirst) use ($currentTaskDuration) {
+        //     $conflictingDuration = $userRecurrence->reminder->task->durations()->where(function ($queryUserTasksDurationFirst) use ($currentTaskDuration) {
 
-                $queryUserTasksDurationFirst->where('start', '>=', $currentTaskDuration['start'])
-                    ->where('start', '<', $currentTaskDuration['end'])
-                    ->orWhere(function ($queryUserTasksDurationSecond) use ($currentTaskDuration) {
+        //         $queryUserTasksDurationFirst->where('start', '>=', $currentTaskDuration['start'])
+        //             ->where('start', '<', $currentTaskDuration['end'])
+        //             ->orWhere(function ($queryUserTasksDurationSecond) use ($currentTaskDuration) {
 
-                        $queryUserTasksDurationSecond->where('end', '>', $currentTaskDuration['start'])
-                            ->where('end', '<=', $currentTaskDuration['end']);
-                    })
-                    ->orWhere(function ($queryUserTasksDurationThird) use ($currentTaskDuration) {
-                        $queryUserTasksDurationThird->where('start', '<=', $currentTaskDuration['start'])
-                            ->where('end', '>=', $currentTaskDuration['end']);
-                    });
-            })->exists();
+        //                 $queryUserTasksDurationSecond->where('end', '>', $currentTaskDuration['start'])
+        //                     ->where('end', '<=', $currentTaskDuration['end']);
+        //             })
+        //             ->orWhere(function ($queryUserTasksDurationThird) use ($currentTaskDuration) {
+        //                 $queryUserTasksDurationThird->where('start', '<=', $currentTaskDuration['start'])
+        //                     ->where('end', '>=', $currentTaskDuration['end']);
+        //             });
+        //     })->exists();
 
-            if ($conflictingDuration) {
-                return redirect()->back()->withErrors([
-                    'conflictingDuration' =>
-                    $userRecurrence->reminder->task->title,
+        //     if ($conflictingDuration) {
+        //         return redirect()->back()->withErrors([
+        //             'conflictingDuration' =>
+        //             $userRecurrence->reminder->task->title,
 
-                ])->withInput();
-            }
-        }
+        //         ])->withInput();
+        //     }
+        // }
 
         $startTime = $request->start ? date('H:i', strtotime($request->start)) : null;
         $endTime = $request->end ? date('H:i', strtotime($request->end)) : null;
