@@ -164,7 +164,7 @@
                                         @endphp
 
                                         @if ($errors->has('conflictingDuration'))
-                                            <div class="alert border-danger my-4 border border-2 bg-transparent">
+                                            <div class="alert border-danger my-4 border border-2 bg-white">
 
                                                 <p class="text-danger">As durações propostas estão se sobrepondo com uma
                                                     tarefa já

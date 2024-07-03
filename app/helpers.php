@@ -160,6 +160,8 @@ if (!function_exists('getRecurringTask')) {
 
     function getRecurringTask(Builder $query, $recurrencePattern, $inputData)
     {
+        // dd($recurrencePattern);
+
         $weekDayOfSpecificDate = null;
 
         $hasSpecificDate = $inputData['specific_date'] !== null;
@@ -243,15 +245,28 @@ if (!function_exists('getConflictingTask')) {
     {
         $userID = auth()->id();
 
+        dd($currentTaskID);
+
+        // dd($inputData);
+
+        // Primeiramente, a consulta deve ignorar a tarefa que já foi criada para, no caso de algum usuário aceitá-la, não gerar conflito de sobreposição
         $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('id', '!=', $currentTaskID)
+
+            // Consulta que verifica se a tarefa pertence ao usuário logado ou se o usuário está participando de alguma tarefa
             ->where(function ($query) use ($userID) {
+
                 $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
 
                     $query->where('user_id', $userID);
                 });
+
+                // Como as recorrências são vinculadas aos lembretes, a consulta passará pela tabela reminders antes de acessar a tabela recurrings
             })->whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $inputData) {
 
+                // Método que lida com a lógica das recorrências
                 getRecurringTask($taskReminderQuery,  $recurrencePattern, $inputData);
+
+                // Depois que a recorrência foi verificada, o código abaixo é responsável por verificar se as durações estão se sobrepondo
             })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($inputData) {
                 addDurationOverlapQuery($taskRecurringsDurtionQuery, $inputData);
             });
