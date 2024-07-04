@@ -66,11 +66,22 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        // dd($request->all());
+
         $user->name = $request->input('name');
         $user->lastname = $request->input('lastname');
         $user->role = $request->input('role');
         $user->email = $request->input('email');
         $user->telephone = $request->input('telephone');
+
+        $profilePicture = $request->profile_picture ?? null;
+        if (isset($profilePicture)) {
+
+            $profilePicturePath = getProfilePicturePath($profilePicture, $request->email) ?? null;
+
+            $user->profile_picture = $profilePicturePath;
+        }
+        // dd($profilePicturePath);
 
         if ($request->filled('color')) {
             $user->color = $request->input('color');

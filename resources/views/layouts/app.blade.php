@@ -55,32 +55,6 @@
                     {{ config('app.name', 'Tela tarefa') }}
                 </a>
 
-                @auth
-                    <div class="dropdown">
-
-                        <button class="btn btn-secondary" type="button" id="dropdownMenuButtonEvent"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Criar evento
-                        </button>
-
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonEvent">
-
-                            <li class="">
-                                <a class="dropdown-item" href="{{ route('reminder.create') }}">
-                                    Lembrete
-                                </a>
-                            </li>
-
-                            <li class="">
-                                <a class="dropdown-item" href="{{ route('task.create') }}">
-                                    Tarefa
-                                </a>
-                            </li>
-                        </ul>
-
-                    </div>
-                @endauth
-
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
@@ -91,13 +65,41 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
 
+                        @auth
+                            <div class="dropdown">
+
+                                <button class="btn btn-secondary" type="button" id="dropdownMenuButtonEvent"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    Criar evento
+                                </button>
+
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonEvent">
+
+                                    <li class="">
+                                        <a class="dropdown-item" href="{{ route('reminder.create') }}">
+                                            Lembrete
+                                        </a>
+                                    </li>
+
+                                    <li class="">
+                                        <a class="dropdown-item" href="{{ route('task.create') }}">
+                                            Tarefa
+                                        </a>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        @endauth
+
                     </ul>
 
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
+
                         @auth
                             @php
                                 $hasAnyPendingTask = count($pendingTasks) > 0;
+
                                 $pluralOrSingularInvitation =
                                     count($pendingTasks) > 1 ? 'convites pendentes' : 'convite pendente';
                             @endphp

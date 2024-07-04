@@ -4,11 +4,33 @@ use Carbon\Carbon;
 use App\Models\Task;
 use Illuminate\Database\Eloquent\Builder;
 
-if (!function_exists('human_case')) {
+if (!function_exists('getFormatedTelephone')) {
 
     function getFormatedTelephone($user)
     {
         return  $user->telephone = '(' . substr($user->telephone, 0, 2) . ') ' . substr($user->telephone, 2, 1) . ' ' . substr($user->telephone, 3);
+    }
+}
+
+if (!function_exists('getProfilePicturePath')) {
+
+    function getProfilePicturePath($image, $email)
+    {
+        $hasUserUploadedPicture = isset($image);
+
+        if ($hasUserUploadedPicture) {
+
+            $emailWithoutDotCom = str_replace('.com', '', $email);
+
+            $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
+
+            // rodrigo
+            // @dd($profilePictureName);
+
+            return  $image->storeAs('profile_pictures', $profilePictureName);
+        }
+
+        return 'default_user_icon.jpg';
     }
 }
 

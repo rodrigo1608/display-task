@@ -131,26 +131,6 @@ class RegisterController extends Controller
         return Validator::make($data, $rules, $feedbacks);
     }
 
-    public function getProfilePicturePath($image, $email)
-    {
-
-        $hasUserUploadedPicture = isset($image);
-
-        if ($hasUserUploadedPicture) {
-
-            $emailWithoutDotCom = str_replace('.com', '', $email);
-
-            $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
-
-            // rodrigo
-            // @dd($profilePictureName);
-
-            return  $image->storeAs('profile_pictures', $profilePictureName);
-        }
-
-        return 'default_user_icon.jpg';
-    }
-
     /**
      * Create a new user instance after a valid registration.
      *
@@ -162,7 +142,7 @@ class RegisterController extends Controller
 
         $profilePicture = $data['profile_picture'] ?? null;
 
-        $profilePicturePath = $this->getProfilePicturePath($profilePicture, $data['email']) ?? null;
+        $profilePicturePath = getProfilePicturePath($profilePicture, $data['email']) ?? null;
 
         return User::create([
             'name' => $data['name'],
