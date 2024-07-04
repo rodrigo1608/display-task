@@ -108,9 +108,11 @@ if (!function_exists('getRecurringMessage')) {
                     $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $repeatingDays);
 
                     $recurringMessage .= ' e ' . $lastDay . '.';
-                } else {
+                } else {;
 
-                    $recurringMessage .= 'Todas as ' . $repeatingDays[0] . 's';
+                    $recurringMessage .=    $repeatingDays[0] === "sábado" || 'domingo'
+                        ? 'Todos os ' . $repeatingDays[0] . 's'
+                        : 'Todas as ' . $repeatingDays[0] . 's';
                 }
             }
         } else {
@@ -134,8 +136,10 @@ if (!function_exists('getParticipantsEmail')) {
 
         $participants = [];
 
-        foreach ($request->all() as $key => $value) {
-            if (strpos($key, 'participant') === 0) {
+        foreach ($request->all() as $attribute => $value) {
+
+            if (strpos($attribute, 'participant') === 0) {
+
                 $participants[] = $value;
             }
         }

@@ -87,14 +87,15 @@ class TaskController extends Controller
             if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
                 return $conflict;
             }
-        }
+        } else {
 
-        foreach (array_keys($recurrencePatterns) as $pattern) {
+            foreach (array_keys($recurrencePatterns) as $pattern) {
 
-            $conflict = getConflictingTask($request,  $pattern);
+                $conflict = getConflictingTask($request,  $pattern);
 
-            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
-                return $conflict;
+                if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                    return $conflict;
+                }
             }
         }
 
@@ -147,7 +148,7 @@ class TaskController extends Controller
 
         $specificNotificationTime = $request->time ? date('H:i', strtotime($request->time)) : null;
 
-        $notificationData = [
+        NotificationTime::create([
 
             'specific_notification_time' => $specificNotificationTime,
 
@@ -161,9 +162,9 @@ class TaskController extends Controller
 
             'reminder_id' => $task->reminder->id
 
-        ];
+        ]);
 
-        $recurringData = [
+        Recurring::create([
 
             'specific_date' => $request->specific_date ?? null,
 
@@ -185,15 +186,11 @@ class TaskController extends Controller
 
             'reminder_id' => $reminder->id,
 
-        ];
+        ]);
 
-        $recurring = Recurring::create($recurringData);
+        foreach ($request->all() as $attribute => $value) {
 
-        NotificationTime::create($notificationData);
-
-        foreach ($request->all() as $key => $value) {
-
-            if (str_starts_with($key, 'participant')) {
+            if (str_starts_with($attribute, 'participant')) {
 
                 Participant::create([
 
@@ -216,12 +213,14 @@ class TaskController extends Controller
 
         ]);
 
-        $participantsEmail = getParticipantsEmail($request);
+        $participantsEmails = getParticipantsEmail($request);
 
         //Rodrigo
         // dd($participantsEmail);
 
-        $hasAnyParticipant = !empty($participantEmails);
+        $hasAnyParticipant = !empty($participantsEmails);
+        //rodrigo
+        // dd($hasAnyParticipant);
 
         //Rodrigo
         // dd($hasAnyParticipant);
@@ -235,7 +234,7 @@ class TaskController extends Controller
 
             $creatorName = "$creator->name $creator->lastname";
 
-            Mail::to($participantsEmail)->send(new TaskInvitationMail($task, $creatorName));
+            Mail::to($participantsEmails)->send(new TaskInvitationMail($task, $creatorName));
         }
 
         return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
