@@ -183,6 +183,78 @@
 
         </nav>
 
+        <button class="btn btn-primary m-5" type="button" data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">+</button>
+
+        <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+            aria-labelledby="offcanvasWithBothOptionsLabel">
+
+            <div class="w-100 text-end">
+                <button type="button" class="btn-close me-4 mt-4" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
+            </div>
+
+            <div class="offcanvas-header">
+
+                <div class="w-100 d-flex flex-column ps-4">
+
+                    <div
+                        class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
+
+                        <img class="img-size" src="{{ asset('storage/' . $currentUser->profile_picture) }}"
+                            alt="Imagem do usuário">
+
+                    </div>
+
+                    <div class='mt-2 text-start'>
+
+                        <h2 class="fs-4 poppins-medium m-0 p-0">
+                            {{ $currentUser->name }}
+                            {{ $currentUser->lastname }}
+                        </h2>
+
+                        <p class="fs-5 roboto">{{ $currentUser->role }} </p>
+
+                        <p class="fs-5 roboto m-0 p-0">{{ $currentUser->email }} </p>
+
+                        <p class="fs-5 roboto m-0">{{ $currentUser->telephone }} </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="offcanvas-body">
+
+
+                <ul class="list-group poppins">
+
+                    <a href="{{ route('home') }}" class="side-link">
+                        <li class="list-group-item">Início</li>
+                    </a>
+
+                    <a href="#" class="side-link">
+                        <li class="list-group-item">Meu dia</li>
+                    </a>
+
+                    <a href="#" class="side-link">
+                        <li class="list-group-item">Minha semana</li>
+                    </a>
+
+                    <a href="#" class="side-link">
+                        <li class="list-group-item">Meu mês</li>
+                    </a>
+
+                    <a href="#" class="side-link">
+                        <li class="list-group-item active" aria-current="true">Painel geral</li>
+                    </a>
+
+                </ul>
+
+
+            </div>
+        </div>
+
         <main class="py-4">
 
             @yield('content')

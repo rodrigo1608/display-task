@@ -5,34 +5,6 @@
 
         <div class="row vh-100">
 
-            <div class="col-md-2 border-end">
-
-                <ul class="list-group poppins">
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu Perfil</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu dia</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Minha semana</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu mês</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item active" aria-current="true">Painel geral</li>
-                    </a>
-
-                </ul>
-
-            </div>
-
             <div class="col-md-9 container" style="position:relative">
 
                 <div class="row">
@@ -65,13 +37,6 @@
                         });
                     </script>
 
-                    <div
-                        class="col-md-1 profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
-
-                        <img class="img-size" src="{{ asset('storage/' . $currentUser->profile_picture) }}"
-                            alt="Imagem do usuário">
-
-                    </div>
 
                     <div class='col-md-5 ms-4 text-start'>
 
