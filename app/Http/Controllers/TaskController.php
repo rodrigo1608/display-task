@@ -73,7 +73,7 @@ class TaskController extends Controller
         $recurrencePatterns = getRecurrencePatterns($request->all());
 
         //rodrigo
-        // dd($recurrencePatterns['specific_date']);
+        // dd($recurrencePatterns);
 
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
 
@@ -82,7 +82,7 @@ class TaskController extends Controller
 
         if ($isSpecificDayPattern) {
 
-            $conflict = getConflictingTask($request->all(), 'specific_date',   $recurrencePatterns['specific_date']);
+            $conflict = getConflictingTask($request->all(), 'specific_date');
 
             if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
                 return $conflict;
@@ -351,20 +351,24 @@ class TaskController extends Controller
         if ($isSpecificDayPattern) {
 
             $inputData = $request->all() + $recurrencePatterns;
-            // dd($id);
-            $conflict = getConflictingTask($inputData, 'specific_date', $recurrencePatterns['specific_date'], $id);
+
+            //rodrigo
+            // dd($inputData);
+
+            $conflict = getConflictingTask($inputData, 'specific_date', $id);
 
             if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
                 return $conflict;
             }
-        }
+        } else {
 
-        foreach (array_keys($recurrencePatterns) as $pattern) {
+            foreach (array_keys($recurrencePatterns) as $pattern) {
 
-            $conflict = getConflictingTask($request,  $pattern, $id);
+                $conflict = getConflictingTask($request,  $pattern, $id);
 
-            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
-                return $conflict;
+                if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                    return $conflict;
+                }
             }
         }
 

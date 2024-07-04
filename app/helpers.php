@@ -158,27 +158,30 @@ if (!function_exists('getWeekDayName')) {
 
 if (!function_exists('getRecurringTask')) {
 
-    function getRecurringTask(Builder $query, $recurrencePattern, $inputData)
+    function getRecurringTask(Builder $query, $recurrencePattern, $inputData = null)
     {
-        // dd($recurrencePattern);
+        //rodrigo
+        // dd($inputData);
 
         $weekDayOfSpecificDate = null;
 
         $hasSpecificDate = $inputData['specific_date'] !== null;
 
-        $date = $hasSpecificDate ? $inputData['specific_date'] : null;
+        $date = $inputData['specific_date'];
 
         $weekDayOfSpecificDate = $hasSpecificDate ? getWeekDayName($date) : null;
 
+        // dd($date);
+
         return $hasSpecificDate
             ?
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($date,    $weekDayOfSpecificDate) {
-
-                $taskReminderRecurringQuery->where('specific_date', $date)->orWhere($weekDayOfSpecificDate, 'true');
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($date, $weekDayOfSpecificDate) {
+                // dd($taskReminderRecurringQuery);
+                $taskReminderRecurringQuery->where('specific_date', $date)->orWhere($weekDayOfSpecificDate, "true");
             })
             :
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
-
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern, $weekDayOfSpecificDate) {
+                // dd($recurrencePattern);
                 $taskReminderRecurringQuery->where('specific_date_weekday',   $recurrencePattern)->orWhere($recurrencePattern, 'true');
             });
     }
@@ -245,8 +248,6 @@ if (!function_exists('getConflictingTask')) {
     {
         $userID = auth()->id();
 
-        dd($currentTaskID);
-
         // dd($inputData);
 
         // Primeiramente, a consulta deve ignorar a tarefa que já foi criada para, no caso de algum usuário aceitá-la, não gerar conflito de sobreposição
@@ -257,7 +258,7 @@ if (!function_exists('getConflictingTask')) {
 
                 $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
 
-                    $query->where('user_id', $userID);
+                    $query->where('user_id', $userID)->where('status', 'accepted');
                 });
 
                 // Como as recorrências são vinculadas aos lembretes, a consulta passará pela tabela reminders antes de acessar a tabela recurrings
@@ -271,7 +272,9 @@ if (!function_exists('getConflictingTask')) {
                 addDurationOverlapQuery($taskRecurringsDurtionQuery, $inputData);
             });
 
-        $conflictingTask = $conflictingTaskBuilder->first() ?? null;
+        // dd($conflictingTaskBuilder->toSql(), $conflictingTaskBuilder->getBindings());
+
+        $conflictingTask = $conflictingTaskBuilder->first();
 
         $hasConflictingTask = $conflictingTaskBuilder->exists();
 
