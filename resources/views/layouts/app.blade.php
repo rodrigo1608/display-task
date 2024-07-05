@@ -49,9 +49,14 @@
 
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
 
-            <div class="container">
 
-                <a class="navbar-brand poppins-regular font-black" href="{{ url('/') }}">
+
+            <div class="container-fluid">
+
+                <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">+</button>
+
+                <a class="navbar-brand poppins-regular ms-5 font-black" href="{{ url('/') }}">
                     {{ config('app.name', 'Tela tarefa') }}
                 </a>
 
@@ -66,9 +71,10 @@
                     <ul class="navbar-nav me-auto">
 
                         @auth
+
                             <div class="dropdown">
 
-                                <button class="btn btn-secondary" type="button" id="dropdownMenuButtonEvent"
+                                <button class="btn btn-secondary ms-5" type="button" id="dropdownMenuButtonEvent"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     Criar evento
                                 </button>
@@ -183,79 +189,78 @@
 
         </nav>
 
-        <button class="btn btn-primary m-5" type="button" data-bs-toggle="offcanvas"
-            data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">+</button>
+        @if (Auth::check())
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+                aria-labelledby="offcanvasWithBothOptionsLabel">
 
-        <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
-            aria-labelledby="offcanvasWithBothOptionsLabel">
+                <div class="w-100 text-end">
+                    <button type="button" class="btn-close me-4 mt-4" data-bs-dismiss="offcanvas"
+                        aria-label="Close"></button>
+                </div>
 
-            <div class="w-100 text-end">
-                <button type="button" class="btn-close me-4 mt-4" data-bs-dismiss="offcanvas"
-                    aria-label="Close"></button>
-            </div>
+                <div class="offcanvas-header">
 
-            <div class="offcanvas-header">
+                    <div class="w-100 d-flex flex-column ps-4">
 
-                <div class="w-100 d-flex flex-column ps-4">
+                        <div
+                            class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
 
-                    <div
-                        class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
+                            <img class="img-size" src="{{ asset('storage/' . $user->profile_picture) }}"
+                                alt="Imagem do usuário">
 
-                        <img class="img-size" src="{{ asset('storage/' . $currentUser->profile_picture) }}"
-                            alt="Imagem do usuário">
+                        </div>
 
-                    </div>
+                        <div class='mt-2 text-start'>
 
-                    <div class='mt-2 text-start'>
+                            <h2 class="fs-4 poppins-medium m-0 p-0">
+                                {{ $user->name }}
+                                {{ $user->lastname }}
+                            </h2>
 
-                        <h2 class="fs-4 poppins-medium m-0 p-0">
-                            {{ $currentUser->name }}
-                            {{ $currentUser->lastname }}
-                        </h2>
+                            <p class="fs-5 roboto">{{ $user->role }} </p>
 
-                        <p class="fs-5 roboto">{{ $currentUser->role }} </p>
+                            <p class="fs-5 roboto m-0 p-0">{{ $user->email }} </p>
 
-                        <p class="fs-5 roboto m-0 p-0">{{ $currentUser->email }} </p>
+                            <p class="fs-5 roboto m-0">{{ $user->telephone }} </p>
+                        </div>
 
-                        <p class="fs-5 roboto m-0">{{ $currentUser->telephone }} </p>
                     </div>
 
                 </div>
 
+                <div class="offcanvas-body">
+
+
+                    <ul class="list-group poppins">
+
+                        <a href="{{ route('home') }}" class="side-link">
+                            <li class="list-group-item">Início</li>
+                        </a>
+
+                        <a href="#" class="side-link">
+                            <li class="list-group-item">Meu dia</li>
+                        </a>
+
+                        <a href="#" class="side-link">
+                            <li class="list-group-item">Minha semana</li>
+                        </a>
+
+                        <a href="#" class="side-link">
+                            <li class="list-group-item">Meu mês</li>
+                        </a>
+
+                        <a href="#" class="side-link">
+                            <li class="list-group-item active" aria-current="true">Painel geral</li>
+                        </a>
+
+                    </ul>
+
+
+                </div>
             </div>
+        @endif
 
-            <div class="offcanvas-body">
-
-
-                <ul class="list-group poppins">
-
-                    <a href="{{ route('home') }}" class="side-link">
-                        <li class="list-group-item">Início</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu dia</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Minha semana</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu mês</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item active" aria-current="true">Painel geral</li>
-                    </a>
-
-                </ul>
-
-
-            </div>
-        </div>
-
-        <main class="py-4">
+        <main class="">
 
             @yield('content')
 

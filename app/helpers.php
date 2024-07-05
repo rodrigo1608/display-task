@@ -325,3 +325,16 @@ if (!function_exists('getConflictingTask')) {
         }
     }
 }
+
+
+if (!function_exists('getRecurringTasks')) {
+
+    function getRecurringTasks($pattern, $query)
+    {
+        return $query->with('reminder', 'reminder.recurring')->whereHas('reminder', function ($reminderQuery) use ($pattern) {
+            $reminderQuery->whereHas('recurring', function ($reminderRecurringQuery) use ($pattern) {
+                $reminderRecurringQuery->where($pattern, 'true');
+            });
+        });
+    }
+}

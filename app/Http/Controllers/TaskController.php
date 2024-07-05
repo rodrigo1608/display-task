@@ -168,7 +168,7 @@ class TaskController extends Controller
 
             'specific_date' => $request->specific_date ?? null,
 
-            'specific_date_weekday' => getWeekDayName($request->specific_date) ?? null,
+            'specific_date_weekday' => $isSpecificDayPattern ? getWeekDayName($request->specific_date) : null,
 
             'sunday' => $request->sunday ?? 'false',
 

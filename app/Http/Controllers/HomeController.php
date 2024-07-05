@@ -13,7 +13,6 @@ use App\Models\User;
 
 use Carbon\Carbon;
 
-
 class HomeController extends Controller
 {
     /**
@@ -32,106 +31,122 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
 
-    public function index()
+    public function index($recurrencePattern = 'tuesday')
     {
 
-        $daysInMonth = Carbon::now()->daysInMonth;
+        // $daysInMonth = Carbon::now()->daysInMonth;
 
-        $dayOfWeek = strtolower(Carbon::now()->format('l'));
+        // $dayOfWeek = strtolower(Carbon::now()->format('l'));
 
-        $today = Carbon::today()->format('Y-m-d');
+        // $today = Carbon::today()->format('Y-m-d');
         // Rodrigo
         // dd($today);
 
-        $isThereAnyUser = Auth::check();
+        // $isThereAnyUser = Auth::check();
+
+        $currentUserID = Auth::id();
 
         $currentUserReminders = Reminder::whereNotNull('user_id')->where('user_id', auth()->id())->get();
 
         $isThereAnyReminder = $currentUserReminders->isNotEmpty();
 
-        $currentUser = Auth::user();
+        // $currentUser = Auth::user();
 
-        $currentUserID = $currentUser->id;
-
-        $currentUser->telephone = getFormatedTelephone($currentUser);
-
-        $myTasksBuilder = Task::whereHas('participants', function ($query) use ($currentUserID) {
-
+        $currentUserTasksBuilder = Task::with('participants')->whereHas('participants', function ($query) use ($currentUserID) {
             $query->where('user_id', $currentUserID)
                 ->where('status', 'accepted');
         })->orWhere('created_by', $currentUserID);
 
-        $myTasksToday = $myTasksBuilder->whereHas('reminder', function ($query) use ($today, $dayOfWeek) {
+        $isASpecificRecurrence = $recurrencePattern === "spec";
 
-            $query->whereHas('recurring', function ($recurringQuery) use ($today, $dayOfWeek) {
+        $currentUserPatternsTasks = null;
 
-                $recurringQuery->where('specific_date', $today)
-                    ->orWhere($dayOfWeek, true);
-            });
-        })->get();
+        if ($isASpecificRecurrence) {
 
-        $myTasks =  $myTasksBuilder->get();
-
-        foreach ($myTasks as $task) {
-
-            // rodrigo
-            // dd($task);
-
-            $duration = Duration::where('task_id', $task->id)->where('user_id', $currentUserID)->first();
-
-            $durationExist = $duration !== null;
-
-            // rodrigo
-            // dd($duration->start);
-
-            $task['start'] = $durationExist ? Carbon::parse($duration->start)->format('H:i') : null;
-
-            $task['end'] = $durationExist ? Carbon::parse($duration->end)->format('H:i') : null;
-
-            $currentTime = Carbon::now();
-
-            // $timeDifference = $currentTime->diffForHumans($duration->start, [
-            //     'parts' => 2,
-            //     'join' => true,
-            //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-            // ]);
-            // $task['time_difference'] = $timeDifference;
+            $currentUserPatternsTasks = $currentUserTasksBuilder->with('reminder', 'reminder.recurring')->whereHas('reminder', function ($currentUserTasksReminderQuery) {
+                $currentUserTasksReminderQuery->whereHas('recurring', function ($currentUserTasksReminderRecurringQuery) {
+                    $currentUserTasksReminderRecurringQuery->whereNotNull('specific_date');
+                });
+            })->get();
+        } else {
+            $currentUserPatternsTasks = getRecurringTasks($recurrencePattern, $currentUserTasksBuilder)->get();
         }
 
-        foreach ($myTasksToday as $task) {
+        // dd($currentUserPatternsTasks);
 
-            // Rodrigo
-            // dd($task->reminder->recurring);
+        // dd($currentUserSpecificDateTasks->all());
 
-            $duration = Duration::where('task_id', $task->id)->where('user_id', $currentUserID)->first();
+        // $myTasksToday = $currentUserTasksBuilder->whereHas('reminder', function ($query) use ($today, $dayOfWeek) {
 
-            $durationExist = $duration !== null;
+        //     $query->whereHas('recurring', function ($recurringQuery) use ($today, $dayOfWeek) {
 
-            // Rodrigo
-            // dd($duration);
+        //         $recurringQuery->where('specific_date', $today)
+        //             ->orWhere($dayOfWeek, true);
+        //     });
+        // })->get();
 
-            if ($durationExist) {
+        // $currentUserTasks = $currentUserTasksBuilder->get();
 
-                // rodrigo
-                // dd(Carbon::parse($duration->start));
+        // foreach ($currentUserTasks as $task) {
 
-                $startTime = Carbon::parse($duration->start);
+        //     // rodrigo
+        //     // dd($task);
 
-                $task['start'] =  $startTime;
+        //     $duration = Duration::where('task_id', $task->id)->where('user_id', $currentUserID)->first();
 
-                $endTime = Carbon::parse($duration->end);
+        //     $durationExist = $duration !== null;
 
-                $task['end'] = $endTime;
+        //     // rodrigo
+        //     // dd($duration->start);
 
-                $currentTime = Carbon::now();
+        //     $task['start'] = $durationExist ? Carbon::parse($duration->start)->format('H:i') : null;
 
-                $timeDifferenceInMinutes = $startTime->diffInMinutes($currentTime, false); // Add false to keep the negative value if startTime is in the past
+        //     $task['end'] = $durationExist ? Carbon::parse($duration->end)->format('H:i') : null;
 
-                $task['time_difference'] = $timeDifferenceInMinutes;
+        //     $currentTime = Carbon::now();
 
-                // dd($task['time_difference']);
-            }
-        }
+        //     // $timeDifference = $currentTime->diffForHumans($duration->start, [
+        //     //     'parts' => 2,
+        //     //     'join' => true,
+        //     //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
+        //     // ]);
+        //     // $task['time_difference'] = $timeDifference;
+        // }
+
+        // foreach ($myTasksToday as $task) {
+
+        //     // Rodrigo
+        //     // dd($task->reminder->recurring);
+
+        //     $duration = Duration::where('task_id', $task->id)->where('user_id', $currentUserID)->first();
+
+        //     $durationExist = $duration !== null;
+
+        //     // Rodrigo
+        //     // dd($duration);
+
+        //     if ($durationExist) {
+
+        //         // rodrigo
+        //         // dd(Carbon::parse($duration->start));
+
+        //         $startTime = Carbon::parse($duration->start);
+
+        //         $task['start'] =  $startTime;
+
+        //         $endTime = Carbon::parse($duration->end);
+
+        //         $task['end'] = $endTime;
+
+        //         $currentTime = Carbon::now();
+
+        //         $timeDifferenceInMinutes = $startTime->diffInMinutes($currentTime, false); // Add false to keep the negative value if startTime is in the past
+
+        //         $task['time_difference'] = $timeDifferenceInMinutes;
+
+        //         // dd($task['time_difference']);
+        //     }
+        // }
 
         // $startTime = Carbon::parse($task->start);
 
@@ -143,6 +158,6 @@ class HomeController extends Controller
         //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
         // ]);
 
-        return view('home', compact('isThereAnyReminder', 'myTasks', 'myTasksToday', 'currentUser', 'currentUserReminders'));
+        return view('home', compact('isThereAnyReminder', 'myTasks', 'currentUser', 'currentUserReminders'));
     }
 }

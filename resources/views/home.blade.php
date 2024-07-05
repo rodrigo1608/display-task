@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
+
+    <div class="container">
 
         <div class="row vh-100">
 
@@ -37,23 +38,64 @@
                         });
                     </script>
 
-
-                    <div class='col-md-5 ms-4 text-start'>
-
-                        <h2 class="fs-1 poppins-medium m-0 p-0">
-                            {{ $currentUser->name }}
-                            {{ $currentUser->lastname }}
-                        </h2>
-
-                        <p class="fs-5 roboto">{{ $currentUser->role }} </p>
-
-                        <p class="fs-5 roboto">{{ $currentUser->email }} </p>
-
-                        <p class="fs-5 roboto m-0">{{ $currentUser->telephone }} </p>
-
-                        {{-- <a href="{{ route('user.edit', auth()->id()) }}" class="btn btn-primary mt-4">Editar</a> --}}
-
+                    <div class="row mt-5">
+                        <h2 class="fs-4">Visão Geral</h2>
                     </div>
+
+                    {{-- <div class='col-md-8'>
+
+                        <div class="accordion accordion-flush" id="accordionFlushExample">
+
+                            <div class="d-flex flex-row">
+                                <form action="" method="get">
+
+                                    @csrf
+
+                                    <select class="form-select form-select-sm border-none"
+                                        aria-label="Small select example">
+                                        <option selected disabled>Filtrar por recorrência</option>
+                                        <option value="spec">Dias específicos</option>
+                                        <option value="sun">Domingos</option>
+                                        <option value="mon">Segundas</option>
+                                        <option value="tues">Terças</option>
+                                        <option value="wed">Quartas</option>
+                                        <option value="thurs">Quintas</option>
+                                        <option value="fri">Sextas</option>
+                                        <option value="satur">Sábados</option>
+                                    </select>
+                                </form>
+
+                                <button class="btn btn-primary ms-1 py-0">
+                                    Filtrar
+                                </button>
+                            </div>
+
+                            @foreach ($myTasks as $index => $myTask)
+                                <div class="accordion-item">
+
+                                    <h2 class="accordion-header">
+
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
+                                            aria-controls="flush-collapseOne">
+                                            @php
+
+                                            @endphp
+                                            {{ $myTask->reminder->recurring }}
+                                        </button>
+
+                                    </h2>
+                                    <div id="flush-collapse{{ $index }}" class="accordion-collapse collapse"
+                                        data-bs-parent="#accordionFlushExample">
+                                        <div class="accordion-body">Placeholder content for this accordion, which is
+                                            intended to
+                                            demonstrate the <code>.accordion-flush</code> class. This is the first item's
+                                            accordion body.</div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div> --}}
 
                     @if ($isThereAnyReminder)
                         <div class='col-md-2 text-start'>
@@ -78,41 +120,12 @@
                     @endif
 
                 </div>
-                <div class="row mt-5">
 
-                    <h2 class="fs-2">Meu dia</h2>
-                </div>
                 <div class="row">
                     <div class="col-md-8 p-0">
 
                         <div class="row">
-                            <p>exemplo</p>
-                            @foreach ($myTasksToday as $task)
-                                <div class="m-3 rounded bg-white p-2 shadow" style="max-width: 18rem;">
 
-                                    <div class="h4 border-bottom mb-4 border-2 border-black pb-2">
-                                        {{ $task->title }}
-                                    </div>
-
-                                    <div class="">
-
-                                        <h5 class="roboto">Início: {{ $task->start_time }}</h5>
-
-                                        @php
-
-                                            $startTime = \Carbon\Carbon::parse($task->start_time);
-                                            $currentTime = \Carbon\Carbon::now();
-                                            $timeDifference = $startTime->diffForHumans($currentTime, [
-                                                'parts' => 2,
-                                                'join' => true,
-                                                'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-                                            ]);
-                                        @endphp
-
-                                        <p class="card-text">Começará: {{ $timeDifference }}</p>
-                                    </div>
-                                </div>
-                            @endforeach
                         </div>
 
                     </div>
