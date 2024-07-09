@@ -31,18 +31,41 @@ class HomeController extends Controller
      * @return \Illuminate\Contracts\Support\Renderable
      */
 
-    public function index($recurrencePattern = 'tuesday')
+    public function index(Request $request)
     {
+
+        $selectedDate = $request->input('specific_date');
+
+        $today = Carbon::today()->format('Y-m-d');
+
+        // dd($today);
+
+        if (is_null($selectedDate)) {
+
+            $selectedDate = $today;
+        }
+
+        $isToday = $selectedDate == $today;
+
+        // if ($selectedDate != $today) {
+        //     dd($selectedDate);
+        // }
+
+        $weekDayOfSelectDate = getWeekDayName($selectedDate);
+
+        $labelOverview = $isToday ? 'Agenda de hoje' : "Tarefas de $weekDayOfSelectDate";
+
+        // dd($weekDayOfSelectDate);
 
         // $daysInMonth = Carbon::now()->daysInMonth;
 
         // $dayOfWeek = strtolower(Carbon::now()->format('l'));
 
-        // $today = Carbon::today()->format('Y-m-d');
         // Rodrigo
         // dd($today);
 
         // $isThereAnyUser = Auth::check();
+
 
         $currentUserID = Auth::id();
 
@@ -52,29 +75,104 @@ class HomeController extends Controller
 
         // $currentUser = Auth::user();
 
-        $currentUserTasksBuilder = Task::with('participants')->whereHas('participants', function ($query) use ($currentUserID) {
+        $currentUserTasksBuilder = Task::with('participants', 'durations')->whereHas('participants', function ($query) use ($currentUserID) {
             $query->where('user_id', $currentUserID)
                 ->where('status', 'accepted');
         })->orWhere('created_by', $currentUserID);
 
-        $isASpecificRecurrence = $recurrencePattern === "spec";
+        $selectedCurrentUserTasks = null;
 
-        $currentUserPatternsTasks = null;
+        // $selectedCurrentUserTasks = $currentUserTasksBuilder->with('reminder', 'reminder.recurring',)->whereHas('reminder', function ($currentUserTasksReminderQuery) use ($selectedDate, $weekDayOfSelectDate) {
+        //     $currentUserTasksReminderQuery->whereHas('recurring', function ($currentUserTasksReminderRecurringQuery) use ($selectedDate, $weekDayOfSelectDate) {
+        //         $currentUserTasksReminderRecurringQuery->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+        //             $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
+        //         })->orWhere($weekDayOfSelectDate, 'true');
+        //     });
+        // })->join('durations', function ($join) use ($currentUserID) {
+        //     $join->on('tasks.id', '=', 'durations.task_id')
+        //         ->where('durations.user_id', '=', $currentUserID);
+        // })->orderBy('durations.start', 'asc')
+        //     ->get();
 
-        if ($isASpecificRecurrence) {
+        // $selectedCurrentUserTasks = Task::with('reminder', 'reminder.recurring', 'participants', 'reminder.notificationTimes')
+        //     ->join('durations', function ($join) use ($currentUserID) {
+        //         $join->on('tasks.id', '=', 'durations.task_id')
+        //             ->where('durations.user_id', '=', $currentUserID);
+        //     })
+        //     ->join('reminders', 'tasks.id', '=', 'reminders.task_id')
+        //     ->join('recurrings', 'reminders.id', '=', 'recurrings.reminder_id')
+        //     ->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+        //         $query->where('recurrings.specific_date', $selectedDate)
+        //             ->orWhere('recurrings.' . $weekDayOfSelectDate, 'true');
+        //     })
+        //     ->orderBy('durations.start', 'asc')
+        //     ->get();
 
-            $currentUserPatternsTasks = $currentUserTasksBuilder->with('reminder', 'reminder.recurring')->whereHas('reminder', function ($currentUserTasksReminderQuery) {
-                $currentUserTasksReminderQuery->whereHas('recurring', function ($currentUserTasksReminderRecurringQuery) {
-                    $currentUserTasksReminderRecurringQuery->whereNotNull('specific_date');
+        $selectedCurrentUserTasks = $currentUserTasksBuilder->with([
+            'reminder',
+            'reminder.recurring',
+            'reminder.notificationTimes',
+            'durations' => function ($query) use ($currentUserID) {
+
+                $query->where('user_id', $currentUserID)->orderBy('start', 'asc');
+            }
+        ])
+            ->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+
+                $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+
+                    $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+
+                        $query->where('specific_date', $selectedDate)
+                            ->where('specific_date_weekday', $weekDayOfSelectDate);
+                    })->orWhere($weekDayOfSelectDate, 'true');
                 });
             })->get();
-        } else {
-            $currentUserPatternsTasks = getRecurringTasks($recurrencePattern, $currentUserTasksBuilder)->get();
+
+        // Ordenar tarefas pela duração 'start' do usuário logado
+        $selectedCurrentUserTasks = $selectedCurrentUserTasks->sortBy(function ($task) use ($currentUserID) {
+            return $task->durations->where('user_id', $currentUserID)->first()->start ?? '23:59:59';
+        });
+
+        // dd($selectedCurrentUserTasks);
+
+        foreach ($selectedCurrentUserTasks as $task) {
+
+            $notificationTimes =  $task->reminder->notificationTimes->getAttributes();
+
+            $isNotificationTimeMissing = empty($notificationTimes['specific_notification_time']) &&
+                $notificationTimes['half_an_hour_before'] === "false" &&
+                $notificationTimes['one_hour_before'] === "false" &&
+                $notificationTimes['two_hours_before'] === "false" &&
+                $notificationTimes['one_day_earlier'] === "false";
+
+            $task->isNotificationTimeMissing = $isNotificationTimeMissing;
+
+            if ($task->participants->isEmpty()) {
+
+                $task->emailsParticipants = "Nenhum participante";
+            } else {
+                // Concatena os e-mails dos participantes
+                $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
+            }
+
+            $task->start = substr($task->durations[0]->start, 0, 5);
+            $task->end =  substr($task->durations[0]->end, 0, 5);
+
+            $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
         }
 
-        // dd($currentUserPatternsTasks);
+        // dd($selectedCurrentUserTasks);
 
-        // dd($currentUserSpecificDateTasks->all());
+        // dd($selectedCurrentUserTasks);
+
+        // else {
+        //     $selectedCurrentUserTasks = getRecurringTasks($recurrencePattern, $currentUserTasksBuilder)->get();
+        // }
+
+        return view('home', compact('isThereAnyReminder', 'selectedCurrentUserTasks', 'currentUserReminders', 'labelOverview'));
+
+        // dd($selectedCurrentUserTasks);
 
         // $myTasksToday = $currentUserTasksBuilder->whereHas('reminder', function ($query) use ($today, $dayOfWeek) {
 
@@ -158,6 +256,6 @@ class HomeController extends Controller
         //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
         // ]);
 
-        return view('home', compact('isThereAnyReminder', 'myTasks', 'currentUser', 'currentUserReminders'));
+
     }
 }

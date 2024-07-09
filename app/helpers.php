@@ -326,7 +326,6 @@ if (!function_exists('getConflictingTask')) {
     }
 }
 
-
 if (!function_exists('getRecurringTasks')) {
 
     function getRecurringTasks($pattern, $query)

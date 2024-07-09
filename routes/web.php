@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 Auth::routes(['verify' => true]);
 
-Route::get('/home/{recurrencePattern?}', [HomeController::class, 'index'])->name('home');
+Route::get('/home/{selectedDate?}', [HomeController::class, 'index'])->name('home');
 
 Route::resource('reminder', ReminderController::class);
 

@@ -49,12 +49,12 @@
 
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
 
-
-
             <div class="container-fluid">
 
-                <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">+</button>
+                @if (Auth::check())
+                    <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">+</button>
+                @endif
 
                 <a class="navbar-brand poppins-regular ms-5 font-black" href="{{ url('/') }}">
                     {{ config('app.name', 'Tela tarefa') }}
@@ -233,11 +233,11 @@
 
                     <ul class="list-group poppins">
 
-                        <a href="{{ route('home') }}" class="side-link">
-                            <li class="list-group-item">Início</li>
-                        </a>
+                        @php
+                            $today = Carbon\Carbon::today()->format('Y-m-d');
+                        @endphp
 
-                        <a href="#" class="side-link">
+                        <a href="{{ route('home', ['selectedDate' => $today]) }}" class="side-link">
                             <li class="list-group-item">Meu dia</li>
                         </a>
 

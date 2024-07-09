@@ -15,7 +15,7 @@ return new class extends Migration
 
             $table->id();
 
-            $table->enum('status', ['accepted', 'pending'])->default('pending');
+            $table->enum('status', ['accepted', 'pending', 'refused'])->default('pending');
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');

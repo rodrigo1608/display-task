@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
     <div class="container">
 
         <div class="row vh-100">
@@ -39,88 +38,113 @@
                     </script>
 
                     <div class="row mt-5">
-                        <h2 class="fs-4">Visão Geral</h2>
-                    </div>
 
-                    {{-- <div class='col-md-8'>
+                        <div class='col-md-8'>
 
-                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                            <div class="d-flex justify-content-between flex-row">
 
-                            <div class="d-flex flex-row">
-                                <form action="" method="get">
+                                <h2 class="fs-3 me-1">{{ $labelOverview }}</h2>
 
+                                <form action="{{ route('home') }}" method="get">
                                     @csrf
+                                    <div class="d-flex flex-row">
+                                        <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
+                                            value="{{ old('specific_date', Carbon\Carbon::now()->format('Y-m-d')) }}"
+                                            min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
 
-                                    <select class="form-select form-select-sm border-none"
-                                        aria-label="Small select example">
-                                        <option selected disabled>Filtrar por recorrência</option>
-                                        <option value="spec">Dias específicos</option>
-                                        <option value="sun">Domingos</option>
-                                        <option value="mon">Segundas</option>
-                                        <option value="tues">Terças</option>
-                                        <option value="wed">Quartas</option>
-                                        <option value="thurs">Quintas</option>
-                                        <option value="fri">Sextas</option>
-                                        <option value="satur">Sábados</option>
-                                    </select>
+                                        <button class="btn btn-secondary ms-1 py-0">
+                                            Enviar
+                                        </button>
+                                    </div>
+
                                 </form>
 
-                                <button class="btn btn-primary ms-1 py-0">
-                                    Filtrar
-                                </button>
                             </div>
 
-                            @foreach ($myTasks as $index => $myTask)
-                                <div class="accordion-item">
+                            <div class="accordion mt-4" id="accordionFlushExample">
 
-                                    <h2 class="accordion-header">
+                                @foreach ($selectedCurrentUserTasks as $index => $task)
+                                    <div class="accordion-item">
 
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                            data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
-                                            aria-controls="flush-collapseOne">
-                                            @php
+                                        <h2 class="accordion-header">
 
-                                            @endphp
-                                            {{ $myTask->reminder->recurring }}
-                                        </button>
+                                            <button class="accordion-button poppins-semibold collapsed" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
+                                                aria-controls="flush-collapseOne">
 
-                                    </h2>
-                                    <div id="flush-collapse{{ $index }}" class="accordion-collapse collapse"
-                                        data-bs-parent="#accordionFlushExample">
-                                        <div class="accordion-body">Placeholder content for this accordion, which is
-                                            intended to
-                                            demonstrate the <code>.accordion-flush</code> class. This is the first item's
-                                            accordion body.</div>
+                                                {{ $task->title }} - {{ $task->start }} até
+                                                {{ $task->end }}
+
+                                            </button>
+
+                                        </h2>
+
+                                        <div id="flush-collapse{{ $index }}" class="accordion-collapse collapse">
+
+                                            <div class="accordion-body">
+
+                                                <p class="roboto-light fs-5">{{ $task->reminder->notification_message }}
+                                                </p>
+
+                                                @if ($task->isNotificationTimeMissing)
+                                                    <p class="text-danger roboto fs-6">Crie um lembrete para ser lembrado
+                                                        antecipadamente, <a href="#"
+                                                            class="roboto-bold text-danger">clique
+                                                            aqui.</a></p>
+                                                @endif
+
+                                                <p class="roboto"><span class="poppins-medium">Local:</span>
+                                                    {{ $task->local }}
+                                                </p>
+
+                                                <p class="roboto"><span class="poppins-medium">Criado por:</span>
+                                                    {{ $task->creator->name }} {{ $task->creator->lastname }}
+                                                </p>
+
+                                                <p class="roboto"><span class="poppins-medium">Participantes:</span>
+                                                    {{ $task->emailsParticipants }}
+                                                </p>
+
+                                                <p class="roboto">
+                                                    {!! $task->recurringMessage !!}
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
                                     </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div> --}}
-
-                    @if ($isThereAnyReminder)
-                        <div class='col-md-2 text-start'>
-
-                            <h2 class="fs-6 poppins-medium" style="color:{{ $currentUser->color }}">
-                                Lembretes
-                            </h2>
-
-                            <ul class="roboto" style="list-style-type: circle">
-                                @foreach ($currentUserReminders->take(5) as $reminder)
-                                    <li class="">{{ $reminder->title }}</li>
                                 @endforeach
-                            </ul>
-
-                            <div class="d-flex justify-content-end">
-                                <a href="{{ route('reminder.index') }}" class="userReminders-link">
-                                    {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
-                                </a>
                             </div>
 
                         </div>
-                    @endif
+
+                        @if ($isThereAnyReminder)
+                            <div class='col-md-2 offset-2 text-start'>
+
+                                <h2 class="fs-6 poppins-medium" style="color:{{ auth()->user()->color }}">
+                                    Lembretes
+                                </h2>
+
+                                <ul class="roboto" style="list-style-type: circle">
+                                    @foreach ($currentUserReminders->take(5) as $reminder)
+                                        <li class="">{{ $reminder->title }}</li>
+                                    @endforeach
+                                </ul>
+
+                                <div class="d-flex justify-content-end">
+                                    <a href="{{ route('reminder.index') }}" class="userReminders-link">
+                                        {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
+                                    </a>
+                                </div>
+
+                            </div>
+                        @endif
+
+                    </div>
 
                 </div>
-
                 <div class="row">
                     <div class="col-md-8 p-0">
 
