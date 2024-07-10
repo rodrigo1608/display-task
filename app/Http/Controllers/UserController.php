@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -69,18 +70,24 @@ class UserController extends Controller
         // dd($request->all());
 
         $user->name = $request->input('name');
+
         $user->lastname = $request->input('lastname');
+
         $user->role = $request->input('role');
+
         $user->email = $request->input('email');
+
         $user->telephone = $request->input('telephone');
 
-        $profilePicture = $request->profile_picture ?? null;
-        if (isset($profilePicture)) {
+        if ($request->has('profile_picture')) {
 
-            $profilePicturePath = getProfilePicturePath($profilePicture, $request->email) ?? null;
+            Storage::delete($user->profile_picture);
+
+            $profilePicturePath = getProfilePicturePath($request->profile_picture, $request->email) ?? null;
 
             $user->profile_picture = $profilePicturePath;
         }
+
         // dd($profilePicturePath);
 
         if ($request->filled('color')) {

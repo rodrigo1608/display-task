@@ -140,10 +140,10 @@ if (!function_exists('getRecurringMessage')) {
                     $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $repeatingDays);
 
                     $recurringMessage .= ' e ' . $lastDay . '.';
-                } else {;
+                } else {
 
-                    $recurringMessage .=    $repeatingDays[0] === "sábado" || 'domingo'
-                        ? 'Todos os ' . $repeatingDays[0] . 's'
+                    $recurringMessage .=    ($repeatingDays[0]) === "sábado" || ($repeatingDays[0]) === 'domingo'
+                        ? 'Todos os ' . ($repeatingDays[0]) . 's'
                         : 'Todas as ' . $repeatingDays[0] . 's';
                 }
             }
@@ -345,5 +345,13 @@ if (!function_exists('getRecurringTasks')) {
                 $reminderRecurringQuery->where($pattern, 'true');
             });
         });
+    }
+}
+
+if (!function_exists('getFormatedDateBR')) {
+
+    function getFormatedDateBR($date)
+    {
+        return Carbon::parse($date)->format('d/m/Y');
     }
 }

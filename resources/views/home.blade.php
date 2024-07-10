@@ -39,28 +39,41 @@
 
                     <div class="row mt-5">
 
+                        <div class="col-md-8 d-flex justify-content-end">
+
+                            <form action="{{ route('home') }}" method="get"> @csrf
+
+                                <div class="d-flex">
+
+                                    <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
+                                        value="{{ old('specific_date', request('specific_date', Carbon\Carbon::now()->format('Y-m-d'))) }}  "
+                                        min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
+
+                                    <button class="btn btn-secondary ms-1 py-0">
+                                        Enviar
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-5">
+
+                        <div class='col-md-8'>
+                            <h2 class="fs-5 me-1">{{ $labelOverview }}</h2>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
                         <div class='col-md-8'>
 
-                            <div class="d-flex justify-content-between flex-row">
-
-                                <h2 class="fs-3 me-1">{{ $labelOverview }}</h2>
-
-                                <form action="{{ route('home') }}" method="get">
-                                    @csrf
-                                    <div class="d-flex flex-row">
-                                        <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                            value="" min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
-
-                                        <button class="btn btn-secondary ms-1 py-0">
-                                            Enviar
-                                        </button>
-                                    </div>
-
-                                </form>
-
-                            </div>
-
-                            <div class="accordion mt-4" id="accordionFlushExample">
+                            <div class="accordion" id="accordionFlushExample">
 
                                 @foreach ($selectedCurrentUserTasks as $index => $task)
                                     <div class="accordion-item">
@@ -83,11 +96,13 @@
 
                                             <div class="accordion-body">
 
-                                                <p class="roboto-light fs-5">{{ $task->reminder->notification_message }}
+                                                <p class="roboto-light fs-5">
+                                                    {{ $task->reminder->notification_message }}
                                                 </p>
 
                                                 @if ($task->isNotificationTimeMissing)
-                                                    <p class="text-danger roboto fs-6">Crie um lembrete para ser lembrado
+                                                    <p class="text-danger roboto fs-6">Crie um lembrete para ser
+                                                        lembrado
                                                         antecipadamente, <a href="#"
                                                             class="roboto-bold text-danger">clique
                                                             aqui.</a></p>
@@ -120,9 +135,9 @@
                         </div>
 
                         @if ($isThereAnyReminder)
-                            <div class='col-md-2 offset-2 text-start'>
+                            <div class='col-md-3 offset-1 text-start'>
 
-                                <h2 class="fs-6 poppins-medium" style="color:{{ auth()->user()->color }}">
+                                <h2 class="fs-5 poppins-medium" style="color:{{ auth()->user()->color }}">
                                     Lembretes
                                 </h2>
 
@@ -141,24 +156,16 @@
                             </div>
                         @endif
 
+
+
                     </div>
 
                 </div>
-                <div class="row">
-                    <div class="col-md-8 p-0">
 
-                        <div class="row">
-
-                        </div>
-
-                    </div>
-                </div>
             </div>
 
+
         </div>
-
-
-    </div>
 
     </div>
 
