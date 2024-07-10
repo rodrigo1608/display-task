@@ -38,6 +38,7 @@ class HomeController extends Controller
 
         $today = Carbon::today()->format('Y-m-d');
 
+        //Rodrigo
         // dd($today);
 
         if (is_null($selectedDate)) {
@@ -47,94 +48,57 @@ class HomeController extends Controller
 
         $isToday = $selectedDate == $today;
 
+        //Rodrigo
         // if ($selectedDate != $today) {
-        //     dd($selectedDate);
+        //     dd($isToday);
         // }
 
         $weekDayOfSelectDate = getWeekDayName($selectedDate);
 
-        $labelOverview = $isToday ? 'Agenda de hoje' : "Tarefas de $weekDayOfSelectDate";
+        $weekdayInPortuguese = getDayOfWeekInPortuguese($weekDayOfSelectDate);
 
-        // dd($weekDayOfSelectDate);
+        //Rodrigo
+        // dd($weekdayInPortuguese);
 
-        // $daysInMonth = Carbon::now()->daysInMonth;
-
-        // $dayOfWeek = strtolower(Carbon::now()->format('l'));
-
-        // Rodrigo
-        // dd($today);
-
-        // $isThereAnyUser = Auth::check();
-
+        $labelOverview = $isToday ? 'Agenda de hoje' : "Agenda de $weekdayInPortuguese";
 
         $currentUserID = Auth::id();
 
-        $currentUserReminders = Reminder::whereNotNull('user_id')->where('user_id', auth()->id())->get();
+        $currentUserReminders = Reminder::whereNotNull('user_id')->where('user_id', $currentUserID)->get();
 
         $isThereAnyReminder = $currentUserReminders->isNotEmpty();
 
-        // $currentUser = Auth::user();
+        // $currentUserTasksBuilder = Task::with('participants')->whereHas('participants', function ($query) use ($currentUserID) {
 
-        $currentUserTasksBuilder = Task::with('participants', 'durations')->whereHas('participants', function ($query) use ($currentUserID) {
-            $query->where('user_id', $currentUserID)
-                ->where('status', 'accepted');
-        })->orWhere('created_by', $currentUserID);
+        //     $query->where('user_id', $currentUserID)
+        //         ->where('status', 'accepted');
+        // })->orWhere('created_by', $currentUserID);
 
-        $selectedCurrentUserTasks = null;
+        $selectedCurrentUserTasks = Task::with([
 
-        // $selectedCurrentUserTasks = $currentUserTasksBuilder->with('reminder', 'reminder.recurring',)->whereHas('reminder', function ($currentUserTasksReminderQuery) use ($selectedDate, $weekDayOfSelectDate) {
-        //     $currentUserTasksReminderQuery->whereHas('recurring', function ($currentUserTasksReminderRecurringQuery) use ($selectedDate, $weekDayOfSelectDate) {
-        //         $currentUserTasksReminderRecurringQuery->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
-        //             $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
-        //         })->orWhere($weekDayOfSelectDate, 'true');
-        //     });
-        // })->join('durations', function ($join) use ($currentUserID) {
-        //     $join->on('tasks.id', '=', 'durations.task_id')
-        //         ->where('durations.user_id', '=', $currentUserID);
-        // })->orderBy('durations.start', 'asc')
-        //     ->get();
-
-        // $selectedCurrentUserTasks = Task::with('reminder', 'reminder.recurring', 'participants', 'reminder.notificationTimes')
-        //     ->join('durations', function ($join) use ($currentUserID) {
-        //         $join->on('tasks.id', '=', 'durations.task_id')
-        //             ->where('durations.user_id', '=', $currentUserID);
-        //     })
-        //     ->join('reminders', 'tasks.id', '=', 'reminders.task_id')
-        //     ->join('recurrings', 'reminders.id', '=', 'recurrings.reminder_id')
-        //     ->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
-        //         $query->where('recurrings.specific_date', $selectedDate)
-        //             ->orWhere('recurrings.' . $weekDayOfSelectDate, 'true');
-        //     })
-        //     ->orderBy('durations.start', 'asc')
-        //     ->get();
-
-        $selectedCurrentUserTasks = $currentUserTasksBuilder->with([
+            'participants',
             'reminder',
             'reminder.recurring',
             'reminder.notificationTimes',
-            'durations' => function ($query) use ($currentUserID) {
+            'durations'
 
-                $query->where('user_id', $currentUserID)->orderBy('start', 'asc');
-            }
-        ])
-            ->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+        ])->whereHas('participants', function ($query) use ($currentUserID) {
 
-                $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+            $query->where(function ($query) use ($currentUserID) {
+                $query->where('user_id', $currentUserID)
+                    ->where('status', 'accepted');
+            })->orWhere('created_by', $currentUserID);
+        })->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
-                    $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+            $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
-                        $query->where('specific_date', $selectedDate)
-                            ->where('specific_date_weekday', $weekDayOfSelectDate);
-                    })->orWhere($weekDayOfSelectDate, 'true');
-                });
-            })->get();
+                $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
-        // Ordenar tarefas pela duração 'start' do usuário logado
-        $selectedCurrentUserTasks = $selectedCurrentUserTasks->sortBy(function ($task) use ($currentUserID) {
-            return $task->durations->where('user_id', $currentUserID)->first()->start ?? '23:59:59';
-        });
+                    $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
+                })->orWhere($weekDayOfSelectDate, 'true');
+            });
+        })->get();
 
-        // dd($selectedCurrentUserTasks);
 
         foreach ($selectedCurrentUserTasks as $task) {
 

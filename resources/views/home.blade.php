@@ -49,8 +49,7 @@
                                     @csrf
                                     <div class="d-flex flex-row">
                                         <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                            value="{{ old('specific_date', Carbon\Carbon::now()->format('Y-m-d')) }}"
-                                            min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
+                                            value="" min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
 
                                         <button class="btn btn-secondary ms-1 py-0">
                                             Enviar

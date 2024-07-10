@@ -38,7 +38,7 @@ if (!function_exists('getDaysOfWeekInPortuguese')) {
 
     function getDaysOfWeekInPortuguese()
     {
-        return [
+        return  [
 
             'sunday' => 'domingo',
 
@@ -55,6 +55,16 @@ if (!function_exists('getDaysOfWeekInPortuguese')) {
             'saturday' => 'sábado',
 
         ];
+    }
+}
+
+if (!function_exists('getDayOfWeekInPortuguese')) {
+
+    function getDayOfWeekInPortuguese($weekDay)
+    {
+        $weekDaysInPortuguese = getDaysOfWeekInPortuguese();
+
+        return $weekDaysInPortuguese[$weekDay];
     }
 }
 
