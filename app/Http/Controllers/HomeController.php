@@ -81,18 +81,22 @@ class HomeController extends Controller
             $query->where(function ($query) use ($currentUserID) {
                 $query->where('user_id', $currentUserID)
                     ->where('status', 'accepted');
-            })->orWhere('created_by', $currentUserID);
-        })->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
-
-            $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
-
-                $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
-
-                    $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
-                })->orWhere($weekDayOfSelectDate, 'true');
             });
-        })->get();
+        })->orWhere(function ($query) use ($currentUserID) {
+            $query->where('created_by', $currentUserID);
+        })
+            ->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
+                $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+
+                    $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+
+                        $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
+                    })->orWhere($weekDayOfSelectDate, 'true');
+                });
+            })->get();
+
+        // dd($selectedCurrentUserTasks)
         $labelOverview = "";
 
         if ($selectedCurrentUserTasks->isEmpty()) {
