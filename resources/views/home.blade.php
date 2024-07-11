@@ -46,10 +46,9 @@
                                 <div class="d-flex">
 
                                     <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                        value="{{ old('specific_date', request('specific_date', Carbon\Carbon::now()->format('Y-m-d'))) }}  "
-                                        min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
+                                        value="{{ old('specific_date', request()->input('specific_date', Carbon\Carbon::now()->format('Y-m-d'))) }}">
 
-                                    <button class="btn btn-secondary ms-1 py-0">
+                                    <button type="submit" class="btn btn-secondary ms-1 py-0">
                                         Enviar
                                     </button>
 
@@ -161,12 +160,9 @@
 
             </div>
 
-
         </div>
 
-    </div>
 
-    </div>
 
     </div>
 @endsection

@@ -60,7 +60,7 @@ class HomeController extends Controller
         //Rodrigo
         // dd($weekdayInPortuguese);
 
-        $formatedselectedDate = Carbon::parse('2024-07-15');
+
 
         $currentUserID = Auth::id();
 
@@ -96,14 +96,16 @@ class HomeController extends Controller
                 });
             })->get();
 
+        //rodrigo
         // dd($selectedCurrentUserTasks)
+
         $labelOverview = "";
 
         if ($selectedCurrentUserTasks->isEmpty()) {
 
-            $labelOverview = $isToday ? "Nenhuma tarefa agendada para hoje " . getFormatedDateBR($today) : " Nenhuma tarefa agendada para este dia " . getFormatedDateBR($today) . "  $weekdayInPortuguese";
+            $labelOverview = $isToday ? "Nenhuma tarefa agendada para hoje, " . getFormatedDateBR($today) : " Nenhuma tarefa agendada para  " . getFormatedDateBR($selectedDate) . ",  $weekdayInPortuguese.";
         } else {
-            $labelOverview = $isToday ? "Agenda de hoje  " . getFormatedDateBR($today) : "Agenda de " . getFormatedDateBR($today) . "  $weekdayInPortuguese";
+            $labelOverview = $isToday ? "Agenda de hoje,  " . getFormatedDateBR($today) : "Agenda de " . getFormatedDateBR($selectedDate) . ",  $weekdayInPortuguese.";
         }
 
         foreach ($selectedCurrentUserTasks as $task) {
