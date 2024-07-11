@@ -13,7 +13,6 @@ use App\Models\User;
 
 use Carbon\Carbon;
 
-
 class HomeController extends Controller
 {
     /**
@@ -40,7 +39,7 @@ class HomeController extends Controller
         $dayOfWeek = strtolower(Carbon::now()->format('l'));
 
         $today = Carbon::today()->format('Y-m-d');
-
+        //rodrigo
         // dd($today);
 
         $isThereAnyUser = Auth::check();
@@ -81,21 +80,14 @@ class HomeController extends Controller
             $task['end_time'] = Carbon::parse($duration->end_time)->format('H:i') ?? null;
 
             $currentTime = Carbon::now();
-
-            // $timeDifference = $currentTime->diffForHumans($duration->start_time, [
-            //     'parts' => 2,
-            //     'join' => true,
-            //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-            // ]);
-            // $task['time_difference'] = $timeDifference;
         }
 
         foreach ($myTasksToday as $task) {
-
+            //Rodrigo
             // dd($task->reminder->recurring);
 
             $duration = Duration::where('task_id', $task->id)->where('user_id', $userID)->first();
-
+            //rodrigo
             // dd($duration);
 
             if ($duration) {
@@ -119,15 +111,7 @@ class HomeController extends Controller
             }
         }
 
-        // $startTime = Carbon::parse($task->start_time);
 
-        // $currentTime = Carbon::now();
-
-        // $timeDifference = $startTime->diffForHumans($currentTime, [
-        //     'parts' => 2,
-        //     'join' => true,
-        //     'syntax' => \Carbon\CarbonInterface::DIFF_RELATIVE_TO_NOW,
-        // ]);
 
         return view('home', compact('isThereAnyReminder', 'myTasks', 'myTasksToday', 'user', 'userReminders'));
     }

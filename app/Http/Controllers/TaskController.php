@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Mail\TaskInvitationMail;
 use App\Helpers\QueryHelpers;
 use App\Http\Requests\StoreTaskRequest;
-use App\Http\Requests\SetPendingTaskDuration;
+use App\Http\Requests\SetPendingTask;
 // use App\Models\NotificationTime;
 use App\Models\Attachment;
 use App\Models\Duration;
@@ -43,17 +43,7 @@ class TaskController extends Controller
     public function create()
     {
 
-        $alertOptions = [
-
-            'half_an_hour_before' => 'Meia hora antes',
-
-            'one_hour_before' => 'Uma hora antes',
-
-            'two_hours_before' => 'Duas horas antes',
-
-            'one_day_earlier' => 'Um dia antes'
-
-        ];
+        $alertOptions = getAlertOptions();
 
         $participants = User::where('id', '!=', auth()->id())->get();
 
@@ -201,9 +191,6 @@ class TaskController extends Controller
             }
         }
 
-        // $startTime = $request->start ? date('Y-m-d H:i:s', strtotime($request->start)) : null;
-        // $endTime = $request->end ? date('Y-m-d H:i:s', strtotime($request->end)) : null;
-
         Duration::create([
 
             'start' => $request->start,
@@ -214,7 +201,6 @@ class TaskController extends Controller
         ]);
 
         $participantsEmails = getParticipantsEmail($request);
-
         //Rodrigo
         // dd($participantsEmail);
 
@@ -222,11 +208,7 @@ class TaskController extends Controller
         //rodrigo
         // dd($hasAnyParticipant);
 
-        //Rodrigo
-        // dd($hasAnyParticipant);
-
         if ($hasAnyParticipant) {
-
             //Rodrigo
             // dd($hasAnyParticipant);
 
@@ -277,11 +259,13 @@ class TaskController extends Controller
         // dd($recurring);
 
         $task['recurringMessage'] = getRecurringMessage($recurring);
-
+        //rodrigo
         // dd($task->getAttributes());
 
+        $alertOptions = getAlertOptions();
+
         return $view === 'pending'
-            ?  view('tasks/showPending', compact('task'))
+            ?  view('tasks/showPending', compact('task', 'alertOptions'))
             :  view('tasks/show', compact('task'));
     }
 
@@ -325,7 +309,7 @@ class TaskController extends Controller
         return redirect('home');
     }
 
-    public function acceptPendingTask(SetPendingTaskDuration $request, string $id)
+    public function acceptPendingTask(SetPendingTask $request, string $id)
     {
         //rodrigo
         // dd($request->all());
@@ -339,18 +323,16 @@ class TaskController extends Controller
         // dd($currentTaskRecurring);
 
         $recurrencePatterns = getRecurrencePatterns($currentTaskRecurring);
-
+        //rodrigo
         // dd($recurrencePatterns);
 
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
-
         //rodrigo
         // dd($isSpecificDayPattern);
 
         if ($isSpecificDayPattern) {
 
             $inputData = $request->all() + $recurrencePatterns;
-
             //rodrigo
             // dd($inputData);
 
@@ -379,6 +361,24 @@ class TaskController extends Controller
             'end' => $endTime,
             'task_id' => $id,
             'user_id' => $currentUserID
+        ]);
+
+        $specificNotificationTime = $request->time ? date('H:i', strtotime($request->time)) : null;
+
+        NotificationTime::create([
+
+            'specific_notification_time' => $specificNotificationTime,
+
+            'half_an_hour_before' => $request->half_an_hour_before ?? 'false',
+
+            'one_hour_before' => $request->one_hour_before ?? 'false',
+
+            'two_hours_before' => $request->two_hours_before ?? 'false',
+
+            'one_day_earlier' => $request->one_day_earlier ?? 'false',
+
+            'reminder_id' => $currentTask->reminder->id
+
         ]);
 
         $participant = Participant::where('user_id', $currentUserID)->where('task_id', $id)->first();

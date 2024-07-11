@@ -355,3 +355,21 @@ if (!function_exists('getFormatedDateBR')) {
         return Carbon::parse($date)->format('d/m/Y');
     }
 }
+
+if (!function_exists('getAlertOptions')) {
+
+    function getAlertOptions()
+    {
+        return [
+
+            'half_an_hour_before' => 'Meia hora antes',
+
+            'one_hour_before' => 'Uma hora antes',
+
+            'two_hours_before' => 'Duas horas antes',
+
+            'one_day_earlier' => 'Um dia antes'
+
+        ];
+    }
+}

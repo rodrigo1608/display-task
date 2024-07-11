@@ -116,14 +116,7 @@
                                     <p class="roboto col-md-8">{!! $task->recurringMessage !!}</p>
                                 </div>
 
-                            </div>
-
-                            <div class="card-footer ps-5 pt-4">
-
-                                <form action="{{ route('task.acceptPendingTask', ['task' => $task->id]) }}" method="post">
-                                    @csrf
-                                    @method('PUT')
-
+                                <div class="row mt-3">
                                     <div class="row d-flex align-items-center mb-5">
 
                                         <p class="poppins-semibold col-md-2 mt-4">Duração: </p>
@@ -132,9 +125,9 @@
 
                                             <label class="poppins fs-6">Começar em: </label>
 
-                                            <input id="start" type="time" name="start"
-                                                class="form-control fs-6 @error('start') is-invalid @enderror text-center"
-                                                value="{{ old('start') ?? $task->start }}">
+                                            <input id="start" type="time"
+                                                class="form-control fs-6 @error('start') is-invalid @enderror border-0 text-center"
+                                                value="{{ $task->start }}">
 
                                             @error('start')
                                                 <div class="invalid-feedback position-absolute">
@@ -147,9 +140,10 @@
 
                                             <label class="poppins fs-6">Terminar em: </label>
 
-                                            <input id="end" type="time" name="end"
-                                                class="form-control fs-6 @error('end') is-invalid @enderror text-center"
-                                                value="{{ old('end') ?? $task->end }}">
+                                            <input id="end" type="time"
+                                                class="form-control fs-6 @error('end') is-invalid @enderror border-0 text-center"
+                                                value="{{ $task->end }}" readonly>
+
                                             @error('end')
                                                 <div class="invalid-feedback position-absolute">
                                                     <strong>{{ $message }}</strong>
@@ -233,18 +227,122 @@
                                             </div>
                                         @endif
 
-                                        <div class="d-flex col-md-3 offset-1 justify-content-end mt-4">
-                                            <button type="button"
-                                                class="btn btn-outline-danger poppins-regular me-4 border-2"
-                                                data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
-                                                Descartar
-                                            </button>
+                                    </div>
+                                </div>
 
-                                            <button class="btn btn-secondary fs-5">Aceitar</button>
+                            </div>
+
+                            <div class="card-footer ps-5">
+
+                                <div class="mb-5">
+
+                                    <form action="{{ route('task.acceptPendingTask', ['task' => $task->id]) }}"
+                                        method="post">
+                                        @csrf
+                                        @method('PUT')
+
+                                        <input type="hidden" id="formStart" name="start">
+                                        <input type="hidden" id="formEnd" name="end">
+
+                                        <div class="row d-flex align-items-start mt-5">
+
+                                            <div class="col-md-2">
+
+                                                <label for="time" class="poppins-regular fs-6 m-0">Horário da
+                                                    notificação</label>
+
+                                                <input id="custom-alert-time" type="time" name="time"
+                                                    class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
+                                                    value="{{ old('time') }}">
+
+                                                @error('time')
+                                                    <div class="invalid-feedback">
+                                                        <strong>{{ $message }}</strong>
+                                                    </div>
+                                                @enderror
+
+                                            </div>
+
+                                            <span class="col-md-1 mt-4 text-center">
+                                                ou
+                                            </span>
+
+                                            <div class="col-md-3 mt-3">
+                                                <div class="accordion" id="accordionPanelsStayOpenExample">
+
+                                                    <div class="accordion-item">
+
+                                                        <h2 class="accordion-header">
+
+                                                            <button class="accordion-button poppins-regular"
+                                                                type="button" data-bs-toggle="collapse"
+                                                                data-bs-target="#panelsStayOpen-collapseOne"
+                                                                aria-expanded="false"
+                                                                aria-controls="panelsStayOpen-collapseOne">
+                                                                Horário pré-definido <span
+                                                                    class="alertOptionsCounter fs-6 ms-2"></span>
+                                                            </button>
+                                                        </h2>
+
+                                                        <div id="panelsStayOpen-collapseOne"
+                                                            class="accordion-collapse collapse">
+
+                                                            <div class="accordion-body">
+
+                                                                @foreach ($alertOptions as $alertIndex => $alertValue)
+                                                                    <div class="form-check">
+
+                                                                        <input class="form-check-input alertOption"
+                                                                            type="checkbox" value="true"
+                                                                            name="{{ $alertIndex }}"
+                                                                            id="alert{{ $alertIndex }}CheckDefault"
+                                                                            {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
+
+                                                                        <label class="form-check-label"
+                                                                            for="alert{{ $alertIndex }}CheckDefault">
+                                                                            {{ $alertValue }}
+                                                                        </label>
+                                                                    </div>
+                                                                @endforeach
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="d-flex col-md-3 offset-1 justify-content-end mt-4 p-0">
+                                                <button type="button"
+                                                    class="btn btn-outline-danger poppins-regular me-4 border-2"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
+                                                    Descartar
+                                                </button>
+
+                                                <button class="btn btn-secondary fs-5">Aceitar</button>
+                                            </div>
+
                                         </div>
 
-                                    </div>
-                                </form>
+                                    </form>
+
+                                    <script>
+                                        const start = document.getElementById('start').value;
+                                        const end = document.getElementById('end').value;
+
+                                        const formStart = document.getElementById('formStart');
+                                        const formEnd = document.getElementById('formEnd');
+
+                                        formStart.value = start
+                                        formEnd.value = end
+
+                                        console.log(start, end, formStart, formEnd);
+                                    </script>
+
+                                </div>
 
                                 <div class="modal fade" id="deleteParticipantModal" tabindex="-1"
                                     aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
@@ -281,6 +379,7 @@
                                             </div>
 
                                         </div>
+
                                     </div>
 
                                 </div>
