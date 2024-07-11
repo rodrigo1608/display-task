@@ -76,28 +76,23 @@ class HomeController extends Controller
             'reminder.notificationTimes',
             'durations'
 
-        ])->whereHas('participants', function ($query) use ($currentUserID) {
-
-            $query->where(function ($query) use ($currentUserID) {
-                $query->where('user_id', $currentUserID)
-                    ->where('status', 'accepted');
+        ])->where(function ($query) use ($currentUserID) {
+            $query->where('created_by', $currentUserID)->orWhereHas('participants', function ($query) use ($currentUserID) {
+                $query->where('user_id', $currentUserID)->where('status', 'accepted');
             });
-        })->orWhere(function ($query) use ($currentUserID) {
-            $query->where('created_by', $currentUserID);
-        })
-            ->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+        })->whereHas('reminder', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
-                $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+            $query->whereHas('recurring', function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
-                    $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
+                $query->where(function ($query) use ($selectedDate, $weekDayOfSelectDate) {
 
-                        $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
-                    })->orWhere($weekDayOfSelectDate, 'true');
-                });
-            })->get();
+                    $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekDayOfSelectDate);
+                })->orWhere($weekDayOfSelectDate, 'true');
+            });
+        })->get();
 
-        //rodrigo
-        // dd($selectedCurrentUserTasks)
+        // rodrigo
+        // dd($selectedCurrentUserTasks, $selectedDate, $weekDayOfSelectDate);
 
         $labelOverview = "";
 
