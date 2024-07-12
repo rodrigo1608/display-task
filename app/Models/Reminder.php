@@ -40,6 +40,6 @@ class Reminder extends Model
 
     public function notificationTimes()
     {
-        return $this->hasOne(NotificationTime::class);
+        return $this->hasMany(NotificationTime::class);
     }
 }

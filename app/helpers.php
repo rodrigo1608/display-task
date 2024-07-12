@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use App\Models\Task;
+use App\Models\NotificationTime;
 use Illuminate\Database\Eloquent\Builder;
 
 if (!function_exists('getFormatedTelephone')) {
@@ -371,5 +372,30 @@ if (!function_exists('getAlertOptions')) {
             'one_day_earlier' => 'Um dia antes'
 
         ];
+    }
+}
+
+if (!function_exists('getNotificationQuery')) {
+
+    function getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID)
+    {
+        if ($creatorOrParticipant === 'creator') {
+            return $query->where('created_by', $currentUserID);
+        } else {
+            return $query->where('id', $taskID)->whereHas('participants', function ($query) use ($currentUserID,  $taskID) {
+
+                $query->where('user_id', $currentUserID)->where('task_id', $taskID)->where('status', 'accepted');
+            });
+        };
+    }
+}
+
+if (!function_exists('getNotificationTime')) {
+
+    function getNotificationTime($creatorOrParticipant, $currentUserID, $taskID)
+    {
+        return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
+            getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
+        })->first()->get();
     }
 }

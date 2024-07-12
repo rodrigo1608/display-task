@@ -25,7 +25,9 @@ return new class extends Migration
 
             $table->enum('one_day_earlier', ['true', 'false']);
 
-            $table->unsignedBigInteger('reminder_id');
+            $table->unsignedInteger('reminder_id');
+
+            $table->unsignedInteger('user_id');
 
             $table->foreign('reminder_id')->references('id')->on('reminders')->onUpdate('cascade')->onDelete('cascade');
 

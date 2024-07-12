@@ -21,8 +21,13 @@ class NotificationTime extends Model
 
         'one_day_earlier',
 
-        'task_id',
+        'user_id',
 
         'reminder_id'
     ];
+
+    public function reminder()
+    {
+        return $this->belongsTo(Reminder::class, 'reminder_id');
+    }
 }

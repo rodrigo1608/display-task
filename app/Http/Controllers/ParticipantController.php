@@ -16,7 +16,6 @@ class ParticipantController extends Controller
             ->where('user_id', $request->user_id)
             ->first();
 
-
         $participant->delete();
 
         $creator = $participant->task->creator->name . " " . $participant->task->creator->lastname;
