@@ -150,7 +150,9 @@ class TaskController extends Controller
 
             'one_day_earlier' => $request->one_day_earlier ?? 'false',
 
-            'reminder_id' => $task->reminder->id
+            'reminder_id' => $task->reminder->id,
+
+            'user_id' => auth()->id(),
 
         ]);
 
@@ -175,6 +177,7 @@ class TaskController extends Controller
             'saturday' => $request->saturday ?? 'false',
 
             'reminder_id' => $reminder->id,
+
 
         ]);
 
@@ -377,7 +380,9 @@ class TaskController extends Controller
 
             'one_day_earlier' => $request->one_day_earlier ?? 'false',
 
-            'reminder_id' => $currentTask->reminder->id
+            'reminder_id' => $currentTask->reminder->id,
+
+            'user_id' => auth()->id(),
 
         ]);
 

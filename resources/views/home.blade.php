@@ -9,39 +9,12 @@
 
                 <div class="row">
 
-                    @if (session('success'))
-                        <div id="success-alert" class="row" style="position:absolute; left: 20%;">
-                            <div class="alert alert-success col-md-4">
-                                {{ session('success') }}
-                            </div>
-                        </div>
-                    @endif
-
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-
-                            const alertBox = document.getElementById('success-alert');
-                            if (alertBox) {
-                                setTimeout(() => {
-
-                                    alertBox.style.transition = 'opacity 1s';
-
-                                    alertBox.style.opacity = '0';
-
-                                    setTimeout(() => {
-                                        alertBox.remove();
-                                    }, 1000);
-
-                                }, 3000);
-                            }
-                        });
-                    </script>
-
                     <div class="row mt-5">
 
                         <div class="col-md-8 d-flex justify-content-end">
 
-                            <form action="{{ route('home') }}" method="get"> @csrf
+                            <form action="{{ route('home') }}" method="get">
+                                @csrf
 
                                 <div class="d-flex">
 
@@ -134,25 +107,48 @@
                         </div>
 
                         @if ($isThereAnyReminder)
-                            <div class='col-md-3 offset-1 text-start'>
+                            <div class='col-md-4 text-start'>
+
+                                <div class="card rounded-2 mb-3 border border-2 border-black shadow-none">
+
+                                    <div class="card-header border-bottom-0 border"> Lembretes</div>
+
+                                    <div class="card-body text-secondary">
+
+                                        <ul class="roboto" style="list-style-type: circle">
+                                            @foreach ($currentUserReminders->take(5) as $reminder)
+                                                <li class="mt-2">{{ $reminder->title }}</li>
+                                            @endforeach
+                                        </ul>
+
+                                    </div>
+
+                                    <div class="card-footer border-top-0 border bg-transparent">
+
+                                        <div class="d-flex justify-content-end">
+
+                                            <a href="{{ route('reminder.index') }}" class="poppins fs-6 py-2 text-black">
+
+                                                {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
+
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            {{-- <div class='col-md-3 offset-1 text-start shadow'>
 
                                 <h2 class="fs-5 poppins-medium" style="color:{{ auth()->user()->color }}">
                                     Lembretes
                                 </h2>
 
-                                <ul class="roboto" style="list-style-type: circle">
-                                    @foreach ($currentUserReminders->take(5) as $reminder)
-                                        <li class="">{{ $reminder->title }}</li>
-                                    @endforeach
-                                </ul>
 
-                                <div class="d-flex justify-content-end">
-                                    <a href="{{ route('reminder.index') }}" class="userReminders-link">
-                                        {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
-                                    </a>
-                                </div>
 
-                            </div>
+                            </div> --}}
                         @endif
                     </div>
 

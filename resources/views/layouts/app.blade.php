@@ -189,6 +189,34 @@
 
         </nav>
 
+        @if (session('success'))
+            <div id="success-alert" class="row" style="position:absolute; top:10%; left: 50%; z-index: 1000;">
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            </div>
+        @endif
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const alertBox = document.getElementById('success-alert');
+                if (alertBox) {
+                    setTimeout(() => {
+
+                        alertBox.style.transition = 'opacity 1s';
+
+                        alertBox.style.opacity = '0';
+
+                        setTimeout(() => {
+                            alertBox.remove();
+                        }, 1000);
+
+                    }, 3000);
+                }
+            });
+        </script>
+
         @if (Auth::check())
             <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
                 aria-labelledby="offcanvasWithBothOptionsLabel">
@@ -229,7 +257,6 @@
                 </div>
 
                 <div class="offcanvas-body">
-
 
                     <ul class="list-group poppins">
 

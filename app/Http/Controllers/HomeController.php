@@ -141,34 +141,14 @@ class HomeController extends Controller
                     });
                 })->first()->getAttributes();
             } else {
-                $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
-                    $query->where('task_id', $taskID)
-                        ->where('user_id', $currentUserID) // Verifica que o lembrete é para o participante
-                        ->whereHas('task.participants', function ($query) use ($currentUserID) {
-                            $query->where('user_id', $currentUserID)
-                                ->where('status', 'accepted');
-                        });
-                })->get();
+                $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+
+                    $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+
+                        $query->where('task_id', $taskID);
+                    });
+                })->first()->getAttributes();
             }
-
-            // else {
-
-            //     $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
-
-            //         $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
-
-            //             $query->where('task_id', $taskID)
-
-            //                 ->whereHas('participants', function ($query) use ($currentUserID,  $taskID) {
-
-            //                     $query->where(function ($query) use ($currentUserID,  $taskID) {
-            //                         $query->where('user_id', $currentUserID)->where('task_id', $taskID);
-            //                     })
-            //                         ->where('status', 'accepted');
-            //                 });
-            //         });
-            //     })->get();
-            // }
 
             // dd($notificationTime);
 
