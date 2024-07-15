@@ -46,7 +46,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="sunday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-sunday" autocomplete="off">
+                                        id="btn-check-outlined-sunday" autocomplete="off"
+                                        {{ old('sunday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex me-3 mt-4 border-2"
@@ -58,7 +59,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="monday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-monday" autocomplete="off">
+                                        id="btn-check-outlined-monday" autocomplete="off"
+                                        {{ old('monday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -69,7 +71,8 @@
 
                                 <div class="">
                                     <input type="checkbox" name="tuesday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-tuesday" autocomplete="off">
+                                        id="btn-check-outlined-tuesday" autocomplete="off"
+                                        {{ old('tuesday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -80,7 +83,8 @@
 
                                 <div class="">
                                     <input type="checkbox" name="wednesday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-wednesday" autocomplete="off">
+                                        id="btn-check-outlined-wednesday" autocomplete="off"
+                                        {{ old('wednesday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -92,7 +96,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="thursday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-thursday" autocomplete="off">
+                                        id="btn-check-outlined-thursday" autocomplete="off"
+                                        {{ old('thursday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -104,7 +109,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="friday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-friday" autocomplete="off">
+                                        id="btn-check-outlined-friday" autocomplete="off"
+                                        {{ old('friday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -116,7 +122,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="saturday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-saturday" autocomplete="off">
+                                        id="btn-check-outlined-saturday" autocomplete="off"
+                                        {{ old('saturday') == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -136,13 +143,12 @@
 
                                     <input id="time" type="time" name="time"
                                         class="form-control w-50 fs-6 @error('time') is-invalid @enderror text-center"
-                                        name="time">
+                                        name="time" value="{{ old('time', Carbon\Carbon::now()->format('Y-m-d')) }}">
                                     @error('time')
                                         <div class="invalid-feedback">
                                             <strong>{{ $message }}</strong>
                                         </div>
                                     @enderror
-
                                 </div>
                             </div>
 
@@ -151,7 +157,8 @@
                                     <label for="title" class="poppins-regular fs-6">Título </label>
 
                                     <input id="title" type="text"
-                                        class="form-control fs-6 @error('title') is-invalid @enderror" name="title">
+                                        class="form-control fs-6 @error('title') is-invalid @enderror" name="title"
+                                        value="{{ old('title') }}">
 
                                     @error('title')
                                         <div class="invalid-feedback">
@@ -165,11 +172,10 @@
 
                                 <div class="">
                                     <label for="title" class="fs-6">Mensagem de notificação</label>
-                                    <textarea name="notification_message" id="" cols="30" rows="5" class="form-control roboto"></textarea>
+                                    <textarea name="notification_message" id="" cols="30" rows="5" class="form-control roboto">{{ old('notification_message') }}</textarea>
                                 </div>
 
                             </div>
-
 
                             <div class="d-flex justify-content-between mt-3">
 
