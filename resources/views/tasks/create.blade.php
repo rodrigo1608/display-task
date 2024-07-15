@@ -704,7 +704,7 @@
 
                 setTaskLabelFromInputDate();
 
-                //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de opções foram selecionadas
+                //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
 
                 const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
 

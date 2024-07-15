@@ -339,7 +339,60 @@
                                         formStart.value = start
                                         formEnd.value = end
 
-                                        console.log(start, end, formStart, formEnd);
+                                        //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
+
+                                        const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
+
+                                            const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
+
+                                            const affectedInputIsEmpty = affectedInput.value.trim() == '';
+
+                                            const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
+
+                                            affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
+
+                                        }
+
+
+                                        const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
+
+                                        const customAlertTime = document.querySelector('#custom-alert-time');
+
+                                        const alertOptionsCollection = document.querySelectorAll('.alertOption');
+
+                                        const alertOptions = Array.from(alertOptionsCollection);
+
+                                        const displaySelectedAlertCounter = () => {
+
+                                            const checkedOptions = alertOptions.filter(option => option.checked);
+                                            const checkedRegister = checkedOptions.length;
+
+                                            checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                                                    checkedRegister + ')') :
+                                                alertOptionsCounterLabel.innerText = "";
+                                        }
+
+                                        displaySelectedAlertCounter();
+
+                                        alertOptions.forEach(optionAlert => {
+
+                                            optionAlert.addEventListener('click', () => {
+
+                                                displaySelectedAlertCounter();
+
+                                                handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
+
+                                            })
+
+                                            customAlertTime.addEventListener('change', () => {
+                                                alertOptions.forEach(checkBox => {
+
+                                                    checkBox.checked = false;
+                                                    alertOptionsCounterLabel.innerText = '';
+                                                });
+                                            })
+
+                                        })
                                     </script>
 
                                 </div>
