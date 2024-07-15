@@ -115,7 +115,7 @@
 
                                     <div class="card-body text-secondary">
 
-                                        <ul class="roboto" style="list-style-type: circle">
+                                        <ul class="roboto text-black" style="list-style-type: circle">
                                             @foreach ($currentUserReminders->take(5) as $reminder)
                                                 <li class="mt-2">{{ $reminder->title }}</li>
                                             @endforeach
@@ -139,14 +139,6 @@
 
                                 </div>
                             </div>
-
-                            {{-- <div class='col-md-3 offset-1 text-start shadow'>
-
-                                <h2 class="fs-5 poppins-medium" style="color:{{ auth()->user()->color }}">
-                                    Lembretes
-                                </h2>
-
-                            </div> --}}
                         @endif
                     </div>
 
