@@ -1,124 +1,121 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container">
 
         <div class="row vh-100">
 
-            <div class="col-md-2 border-end">
-
-                <ul class="list-group poppins">
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu Perfil</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu dia</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Minha semana</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu mês</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item active" aria-current="true">Painel geral</li>
-                    </a>
-
-                </ul>
-
-            </div>
-
             <div class="col-md-9 container">
 
-                <div class="card text-center">
-                    <div class="card-header">
-                        <ul class="nav nav-pills card-header-pills">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">Active</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Link</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                            </li>
-                        </ul>
+                <div class="card mt-5">
+
+                    <div class="card-header text-end">
+                        @if (auth()->id() == $task->created_by)
+                            <a href="#" class="btn btn-primary">Adicionar participantes</a>
+                            <a href="#" class="btn btn-secondary">Marcar como concluída</a>
+                        @endif
+
+
                     </div>
-                    <div class="card-body">
 
-                        <h1>Título da tarefa: {{ $task->title }}</h1>
+                    <div class="card-body p-5">
 
-                        <p>Local: {{ $task->local }}</p>
+                        <h1>{{ $task->title }}</h1>
 
-                        <p>Dono: {{ $task->creator }}</p>
+                        <p class="roboto fs-4"> {{ $task->description }}</p>
 
-                        <p>Dono telefone: {{ $task->creator_telephone }}</p>
+                        <div class="accordion" id="accordionExample">
+                            <div class="accordion-item my-4">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Detalhes
+                                    </button>
+                                </h2>
 
-                        <p>Dono email: {{ $task->creator_telephone }}</p>
+                                <div id="collapseOne" class="accordion-collapse show collapse"
+                                    data-bs-parent="#accordionExample">
 
-                        <p>Dono email: {{ $task->creator_email }}</p>
+                                    <div class="accordion-body">
+                                        <p class= "roboto"><span class="poppins-semibold">Local:</span>
+                                            {{ $task->local }}
+                                        </p>
 
-                        <p>Descrição: {{ $task->description }}</p>
+                                        <p><span class="poppins-semibold">Criado por:</span> {{ $task->creator }}</p>
 
-                        <p>Anexos:</p>
+                                        <p><span class="poppins-semibold">Telefone do responsável:</span>
+                                            {{ $task->creator_telephone }}</p>
 
-                        <div class="d-flex w-50 flex-row flex-wrap">
+                                        <p><span class="poppins-semibold">Email do responsável:</span>
 
-                            @foreach ($task->attachments as $index => $attachment)
-                                {{-- rodrigo --}}
-                                {{-- @dd($attachment) --}}
+                                            {{ $task->creator_email }}</p>
 
-                                <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal"
-                                    data-bs-target="#attach{{ $index }}">
+                                        @if (!empty($task->attachments))
+                                            <p><span class="poppins-semibold">Anexos:</span></p>
 
-                                    <img style="width:100px" src="{{ asset('storage/' . $attachment->path) }}"
-                                        alt="Attachment Image">
+                                            <div class="d-flex flex-row flex-wrap">
 
-                                </button>
+                                                @foreach ($task->attachments as $index => $attachment)
+                                                    {{-- rodrigo --}}
+                                                    {{-- @dd($attachment) --}}
 
-                                <!-- Modal -->
-                                <div class="modal fade modal-xl" id="attach{{ $index }}" tabindex="-1"
-                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                    <!-- Button trigger modal -->
+                                                    <button type="button" class="btn btn-primary me-3"
+                                                        data-bs-toggle="modal" data-bs-target="#attach{{ $index }}">
 
-                                    <div class="modal-dialog">
+                                                        <img style="width:100px"
+                                                            src="{{ asset('storage/' . $attachment->path) }}"
+                                                            alt="Attachment Image">
 
-                                        <div class="modal-content">
+                                                    </button>
 
-                                            <div class="modal-header">
+                                                    <!-- Modal -->
+                                                    <div class="modal fade modal-xl" id="attach{{ $index }}"
+                                                        tabindex="-1" aria-labelledby="attachmentModalLabel"
+                                                        aria-hidden="true">
 
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Anexo
-                                                    {{ $index + 1 }}</h1>
+                                                        <div class="modal-dialog">
 
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
+                                                            <div class="modal-content">
+
+                                                                <div class="modal-header">
+
+                                                                    <h1 class="modal-title fs-5" id="attachmentModalLabel">
+                                                                        Anexo
+                                                                        {{ $index + 1 }}</h1>
+
+                                                                    <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div>
+
+                                                                <div class="modal-body text-center">
+                                                                    <img src="{{ asset('storage/' . $attachment->path) }}"
+                                                                        alt="Attachment Image"
+                                                                        style="max-width: 100%; height: auto;">
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+
                                             </div>
-                                            <div class="modal-body">
-                                                <img src="{{ asset('storage/' . $attachment->path) }}"
-                                                    alt="Attachment Image">
-                                            </div>
+                                        @endif
+                                        <p>{!! $task->recurringMessage !!}</p>
 
-                                        </div>
-
+                                        <span class="fs-5">{{ $task->start }}</span> <span class="mx-2">-</span>
+                                        <span class="fs-5">{{ $task->end }}</span>
                                     </div>
 
                                 </div>
-                            @endforeach
+
+                            </div>
+
+
                         </div>
-
-                        <p>Começa em: {{ $task->start }}</p>
-                        <p>Termina em: {{ $task->end }}</p>
-
-                        <p>{!! $task->recurringMessage !!}</p>
 
                     </div>
                 </div>
-
 
             </div>
 

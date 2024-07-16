@@ -56,9 +56,11 @@
                                                 data-bs-toggle="collapse"
                                                 data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
                                                 aria-controls="flush-collapseOne">
-
-                                                {{ $task->title }} - {{ $task->start }} até
-                                                {{ $task->end }}
+                                                <span class="fs-5">{{ $task->start }}</span> <span
+                                                    class="mx-2">-</span>
+                                                <span class="fs-5">{{ $task->end }}</span> <span
+                                                    class="mx-2">:</span>
+                                                {{ $task->title }}
 
                                             </button>
 
@@ -96,8 +98,12 @@
                                                     {!! $task->recurringMessage !!}
                                                 </p>
 
+                                                <div class="text-end">
+                                                    <a href="{{ route('task.show', ['task' => $task->id]) }}"
+                                                        class="btn btn-secondary">Ver
+                                                        tarefa</a>
+                                                </div>
                                             </div>
-
                                         </div>
 
                                     </div>

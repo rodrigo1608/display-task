@@ -127,7 +127,7 @@
 
                                             <input id="start" type="time"
                                                 class="form-control fs-6 @error('start') is-invalid @enderror border-0 text-center"
-                                                value="{{ $task->start }}">
+                                                value="{{ $task->start }}" readonly>
 
                                             @error('start')
                                                 <div class="invalid-feedback position-absolute">
@@ -352,7 +352,6 @@
                                             affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
 
                                         }
-
 
                                         const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
 
