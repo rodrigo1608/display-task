@@ -99,14 +99,23 @@
                                 </ul>
 
                             </div>
+
                         @endauth
 
                     </ul>
 
                     <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
 
+                    <ul class="navbar-nav ms-auto">
                         @auth
+                            <form action="{{ route('filteredTasks.filterByTitle') }}" method="get"
+                                class="d-flex me-5 flex-row">
+                                @csrf
+                                <input type="text" name="title_filter" id="title_filter"
+                                    placeholder="Procurar por nome da tarefa"class="form-control fs-6 me-1">
+                                <button class="btn btn-primary">Enviar</button>
+                            </form>
+
                             @php
                                 $hasAnyPendingTask = count($pendingTasks) > 0;
 
@@ -120,7 +129,7 @@
                                     <button type="button" class="btn btn-danger dropdown-toggle me-3"
                                         data-bs-toggle="dropdown" aria-expanded="false">
 
-                                        Voce possui {{ count($pendingTasks) }} {{ $pluralOrSingularInvitation }}
+                                        Você possui {{ count($pendingTasks) }} {{ $pluralOrSingularInvitation }}
 
                                     </button>
 

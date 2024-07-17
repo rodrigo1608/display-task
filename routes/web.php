@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FeedbackController;
+use App\Http\Controllers\FilterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -10,7 +11,6 @@ use App\Http\Controllers\UserController;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
 
 Route::get('/', function () {
     return redirect()->route('home');
@@ -31,3 +31,5 @@ Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');
 Route::delete('participant', [ParticipantController::class, 'destroy'])->name('participant.destroy');
 
 Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.store');
+
+Route::get('filteredTasks', [FilterController::class, 'filterByTitle'])->name('filteredTasks.filterByTitle');
