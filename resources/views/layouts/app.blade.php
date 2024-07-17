@@ -108,7 +108,7 @@
 
                     <ul class="navbar-nav ms-auto">
                         @auth
-                            <form action="{{ route('filteredTasks.filterByTitle') }}" method="get"
+                            <form action="{{ route('search_tasks.searchByTitle') }}" method="get"
                                 class="d-flex me-5 flex-row">
                                 @csrf
                                 <input type="text" name="title_filter" id="title_filter"
@@ -295,6 +295,76 @@
 
                     </ul>
 
+                    <div class="mt-3">
+
+                        <div class="accordion" id="accordionPanelsStayOpenFilter">
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button class="accordion-button poppins-regular" type="button"
+                                        data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFilter"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapseFilter">
+                                        Filtrar tarefas
+                                    </button>
+                                </h2>
+
+                                <form action="{{ route('filter_tasks.filter') }}" method="get">
+                                    @csrf
+
+                                    <div id="panelsStayOpen-collapseFilter" class="accordion-collapse collapse">
+
+                                        <div class="accordion-body">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input" type="checkbox" value="true"
+                                                    name="created_by_me" id="created_by_me"
+                                                    {{ old('created_by_me') === 'true' ? 'checked' : '' }}>
+
+                                                <label class="form-check-label" for="created_by_me">
+                                                    Criadas por mim
+                                                </label>
+
+                                            </div>
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input" type="checkbox" value="true"
+                                                    name="task_participation" id="task_participation"
+                                                    {{ old('task_participation') === 'true' ? 'checked' : '' }}>
+
+                                                <label class="form-check-label" for="task_participation">
+                                                    Estou participando
+                                                </label>
+
+                                            </div>
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input" type="checkbox" value="true"
+                                                    name="task_participation" id="task_participation"
+                                                    {{ old('task_participation') === 'true' ? 'checked' : '' }}>
+
+                                                <label class="form-check-label" for="task_participation">
+                                                    Concluídas
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
 
                 </div>
             </div>

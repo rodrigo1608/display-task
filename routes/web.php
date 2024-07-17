@@ -32,4 +32,4 @@ Route::delete('participant', [ParticipantController::class, 'destroy'])->name('p
 
 Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
-Route::get('filteredTasks', [FilterController::class, 'filterByTitle'])->name('filteredTasks.filterByTitle');
+Route::get('search_tasks', [FilterController::class, 'searchByTitle'])->name('search_tasks.searchByTitle');

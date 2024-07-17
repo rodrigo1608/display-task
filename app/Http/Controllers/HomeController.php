@@ -53,7 +53,7 @@ class HomeController extends Controller
 
         //Rodrigo
         // if ($selectedDate != $today) {
-        //     dd($isToday);er
+        //     dd($isToday);
         // }
 
         $weekDayOfSelectDate = getWeekDayName($selectedDate);
@@ -73,11 +73,6 @@ class HomeController extends Controller
 
             'participants',
             'reminder',
-            // 'reminder.notificationTimes' => function ($query) use ($currentUserID) {
-            //     $query->whereHas('reminder', function ($query) use ($currentUserID) {
-            //         $query->where('user_id', $currentUserID);
-            //     });
-            // },
             'reminder.recurring',
             'durations'
 
@@ -117,13 +112,6 @@ class HomeController extends Controller
         foreach ($selectedCurrentUserTasks as $task) {
 
             $taskID = $task->id;
-
-            // $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
-            //     $query->where('user_id', $currentUserID)
-            //         ->where('task_id', $taskID);
-            // })->get();
-
-            // dd($task->reminder->id);
 
             $creatorOrParticipant  = $task->created_by == $currentUserID ? 'creator' : 'participant';
 

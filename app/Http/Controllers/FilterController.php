@@ -23,7 +23,7 @@ class FilterController extends Controller
         $this->middleware(['auth', 'verified']);
     }
 
-    public function filterByTitle(Request $request)
+    public function searchByTitle(Request $request)
     {
 
         $tasksFilteredByTitle = Task::where('title', 'LIKE', "%$request->title_filter%")->get();
