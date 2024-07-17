@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -29,3 +29,5 @@ Route::get('user/{id}', [UserController::class, 'edit'])->name('user.edit');
 Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');
 
 Route::delete('participant', [ParticipantController::class, 'destroy'])->name('participant.destroy');
+
+Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.store');

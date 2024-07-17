@@ -222,7 +222,9 @@ class TaskController extends Controller
             Mail::to($participantsEmails)->send(new TaskInvitationMail($task, $creatorName));
         }
 
-        return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
+        $feedbacks = Feedback::all();
+
+        return redirect()->route('task.show', compact('task'))->with('success', 'Tarefa criada com sucesso!');
     }
 
     /**
@@ -233,43 +235,49 @@ class TaskController extends Controller
 
         $task = Task::find($id);
 
-        $view = request()->query('view', 'default');
+        if (!is_null($task)) {
 
-        $createdBy =  $task->creator ?? null;
+            $view = request()->query('view', 'default');
 
-        $task['creator'] = $createdBy->name . ' ' . $createdBy->lastname;
+            $createdBy =  $task->creator ?? null;
 
-        $task['creator_telephone'] = getFormatedTelephone($createdBy);
+            $task['creator'] = $createdBy->name . ' ' . $createdBy->lastname;
 
-        $task['creator_email'] = $createdBy->email;
+            $task['creator_telephone'] = getFormatedTelephone($createdBy);
 
-        $task['description'] = $task->feedbacks->first()->feedback;
+            $task['creator_email'] = $createdBy->email;
 
-        $task['attachments'] = $task->feedbacks->first()->attachments->all();
+            $task['description'] = $task->feedbacks->first()->feedback;
 
-        $duration = $task->durations->first();
+            $task['attachments'] = $task->feedbacks->first()->attachments->all();
 
-        $task['start'] = $duration->start ? date('H:i', strtotime($duration->start)) : null;
+            $duration = $task->durations->first();
 
-        $task['end'] = $duration->end ? date('H:i', strtotime($duration->end)) : null;
+            $task['start'] = $duration->start ? date('H:i', strtotime($duration->start)) : null;
 
-        //rodrigo
-        // $startTime = Carbon::parse($duration->start_time)->format('H:i');
+            $task['end'] = $duration->end ? date('H:i', strtotime($duration->end)) : null;
 
-        $recurring = $task->reminder->recurring;
+            //rodrigo
+            // $startTime = Carbon::parse($duration->start_time)->format('H:i');
 
-        //rodrigo
-        // dd($recurring);
+            $recurring = $task->reminder->recurring;
 
-        $task['recurringMessage'] = getRecurringMessage($recurring);
-        //rodrigo
-        // dd($task->getAttributes());
+            //rodrigo
+            // dd($recurring);
 
-        $alertOptions = getAlertOptions();
+            $task['recurringMessage'] = getRecurringMessage($recurring);
+            //rodrigo
+            // dd($task->getAttributes());
 
-        return $view === 'pending'
-            ?  view('tasks/showPending', compact('task', 'alertOptions'))
-            :  view('tasks/show', compact('task'));
+            $alertOptions = getAlertOptions();
+
+            return $view === 'pending'
+                ?  view('tasks/showPending', compact('task', 'alertOptions'))
+                :  view('tasks/show', compact('task'));
+        } else {
+
+            return redirect('home');
+        }
     }
 
     // public function showPending(string $id)

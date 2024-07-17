@@ -12,12 +12,9 @@ class Feedback extends Model
     protected $table = 'feedbacks';
 
     protected $fillable = [
-
         'feedback',
         'user_id',
-        'task_id',
-        'user_id',
-
+        'task_id'
     ];
 
     public function attachments()

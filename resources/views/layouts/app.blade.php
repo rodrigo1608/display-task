@@ -31,6 +31,10 @@
                 border: 0.4rem solid {{ Auth::user()->color }};
             }
 
+            .feedback-border {
+                border: 0.2rem solid {{ Auth::user()->color }};
+            }
+
             .reminders-link {
                 color: {{ Auth::user()->color }}
             }
