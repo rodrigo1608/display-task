@@ -310,7 +310,7 @@
                                     </button>
                                 </h2>
 
-                                <form action="{{ route('filter_tasks.filter') }}" method="get">
+                                <form action="" method="get">
                                     @csrf
 
                                     <div id="panelsStayOpen-collapseFilter" class="accordion-collapse collapse">

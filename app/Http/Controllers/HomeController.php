@@ -37,17 +37,12 @@ class HomeController extends Controller
     public function index(Request $request)
     {
 
-        $selectedDate = $request->input('specific_date');
-
         $today = Carbon::today()->format('Y-m-d');
 
+        $selectedDate = $request->input('specific_date') ?? $today;
+
         //Rodrigo
-        // dd($today);
-
-        if (is_null($selectedDate)) {
-
-            $selectedDate = $today;
-        }
+        // dd($selectedDate);
 
         $isToday = $selectedDate == $today;
 
