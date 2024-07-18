@@ -19,7 +19,9 @@ return new class extends Migration
 
             $table->string('local')->nullable();
 
-            $table->enum('available', ['true', 'false'])->default('true');
+            $table->enum('concluded', ['true', 'false'])->default('true');
+
+            $table->enum('status', ['starting', 'in_progress', 'finished'])->default('starting');
 
             $table->timestamps();
 

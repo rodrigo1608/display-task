@@ -277,11 +277,11 @@
                             $today = Carbon\Carbon::today()->format('Y-m-d');
                         @endphp
 
-                        <a href="{{ route('home', ['selectedDate' => $today]) }}" class="side-link">
+                        <a href="{{ route('home', ['displayOption' => 'specific_day']) }}" class="side-link">
                             <li class="list-group-item">Meu dia</li>
                         </a>
 
-                        <a href="#" class="side-link">
+                        <a href="{{ route('home', ['displayOption' => 'week']) }}" class="side-link">
                             <li class="list-group-item">Minha semana</li>
                         </a>
 

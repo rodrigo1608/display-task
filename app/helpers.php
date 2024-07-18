@@ -59,9 +59,9 @@ if (!function_exists('getDaysOfWeekInPortuguese')) {
     }
 }
 
-if (!function_exists('getDayOfWeekInPortuguese')) {
+if (!function_exists('getWeekdayInPortuguese')) {
 
-    function getDayOfWeekInPortuguese($weekDay)
+    function getWeekdayInPortuguese($weekDay)
     {
         $weekDaysInPortuguese = getDaysOfWeekInPortuguese();
 
@@ -399,3 +399,23 @@ if (!function_exists('getNotificationTime')) {
         })->first()->get();
     }
 }
+
+
+// if ($creatorOrParticipant == 'creator') {
+
+//     $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+
+//         $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+
+//             $query->where('created_by', $currentUserID)->where('id', $taskID);
+//         });
+//     })->first()->getAttributes();
+// } else {
+//     $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+
+//         $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+
+//             $query->where('task_id', $taskID);
+//         });
+//     })->first()->getAttributes();
+// }

@@ -14,7 +14,7 @@ use App\Models\User;
 
 use Carbon\Carbon;
 
-use function PHPUnit\Framework\isEmpty;
+// use function PHPUnit\Framework\isEmpty;
 
 class HomeController extends Controller
 {
@@ -40,7 +40,6 @@ class HomeController extends Controller
         $today = Carbon::today()->format('Y-m-d');
 
         $selectedDate = $request->input('specific_date') ?? $today;
-
         //Rodrigo
         // dd($selectedDate);
 
@@ -53,7 +52,7 @@ class HomeController extends Controller
 
         $weekDayOfSelectDate = getWeekDayName($selectedDate);
 
-        $weekdayInPortuguese = getDayOfWeekInPortuguese($weekDayOfSelectDate);
+        $weekdayInPortuguese = getWeekdayInPortuguese($weekDayOfSelectDate);
 
         //Rodrigo
         // dd($weekdayInPortuguese);
@@ -171,12 +170,10 @@ class HomeController extends Controller
                 $task->isNotificationTimeMissing = $isNotificationTimeMissing;
             }
 
-
             if ($task->participants->isEmpty()) {
 
                 $task->emailsParticipants = "Nenhum participante";
             } else {
-                // Concatena os e-mails dos participantes
                 $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
             }
 
