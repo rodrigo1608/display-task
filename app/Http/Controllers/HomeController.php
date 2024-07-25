@@ -12,6 +12,8 @@ use App\Models\Recurring;
 use App\Models\Task;
 use App\Models\User;
 
+use App\Jobs\JobHandleDurationsStatus;
+
 use Carbon\Carbon;
 
 // use function PHPUnit\Framework\isEmpty;
@@ -36,6 +38,59 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
+
+        //Teste
+
+        $tasks = Task::all();
+        $now = Carbon::now('America/Sao_Paulo');
+
+        $task = Task::find(8);
+
+
+
+        $start =  getCarbonTime($task->durations[0]->start);
+        $end =  getCarbonTime($task->durations[0]->end);
+
+        // dd($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now));
+
+
+        // dd($tasks[0]->reminder->recurring->specific_date);
+
+        // foreach ($tasks as $task) {
+
+        //     $isRecurrentTask = $task->reminder->recurring->specific_date == null;
+
+        //     if ($isRecurrentTask) {
+
+        //         foreach ($task->durations as $duration) {
+
+        //             $startString = $duration->start;
+        //             $endString  = $duration->end;
+
+        //             $start =  Carbon::parse($startString, 'America/Sao_Paulo');
+        //             $end =  Carbon::parse($endString, 'America/Sao_Paulo');
+
+        //             if ($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now)) {
+
+        //                 dump($task->durations()->where());
+        //             } elseif ($end->lessThan($now)) {
+
+        //                 dump($task->durations);
+        //             } elseif ($start->greaterThan($now)) {
+
+        //                 dump($task->durations);
+        //             }
+        //         }
+        //     }
+        // }
+
+        JobHandleDurationsStatus::dispatch();
+
+        //termina o teste
+
+        // Task::whereHas('durations', function ($query) use ($now) {
+        //     $query->where('end', '<', $now);
+        // })->update(['status' => 'finished']);
 
         $today = Carbon::today()->format('Y-m-d');
 
@@ -71,6 +126,7 @@ class HomeController extends Controller
             'durations'
 
         ])->where(function ($query) use ($currentUserID) {
+
             $query->where('created_by', $currentUserID)->orWhereHas('participants', function ($query) use ($currentUserID) {
                 $query->where('user_id', $currentUserID)->where('status', 'accepted');
             });

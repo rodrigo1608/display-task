@@ -401,6 +401,24 @@ if (!function_exists('getNotificationTime')) {
 }
 
 
+if (!function_exists('getCurrentUserTasks')) {
+
+    function getCurrentUserTasks($creatorOrParticipant, $currentUserID, $taskID)
+    {
+        return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
+            getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
+        })->first()->get();
+    }
+}
+
+if (!function_exists('getCarbonTime')) {
+
+    function getCarbonTime($stringTime)
+    {
+        return Carbon::parse($stringTime, 'America/Sao_Paulo');
+    }
+}
+
 // if ($creatorOrParticipant == 'creator') {
 
 //     $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {

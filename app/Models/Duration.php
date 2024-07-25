@@ -12,10 +12,17 @@ class Duration extends Model
     protected $table = 'durations';
 
     protected $fillable = [
+
         'start',
+
+        'status',
+
         'end',
+
         'task_id',
+
         'user_id',
+
     ];
 
     /**

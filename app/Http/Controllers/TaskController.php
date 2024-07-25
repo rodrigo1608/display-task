@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\TaskInvitationMail;
 use App\Helpers\QueryHelpers;
+
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\SetPendingTask;
+use App\Jobs\JobSendInvitationEmail;
 // use App\Models\NotificationTime;
 use App\Models\Attachment;
 use App\Models\Duration;
@@ -16,11 +17,10 @@ use App\Models\User;
 use App\Models\Participant;
 use App\Models\Recurring;
 use App\Models\Reminder;
+
 use Carbon\Carbon;
 
 use Illuminate\Http\Request;
-
-use Mail;
 
 class TaskController extends Controller
 {
@@ -219,7 +219,7 @@ class TaskController extends Controller
 
             $creatorName = "$creator->name $creator->lastname";
 
-            Mail::to($participantsEmails)->send(new TaskInvitationMail($task, $creatorName));
+            JobSendInvitationEmail::dispatch($participantsEmails, $task, $creatorName);
         }
 
         $feedbacks = Feedback::all();

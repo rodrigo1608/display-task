@@ -21,8 +21,6 @@ return new class extends Migration
 
             $table->enum('concluded', ['true', 'false'])->default('true');
 
-            $table->enum('status', ['starting', 'in_progress', 'finished'])->default('starting');
-
             $table->timestamps();
 
             $table->unsignedBigInteger('created_by');

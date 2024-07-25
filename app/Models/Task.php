@@ -15,6 +15,8 @@ class task extends Model
 
         'local',
 
+        'concluded',
+
         'available',
 
         'created_by',

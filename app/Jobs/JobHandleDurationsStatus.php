@@ -33,7 +33,7 @@ class JobHandleDurationsStatus implements ShouldQueue
      */
     public function handle(): void
     {
-
+        Log::info('job iniciado');
         $now = Carbon::now('America/Sao_Paulo');
 
         Log::info($now);
@@ -85,5 +85,7 @@ class JobHandleDurationsStatus implements ShouldQueue
                 }
             }
         }
+
+        Log::info('job encerrado');
     }
 }

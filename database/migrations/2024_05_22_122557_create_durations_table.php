@@ -17,6 +17,8 @@ return new class extends Migration
             $table->time('start');
             $table->time('end');
 
+            $table->enum('status', ['starting', 'in_progress', 'finished'])->default('starting');
+
             $table->unsignedBigInteger('task_id');
             $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade')->onUpdate('cascade');
 
