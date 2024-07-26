@@ -12,8 +12,6 @@ use App\Models\Recurring;
 use App\Models\Task;
 use App\Models\User;
 
-use App\Jobs\JobHandleDurationsStatus;
-
 use Carbon\Carbon;
 
 // use function PHPUnit\Framework\isEmpty;
@@ -25,6 +23,7 @@ class HomeController extends Controller
      *
      * @return void
      */
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -39,60 +38,38 @@ class HomeController extends Controller
     public function index(Request $request)
     {
 
-        //Teste
-
-        $tasks = Task::all();
         $now = Carbon::now('America/Sao_Paulo');
 
-        $task = Task::find(8);
+        //Teste
+        $tasks = Task::all();
 
+        foreach ($tasks as $task) {
 
+            $notificationTimes = $task->reminder->notificationTimes;
 
-        $start =  getCarbonTime($task->durations[0]->start);
-        $end =  getCarbonTime($task->durations[0]->end);
+            foreach ($notificationTimes as  $notificationTime) {
 
-        // dd($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now));
+                foreach ($notificationTime->getAttributes() as $timeSlot => $timeSlotValue) {
 
+                    if ($timeSlotValue === "true") {
 
-        // dd($tasks[0]->reminder->recurring->specific_date);
+                        $halfAnHourBefore = "";
+                    }
+                }
 
-        // foreach ($tasks as $task) {
+                if (!is_null($notificationTime->specific_notification_time)) {
+                }
+            }
+        }
 
-        //     $isRecurrentTask = $task->reminder->recurring->specific_date == null;
+        $notificationTimes =
+            //termina o teste
 
-        //     if ($isRecurrentTask) {
+            // Task::whereHas('durations', function ($query) use ($now) {
+            //     $query->where('end', '<', $now);
+            // })->update(['status' => 'finished']);
 
-        //         foreach ($task->durations as $duration) {
-
-        //             $startString = $duration->start;
-        //             $endString  = $duration->end;
-
-        //             $start =  Carbon::parse($startString, 'America/Sao_Paulo');
-        //             $end =  Carbon::parse($endString, 'America/Sao_Paulo');
-
-        //             if ($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now)) {
-
-        //                 dump($task->durations()->where());
-        //             } elseif ($end->lessThan($now)) {
-
-        //                 dump($task->durations);
-        //             } elseif ($start->greaterThan($now)) {
-
-        //                 dump($task->durations);
-        //             }
-        //         }
-        //     }
-        // }
-
-        JobHandleDurationsStatus::dispatch();
-
-        //termina o teste
-
-        // Task::whereHas('durations', function ($query) use ($now) {
-        //     $query->where('end', '<', $now);
-        // })->update(['status' => 'finished']);
-
-        $today = Carbon::today()->format('Y-m-d');
+            $today = Carbon::today()->format('Y-m-d');
 
         $selectedDate = $request->input('specific_date') ?? $today;
         //Rodrigo

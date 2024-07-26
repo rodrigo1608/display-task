@@ -34,22 +34,32 @@ class JobHandleDurationsStatus implements ShouldQueue
     public function handle(): void
     {
         Log::info('job iniciado');
+
         $now = Carbon::now('America/Sao_Paulo');
 
-        Log::info($now);
+
+        Log::info($now->format('H:i'));
 
         $tasks = Task::all();
+
+        $todayWeekDay = getWeekDayName($now->toDateString());
 
         foreach ($tasks as $task) {
 
             $isRecurrentTask = $task->reminder->recurring->specific_date == null;
 
-            if ($isRecurrentTask) {
+            $isTodayRecurring = $task->reminder->recurring->$todayWeekDay == 'true';
+
+            $isSpecificDateEqualToToday = $task->reminder->recurring->specific_date_weekday == $todayWeekDay;
+
+            $isToday =  $isTodayRecurring  || $isSpecificDateEqualToToday;
+
+            if ($isRecurrentTask && $isToday) {
 
                 foreach ($task->durations as $duration) {
 
                     $start =  getCarbonTime($duration->start);
-                    $end =  getCarbonTime($duration->end);
+                    $end =    getCarbonTime($duration->end);
 
                     $isInProgress = $start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now);
                     $isFinished = $end->lessThan($now);
@@ -66,20 +76,19 @@ class JobHandleDurationsStatus implements ShouldQueue
                         $duration->update(['status' => 'starting']);
                     }
                 }
-            } else {
+            } elseif ($isToday) {
 
                 foreach ($task->durations as $duration) {
 
                     $start =  getCarbonTime($duration->start);
                     $end =  getCarbonTime($duration->end);
 
-                    $isInProgress = ($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now)) && $duration->stauts == 'starting';
-                    $isFinished = $end->lessThan($now) && $duration->stauts == 'starting';
+                    $isInProgress = ($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now));
+                    $isFinished = $end->lessThan($now);
 
                     if ($isInProgress) {
                         $duration->update(['status' => 'in_progress']);
                     } elseif ($end->lessThan($now)) {
-
                         $duration->update(['status' => 'finished']);
                     }
                 }
