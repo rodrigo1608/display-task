@@ -33,8 +33,8 @@
 
                                 <div class="col-3 d-flex justify-content-end">
 
-                                    <input type="date" id="input-date" name="date" class="form-control fs-6"
-                                        value="{{ Carbon\Carbon::now()->format('Y-m-d') }}"
+                                    <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
+                                        value="{{ old('specific_date', Carbon\Carbon::now()->format('Y-m-d')) }}"
                                         min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                                 </div>
 

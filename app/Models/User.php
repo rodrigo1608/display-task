@@ -64,6 +64,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Reminder::class);
     }
 
+    public function task()
+    {
+        return $this->hasMany(Task::class, 'created_by')
+            ->withPivot('status')
+            ->withTimestamps();
+    }
+
     public function participatingTasks()
     {
         return $this->belongsToMany(Task::class, 'participants')

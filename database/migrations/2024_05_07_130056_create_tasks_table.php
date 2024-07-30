@@ -19,7 +19,7 @@ return new class extends Migration
 
             $table->string('local')->nullable();
 
-            $table->enum('concluded', ['true', 'false'])->default('true');
+            $table->enum('concluded', ['true', 'false'])->default('false');
 
             $table->timestamps();
 

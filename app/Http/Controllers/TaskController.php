@@ -57,14 +57,11 @@ class TaskController extends Controller
     {
         // rodrigo
         // dd($request->all());
-
         $currentUserID = auth()->id();
-
         $recurrencePatterns = getRecurrencePatterns($request->all());
 
         //rodrigo
         // dd($recurrencePatterns);
-
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
 
         //rodrigo
@@ -99,10 +96,6 @@ class TaskController extends Controller
         ]);
 
         $reminder = Reminder::create([
-
-            'title' =>  $task->title,
-
-            'notification_message' => $request->description,
 
             'task_id' => $task->id
         ]);
@@ -156,30 +149,10 @@ class TaskController extends Controller
 
         ]);
 
-        Recurring::create([
-
-            'specific_date' => $request->specific_date ?? null,
-
-            'specific_date_weekday' => $isSpecificDayPattern ? getWeekDayName($request->specific_date) : null,
-
-            'sunday' => $request->sunday ?? 'false',
-
-            'monday' => $request->monday ?? 'false',
-
-            'tuesday' => $request->tuesday ?? 'false',
-
-            'wednesday' => $request->wednesday ??  'false',
-
-            'thursday' => $request->thursday ?? 'false',
-
-            'friday' => $request->friday ?? 'false',
-
-            'saturday' => $request->saturday ?? 'false',
-
-            'reminder_id' => $reminder->id,
+        $recurringData = getRecurringData($request, $isSpecificDayPattern, $reminder);
 
 
-        ]);
+        Recurring::create($recurringData);
 
         foreach ($request->all() as $attribute => $value) {
 

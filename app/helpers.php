@@ -94,15 +94,17 @@ if (!function_exists('setTask')) {
 
 if (!function_exists('getRepeatingDays')) {
 
-    function getRepeatingDays($daysOfWeek, $recurring)
+    function getRepeatingDays($recurring, $translated = false)
     {
+        $daysOfWeek = getDaysOfWeekInPortuguese();
+
         $repeatingDays = [];
 
         foreach ($daysOfWeek as $key => $day) {
 
             if ($recurring->$key === 'true') {
 
-                $repeatingDays[] = $day;
+                $repeatingDays[] = $translated ? $day : $key;
             }
         }
         return $repeatingDays;
@@ -117,22 +119,18 @@ if (!function_exists('getRecurringMessage')) {
 
             $recurringMessage = '';
 
-            $daysOfWeek = getDaysOfWeekInPortuguese();
+            // $daysOfWeek = getDaysOfWeekInPortuguese();
 
-            $repeatingDays = getRepeatingDays($daysOfWeek, $recurring);
+            // $repeatingDays = getRepeatingDays($daysOfWeek, $recurring);
+
+            $repeatingDays = getRepeatingDays($recurring, true);
 
             $numberOfRepeatingDays = count($repeatingDays);
-
-            //rodrigo
-            // dd($repeatingDays);
 
             if ($numberOfRepeatingDays == 7) {
 
                 $recurringMessage = 'Todos os dias.';
             } else {
-
-                // rodrigo
-                // dd($recurringMessage);
 
                 if ($numberOfRepeatingDays > 1) {
 
@@ -177,7 +175,7 @@ if (!function_exists('getParticipantsEmail')) {
             }
         }
 
-        return   $participants;
+        return $participants;
     }
 }
 
@@ -285,8 +283,6 @@ if (!function_exists('getConflictingTask')) {
     {
         $userID = auth()->id();
 
-        // dd($inputData);
-
         // Primeiramente, a consulta deve ignorar a tarefa que já foi criada para, no caso de algum usuário aceitá-la, não gerar conflito de sobreposição
         $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('id', '!=', $currentTaskID)
 
@@ -390,16 +386,15 @@ if (!function_exists('getNotificationQuery')) {
     }
 }
 
-if (!function_exists('getNotificationTime')) {
+// if (!function_exists('getNotificationTime')) {
 
-    function getNotificationTime($creatorOrParticipant, $currentUserID, $taskID)
-    {
-        return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
-            getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
-        })->first()->get();
-    }
-}
-
+//     function getNotificationTime($creatorOrParticipant, $currentUserID, $taskID)
+//     {
+//         return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
+//             getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
+//         })->first()->get();
+//     }
+// }
 
 if (!function_exists('getCurrentUserTasks')) {
 
@@ -418,22 +413,93 @@ if (!function_exists('getCarbonTime')) {
         return Carbon::parse($stringTime, 'America/Sao_Paulo');
     }
 }
+if (!function_exists('getRecurringData')) {
 
-// if ($creatorOrParticipant == 'creator') {
+    function getRecurringData($request, $isSpecificDayPattern, $reminder)
+    {
 
-//     $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+        return [
 
-//         $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+            'specific_date' => $request->specific_date ?? null,
 
-//             $query->where('created_by', $currentUserID)->where('id', $taskID);
-//         });
-//     })->first()->getAttributes();
-// } else {
-//     $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+            'specific_date_weekday' => $isSpecificDayPattern ? getWeekDayName($request->specific_date) : null,
 
-//         $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+            'sunday' => $request->sunday ?? 'false',
 
-//             $query->where('task_id', $taskID);
-//         });
-//     })->first()->getAttributes();
+            'monday' => $request->monday ?? 'false',
+
+            'tuesday' => $request->tuesday ?? 'false',
+
+            'wednesday' => $request->wednesday ?? 'false',
+
+            'thursday' => $request->thursday ?? 'false',
+
+            'friday' => $request->friday ?? 'false',
+
+            'saturday' => $request->saturday ?? 'false',
+
+            'reminder_id' => $reminder->id,
+
+        ];
+    }
+}
+
+if (!function_exists('getNotificationtimes')) {
+
+    function getNotificationtimes($notificationPattern)
+    {
+        $isASpecificNotificationtime = $notificationPattern == 'specific_notification_time';
+
+        return $isASpecificNotificationtime
+            ?
+            NotificationTime::whereNotNull('specific_notification_time')->get()
+            :
+            NotificationTime::where($notificationPattern, 'true')->get();
+    }
+}
+
+if (!function_exists('getToday')) {
+
+    function getToday()
+    {
+
+        return Carbon::today()->format('Y-m-d');
+    }
+}
+
+
+
+
+// if (!function_exists('getNotficationSchedule')) {
+
+//     function getNotficationSchedule($notificationPattern)
+//     {
+//         $notificationTimes = getNotificationtimes($notificationPattern);
+
+//         $usersEmailsToNotificationsTimes = array();
+
+//         foreach ($notificationTimes as $notificationTime) {
+
+//             $user = $notificationTime->user;
+
+//             $startReference = $notificationTime->reminder
+//                 ->task->durations
+//                 ->where('user_id', $user->id)
+//                 ->first()
+//                 ->start;
+
+//             $startReference;
+            // $notificationTime->reminder->task
+            // $specificNotificationTimePattern = $notificationPattern === 'specific_notification_time' &&
+
+            // if ($notificationPattern === 'specific_notification_time') {
+
+            //     $usersEmailsToNotificationsTimes;
+
+            //     dd($notificationTime->specific_notification_time);
+            // }
+
+            // $startReference;
+//         }
+//     }
 // }

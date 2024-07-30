@@ -41,35 +41,122 @@ class HomeController extends Controller
         $now = Carbon::now('America/Sao_Paulo');
 
         //Teste
-        $tasks = Task::all();
 
-        foreach ($tasks as $task) {
+        $notificationTimes =  getNotificationtimes('specific_notification_time');
 
-            $notificationTimes = $task->reminder->notificationTimes;
+        foreach ($notificationTimes as $notificationTime) {
 
-            foreach ($notificationTimes as  $notificationTime) {
+            //Se houver um user_id setado na instancia de um Reminder, é lembrete
+            //Se houver um task_id setado na instancia de um Reminder, é uma tarefa
+            $isTask = is_null($notificationTime->reminder->user_id);
 
-                foreach ($notificationTime->getAttributes() as $timeSlot => $timeSlotValue) {
+            $isSpecifidate = !is_null($notificationTime->reminder->recurring);
 
-                    if ($timeSlotValue === "true") {
+            if ($isSpecifidate) {
 
-                        $halfAnHourBefore = "";
-                    }
-                }
+                $specificDate = Carbon::parse($notificationTime->reminder->recurring->specific_date);
 
-                if (!is_null($notificationTime->specific_notification_time)) {
+                $currentTime = Carbon::now()->format('H:i:s');
+                $specificTime = getCarbonTime($notificationTime->specific_notification_time)->format('H:i:s');
+
+                $isNotificationTime = $specificDate->isToday() && ($currentTime == $specificTime);
+
+                if ($isNotificationTime) {
+                    dd($notificationTime->specific_notification_time);
                 }
             }
+
+            $repeatingDays = getRepeatingDays($notificationTime->reminder->recurring);
+
+            foreach ($repeatingDays as $day) {
+            }
+
+            $userToBeNotify = $notificationTime->user;
+
+            $usersEmailsToNotificationsTimes = array();
+
+            // $startTaskReference = $notificationTime->reminder
+            // ->task->durations
+            // ->where('user_id', $userToBeNotify->id)
+            // ->first()
+            // ->start;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //             $startReference;
+            // $notificationTime->reminder->task
+            // $specificNotificationTimePattern = $notificationPattern === 'specific_notification_time' &&
+
+            // if ($notificationPattern === 'specific_notification_time') {
+
+            //     $usersEmailsToNotificationsTimes;
+
+            //     dd($notificationTime->specific_notification_time);
+            // }
+
+            // $startReference;
+            //         }
+
+
+
+
+            // dd($userToBeNotify->reminder->task->get());
+
+            // $startReference = $notificationTime->reminder
+            //     ->task->durations
+            //     ->where('user_id', $userToBeNotify->id)
+            //     ->first()
+            //     ->start;
+
+            // $carbonStartReference = Carbon::createFromFormat('H:i:s', $startReference);
+
+            // $notificationTime = $carbonStartReference->subMinutes(30)->format('H:i:s');
+
+            // // dump($notificationTime);
         }
 
-        $notificationTimes =
-            //termina o teste
+        // $tasks = Task::all();
 
-            // Task::whereHas('durations', function ($query) use ($now) {
-            //     $query->where('end', '<', $now);
-            // })->update(['status' => 'finished']);
+        // foreach ($tasks as $task) {
 
-            $today = Carbon::today()->format('Y-m-d');
+        //     $notificationTimes = $task->reminder->notificationTimes;
+
+        //     foreach ($notificationTimes as  $notificationTime) {
+
+        //         foreach ($notificationTime->getAttributes() as $timeSlot => $timeSlotValue) {
+
+        //             if ($timeSlotValue === "true") {
+
+        //                 // dd($timeSlot);
+
+        //                 $halfAnHourBefore = "";
+        //             }
+        //         }
+
+        //         if (!is_null($notificationTime->specific_notification_time)) {
+        //         }
+        //     }
+        // }
+
+        // $notificationTimes =
+        //termina o teste
+
+        // Task::whereHas('durations', function ($query) use ($now) {
+        //     $query->where('end', '<', $now);
+        // })->update(['status' => 'finished']);
+
+        $today = getToday();
 
         $selectedDate = $request->input('specific_date') ?? $today;
         //Rodrigo
@@ -156,9 +243,9 @@ class HomeController extends Controller
                     });
                 })->first()->getAttributes();
             } else {
-                $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+                $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($taskID) {
 
-                    $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+                    $query->whereHas('task', function ($query) use ($taskID) {
 
                         $query->where('task_id', $taskID);
                     });
@@ -198,6 +285,7 @@ class HomeController extends Controller
                     $notificationTime['one_hour_before'] === "false" &&
                     $notificationTime['two_hours_before'] === "false" &&
                     $notificationTime['one_day_earlier'] === "false";
+
                 // dd($isNotificationTimeMissing);
 
                 $task->isNotificationTimeMissing = $isNotificationTimeMissing;

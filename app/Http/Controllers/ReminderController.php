@@ -30,9 +30,9 @@ class ReminderController extends Controller
     public function create()
     {
 
-        $tasks = Task::all();
+        // $tasks = Task::all();
 
-        return view('reminders/create', compact('tasks'));
+        return view('reminders/create');
     }
 
     /**
@@ -50,43 +50,25 @@ class ReminderController extends Controller
 
             'user_id' => auth()->id(),
 
-            'task_id' => $request->task,
-
         ]);
 
-        $recurrings = Recurring::create(
-            [
-                'specific_date' => $request->specific_date ?? null,
+        $recurrencePatterns = getRecurrencePatterns($request->all());
 
-                'sunday' => $request->sunday ?? 'false',
+        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
 
-                'monday' => $request->monday ?? 'false',
+        $recurringData = getRecurringData($request, $isSpecificDayPattern, $reminder);
+        //rodrigo
+        // dd($request->all(), $isSpecificDayPattern);
 
-                'tuesday' => $request->tuesday ?? 'false',
+        Recurring::create($recurringData);
 
-                'wednesday' => $request->wednesday ??  'false',
-
-                'thursday' => $request->thursday ?? 'false',
-
-                'friday' => $request->friday ?? 'false',
-
-                'saturday' => $request->saturday ?? 'false',
-
-                'reminder_id' => $reminder->id,
-
-            ]
-        );
-
-
-        $specificNotificationTime = $request->time ? date('Y-m-d H:i:s', strtotime($request->time)) : null;
+        $specificNotificationTime = $request->time ? date('H:i:s', strtotime($request->time)) : null;
 
         NotificationTime::create([
 
             'specific_notification_time' => $specificNotificationTime,
-
             'reminder_id' => $reminder->id
         ]);
-
 
         return redirect()->route('home');
     }

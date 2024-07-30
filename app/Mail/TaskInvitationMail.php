@@ -16,7 +16,7 @@ class TaskInvitationMail extends Mailable
     use Queueable, SerializesModels;
     public $task;
     public $creator;
-    public $url;''
+    public $url;
     /**
      * Create a new message instance.
      */

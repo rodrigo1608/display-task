@@ -201,10 +201,11 @@
             </div>
 
         </nav>
+
         @if (session('success'))
             <div class="w-100" style="position:absolute;  z-index: 1000;">
                 <div id="success-alert" class="row justify-content-center mt-4">
-                    <div class="alert alert-success col-10 text-center">
+                    <div class="alert alert-success col-7 text-center">
                         {{ session('success') }}
                     </div>
                 </div>

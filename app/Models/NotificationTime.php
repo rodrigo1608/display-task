@@ -30,4 +30,9 @@ class NotificationTime extends Model
     {
         return $this->belongsTo(Reminder::class, 'reminder_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

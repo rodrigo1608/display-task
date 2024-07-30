@@ -17,18 +17,17 @@ return new class extends Migration
 
             $table->time('specific_notification_time')->nullable();
 
-            $table->enum('half_an_hour_before', ['true', 'false']);
+            $table->enum('half_an_hour_before', ['true', 'false'])->default('false');
 
-            $table->enum('one_hour_before', ['true', 'false']);
+            $table->enum('one_hour_before', ['true', 'false'])->default('false');
 
-            $table->enum('two_hours_before', ['true', 'false']);
+            $table->enum('two_hours_before', ['true', 'false'])->default('false');
 
-            $table->enum('one_day_earlier', ['true', 'false']);
+            $table->enum('one_day_earlier', ['true', 'false'])->default('false');
 
             $table->unsignedInteger('user_id')->nullable();
 
             $table->unsignedBigInteger('reminder_id');
-
             $table->foreign('reminder_id')->references('id')->on('reminders')->onUpdate('cascade')->onDelete('cascade');
 
             $table->timestamps();

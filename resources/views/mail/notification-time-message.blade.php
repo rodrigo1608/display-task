@@ -1,12 +1,12 @@
 <x-mail::message>
-# Introduction
+    # Introduction
 
-The body of your message.
+    Sua tarefa XXXXXXX irá começar em XXXXX.
 
-<x-mail::button :url="''">
-Button Text
-</x-mail::button>
+    <x-mail::button :url="''">
+        Ver tarefa
+    </x-mail::button>
 
-Thanks,<br>
-{{ config('app.name') }}
+    Thanks,<br>
+    {{ config('app.name') }}
 </x-mail::message>
