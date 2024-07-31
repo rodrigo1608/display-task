@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-
-use Illuminate\Http\Request;
-use App\Models\Duration;
+use App\Mail\TaskNotify;
 use App\Models\NotificationTime;
 use App\Models\Reminder;
-use App\Models\Recurring;
 use App\Models\Task;
-use App\Models\User;
 
-use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 // use function PHPUnit\Framework\isEmpty;
 
@@ -41,8 +38,8 @@ class HomeController extends Controller
         $now = getCarbonNow()->format('H:i:s');
 
         //Teste
-
         $notificationTimes =  getNotificationtimes('specific_notification_time');
+        // dd($notificationTimes);
 
         foreach ($notificationTimes as $notificationTime) {
 
@@ -58,10 +55,16 @@ class HomeController extends Controller
 
                 $specificTime = getCarbonTime($notificationTime->specific_notification_time)->format('H:i:s');
 
-                $isNotificationTime = $specificDate->isToday() && ($now == $specificTime);
+                $isNotificationTime = $specificDate->isToday() && ($now !== $specificTime);
 
                 if ($isNotificationTime) {
-                    dd($specificTime);
+
+                    // dump($notificationTime);
+
+                    $emailAddressToNotify = $notificationTime->user->email;
+                    // dump($emailAddressToNotify);
+
+                    // Mail::to($emailAddressToNotify)->send(new TaskNotify);
                 }
             }
 

@@ -20,7 +20,6 @@
 
                         <p>Enviamos um link de verificação para o seu e-mail. </p>
 
-
                         <form class="d-inline" method="POST" action="{{ route('verification.resend') }}">
                             @csrf
                             <p class="">Se você não recebeu o e-mail,

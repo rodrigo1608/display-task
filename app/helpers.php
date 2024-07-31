@@ -452,9 +452,9 @@ if (!function_exists('getNotificationtimes')) {
 
         return $isASpecificNotificationtime
             ?
-            NotificationTime::whereNotNull('specific_notification_time')->get()
+            NotificationTime::with(['user', 'reminder', 'reminder.task'])->whereNotNull('specific_notification_time')->get()
             :
-            NotificationTime::where($notificationPattern, 'true')->get();
+            NotificationTime::with(['user', 'reminder', 'reminder.task'])->where($notificationPattern, 'true')->get();
     }
 }
 
@@ -482,40 +482,3 @@ if (!function_exists('getCarbonDate')) {
         return Carbon::parse($date)->timezone('America/Sao_Paulo');
     }
 }
-
-
-
-
-// if (!function_exists('getNotficationSchedule')) {
-
-//     function getNotficationSchedule($notificationPattern)
-//     {
-//         $notificationTimes = getNotificationtimes($notificationPattern);
-
-//         $usersEmailsToNotificationsTimes = array();
-
-//         foreach ($notificationTimes as $notificationTime) {
-
-//             $user = $notificationTime->user;
-
-//             $startReference = $notificationTime->reminder
-//                 ->task->durations
-//                 ->where('user_id', $user->id)
-//                 ->first()
-//                 ->start;
-
-//             $startReference;
-            // $notificationTime->reminder->task
-            // $specificNotificationTimePattern = $notificationPattern === 'specific_notification_time' &&
-
-            // if ($notificationPattern === 'specific_notification_time') {
-
-            //     $usersEmailsToNotificationsTimes;
-
-            //     dd($notificationTime->specific_notification_time);
-            // }
-
-            // $startReference;
-//         }
-//     }
-// }

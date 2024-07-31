@@ -67,7 +67,8 @@ class ReminderController extends Controller
         NotificationTime::create([
 
             'specific_notification_time' => $specificNotificationTime,
-            'reminder_id' => $reminder->id
+            'reminder_id' => $reminder->id,
+            'user_id' => auth()->id(),
         ]);
 
         return redirect()->route('home');
