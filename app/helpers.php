@@ -463,7 +463,23 @@ if (!function_exists('getToday')) {
     function getToday()
     {
 
-        return Carbon::today()->format('Y-m-d');
+        return Carbon::today('America/Sao_Paulo');
+    }
+}
+
+if (!function_exists('getCarbonNow')) {
+
+    function getCarbonNow()
+    {
+        return Carbon::now('America/Sao_Paulo');
+    }
+}
+
+if (!function_exists('getCarbonDate')) {
+
+    function getCarbonDate($date)
+    {
+        return Carbon::parse($date)->timezone('America/Sao_Paulo');
     }
 }
 

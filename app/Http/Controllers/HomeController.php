@@ -38,7 +38,7 @@ class HomeController extends Controller
     public function index(Request $request)
     {
 
-        $now = Carbon::now('America/Sao_Paulo');
+        $now = getCarbonNow()->format('H:i:s');
 
         //Teste
 
@@ -50,19 +50,18 @@ class HomeController extends Controller
             //Se houver um task_id setado na instancia de um Reminder, é uma tarefa
             $isTask = is_null($notificationTime->reminder->user_id);
 
-            $isSpecifidate = !is_null($notificationTime->reminder->recurring);
+            $hasSpecificDate = !is_null($notificationTime->reminder->recurring);
 
-            if ($isSpecifidate) {
+            if ($hasSpecificDate) {
 
-                $specificDate = Carbon::parse($notificationTime->reminder->recurring->specific_date);
+                $specificDate = getCarbonDate($notificationTime->reminder->recurring->specific_date);
 
-                $currentTime = Carbon::now()->format('H:i:s');
                 $specificTime = getCarbonTime($notificationTime->specific_notification_time)->format('H:i:s');
 
-                $isNotificationTime = $specificDate->isToday() && ($currentTime == $specificTime);
+                $isNotificationTime = $specificDate->isToday() && ($now == $specificTime);
 
                 if ($isNotificationTime) {
-                    dd($notificationTime->specific_notification_time);
+                    dd($specificTime);
                 }
             }
 
@@ -156,7 +155,7 @@ class HomeController extends Controller
         //     $query->where('end', '<', $now);
         // })->update(['status' => 'finished']);
 
-        $today = getToday();
+        $today = getToday()->format('Y-m-d');
 
         $selectedDate = $request->input('specific_date') ?? $today;
         //Rodrigo
