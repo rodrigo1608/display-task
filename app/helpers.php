@@ -406,13 +406,6 @@ if (!function_exists('getCurrentUserTasks')) {
     }
 }
 
-if (!function_exists('getCarbonTime')) {
-
-    function getCarbonTime($stringTime)
-    {
-        return Carbon::parse($stringTime, 'America/Sao_Paulo');
-    }
-}
 if (!function_exists('getRecurringData')) {
 
     function getRecurringData($request, $isSpecificDayPattern, $reminder)
@@ -444,9 +437,9 @@ if (!function_exists('getRecurringData')) {
     }
 }
 
-if (!function_exists('getNotificationtimes')) {
+if (!function_exists('getNotificationTimes')) {
 
-    function getNotificationtimes($notificationPattern)
+    function getNotificationTimes($notificationPattern)
     {
         $isASpecificNotificationtime = $notificationPattern == 'specific_notification_time';
 
@@ -455,6 +448,51 @@ if (!function_exists('getNotificationtimes')) {
             NotificationTime::with(['user', 'reminder', 'reminder.task'])->whereNotNull('specific_notification_time')->get()
             :
             NotificationTime::with(['user', 'reminder', 'reminder.task'])->where($notificationPattern, 'true')->get();
+    }
+}
+
+
+if (!function_exists('getPluralOrSingularTime')) {
+
+    function getPluralOrSingularTime($time, $measurementUnit)
+    {
+        $isSingular = $time == 1 || $time == 60.0;
+
+        $measurementUnitInSingular = rtrim($measurementUnit, 's');
+
+        return $isSingular
+            ? "$time $measurementUnitInSingular"
+            : "$time $measurementUnit";
+    }
+}
+
+
+if (!function_exists('getTaskNotificationMessage')) {
+
+    function getTaskNotificationMessage($title, $time, $start)
+    {
+
+        $diffInMinutes = $time->diffInMinutes($start);
+
+        $diffInHours = intdiv($diffInMinutes, 60);
+        $remainingMinutes = $diffInMinutes % 60;
+        $isLessThanAnHour = $diffInMinutes < 60;
+
+        $greaterThanAnHourMessage =
+            $remainingMinutes == 0
+
+            ? "A tarefa $title foi programada para iniciar em " .
+            getPluralOrSingularTime($diffInHours, 'horas') . "."
+
+            : "A tarefa $title foi programada para iniciar em " .
+            getPluralOrSingularTime($diffInHours, 'horas') . " e " .
+            getPluralOrSingularTime($remainingMinutes, 'minutos') . ".";
+
+        return  $isLessThanAnHour
+            ? "A tarefa $title foi programada para iniciar em " .
+            getPluralOrSingularTime($diffInMinutes, 'minutos') . "."
+
+            : $greaterThanAnHourMessage;
     }
 }
 
@@ -475,6 +513,14 @@ if (!function_exists('getCarbonNow')) {
     }
 }
 
+if (!function_exists('getCarbonTime')) {
+
+    function getCarbonTime($stringTime)
+    {
+        return Carbon::parse($stringTime, 'America/Sao_Paulo');
+    }
+}
+
 if (!function_exists('getCarbonDate')) {
 
     function getCarbonDate($date)
@@ -482,3 +528,11 @@ if (!function_exists('getCarbonDate')) {
         return Carbon::parse($date)->timezone('America/Sao_Paulo');
     }
 }
+
+// if (!function_exists('getTaskStart')) {
+
+//     function getTaskStart($task)
+//     {
+//         return $task->;
+//     }
+// }

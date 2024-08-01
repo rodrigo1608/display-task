@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ReminderNotify;
 use App\Mail\TaskNotify;
 use App\Models\NotificationTime;
 use App\Models\Reminder;
@@ -48,23 +49,41 @@ class HomeController extends Controller
             $isTask = is_null($notificationTime->reminder->user_id);
 
             $hasSpecificDate = !is_null($notificationTime->reminder->recurring);
+            $userToNotify =  $notificationTime->user;
 
             if ($hasSpecificDate) {
 
                 $specificDate = getCarbonDate($notificationTime->reminder->recurring->specific_date);
-
-                $specificTime = getCarbonTime($notificationTime->specific_notification_time)->format('H:i:s');
+                $specificTime = getCarbonTime($notificationTime->specific_notification_time);
 
                 $isNotificationTime = $specificDate->isToday() && ($now !== $specificTime);
 
                 if ($isNotificationTime) {
 
-                    // dump($notificationTime);
-
-                    $emailAddressToNotify = $notificationTime->user->email;
+                    $emailAddress = $userToNotify->email;
                     // dump($emailAddressToNotify);
 
-                    // Mail::to($emailAddressToNotify)->send(new TaskNotify);
+                    if ($isTask) {
+
+                        $task = $notificationTime->reminder->task;
+
+                        $start = getCarbonTime($task->durations()
+                            ->where('user_id', $userToNotify->id)
+                            ->where('task_id', $task->id)->first()
+                            ->start);
+
+                        $notificationMessage = getTaskNotificationMessage($task->title, $specificTime, $start);
+
+                        $taskData = $task->getAttributes();
+
+                        $taskData['start'] = $start;
+                        $taskData['message'] = getTaskNotificationMessage($task->title, $specificTime, $start);
+
+                        Mail::to($emailAddress)->send(new TaskNotify($taskData));
+                    } else {
+
+                        Mail::to($emailAddress)->send(new ReminderNotify());
+                    }
                 }
             }
 

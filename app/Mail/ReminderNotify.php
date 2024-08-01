@@ -2,8 +2,6 @@
 
 namespace App\Mail;
 
-use App\Models\Task;
-
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -11,20 +9,16 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TaskNotify extends Mailable
+class ReminderNotify extends Mailable
 {
     use Queueable, SerializesModels;
-
-    public $task;
-    public $url;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task)
+    public function __construct()
     {
-        $this->task = $task;
-        $this->url = route('task.show', ['task' => $task->id]);
+        //
     }
 
     /**
@@ -33,7 +27,7 @@ class TaskNotify extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Task Notify',
+            subject: 'Reminder Notify',
         );
     }
 
@@ -43,7 +37,7 @@ class TaskNotify extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.task-notify',
+            markdown: 'mail.reminder-notify',
         );
     }
 

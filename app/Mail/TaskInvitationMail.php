@@ -20,11 +20,9 @@ class TaskInvitationMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task, $creatorName)
+    public function __construct($task)
     {
         $this->task = $task;
-        $this->creator = $creatorName;
-
         $this->url = route('task.show', ['task' => $task->id]);
     }
 
