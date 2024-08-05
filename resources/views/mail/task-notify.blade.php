@@ -1,12 +1,10 @@
 <x-mail::message>
-# Introduction
+{{ $taskData['message'] }}
 
-The body of your message.
-
-<x-mail::button :url="''">
-Button Text
+<x-mail::button :url="$url">
+Clique aqui para ver a tarefa
 </x-mail::button>
 
-Thanks,<br>
+Att,<br>
 {{ config('app.name') }}
 </x-mail::message>

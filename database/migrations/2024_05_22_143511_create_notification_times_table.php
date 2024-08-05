@@ -15,7 +15,7 @@ return new class extends Migration
 
             $table->id();
 
-            $table->time('specific_notification_time')->nullable();
+            $table->time('custom_time')->nullable();
 
             $table->enum('half_an_hour_before', ['true', 'false'])->default('false');
 

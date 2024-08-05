@@ -6,7 +6,7 @@ use App\Helpers\QueryHelpers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\SetPendingTask;
-use App\Jobs\JobSendInvitationEmail;
+use App\Jobs\SendInvitationEmail;
 // use App\Models\NotificationTime;
 use App\Models\Attachment;
 use App\Models\Duration;
@@ -129,11 +129,11 @@ class TaskController extends Controller
             }
         }
 
-        $specificNotificationTime = $request->time ? date('H:i', strtotime($request->time)) : null;
+        $customTime = $request->time ? date('H:i', strtotime($request->time)) : null;
 
         NotificationTime::create([
 
-            'specific_notification_time' => $specificNotificationTime,
+            'custom_time' => $customTime,
 
             'half_an_hour_before' => $request->half_an_hour_before ?? 'false',
 
@@ -150,7 +150,6 @@ class TaskController extends Controller
         ]);
 
         $recurringData = getRecurringData($request, $isSpecificDayPattern, $reminder);
-
 
         Recurring::create($recurringData);
 
@@ -192,7 +191,7 @@ class TaskController extends Controller
 
             $creatorName = "$creator->name $creator->lastname";
 
-            JobSendInvitationEmail::dispatch($participantsEmails, $task, $creatorName);
+            SendInvitationEmail::dispatch($participantsEmails, $task, $creatorName);
         }
 
         $feedbacks = Feedback::all();
@@ -341,17 +340,19 @@ class TaskController extends Controller
         $endTime = $request->end ? date('H:i', strtotime($request->end)) : null;
 
         Duration::create([
+
             'start' => $startTime,
             'end' => $endTime,
             'task_id' => $id,
             'user_id' => $currentUserID
+
         ]);
 
-        $specificNotificationTime = $request->time ? date('H:i', strtotime($request->time)) : null;
+        $customTime = $request->time ? date('H:i', strtotime($request->time)) : null;
 
         NotificationTime::create([
 
-            'specific_notification_time' => $specificNotificationTime,
+            'custom_time' => $customTime,
 
             'half_an_hour_before' => $request->half_an_hour_before ?? 'false',
 

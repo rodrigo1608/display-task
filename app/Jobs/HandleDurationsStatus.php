@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 use Carbon\Carbon;
 
-class JobHandleDurationsStatus implements ShouldQueue
+class HandleDurationsStatus implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -33,24 +33,21 @@ class JobHandleDurationsStatus implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('job iniciado');
+        Log::info('job HandleDurationsStatus iniciado');
 
         $now = Carbon::now('America/Sao_Paulo');
 
-
-        Log::info($now->format('H:i'));
-
         $tasks = Task::all();
 
-        $todayWeekDay = getWeekDayName($now->toDateString());
+        $currentDayOfWeek = getDayOfWeek($now->toDateString());
 
         foreach ($tasks as $task) {
 
             $isRecurrentTask = $task->reminder->recurring->specific_date == null;
 
-            $isTodayRecurring = $task->reminder->recurring->$todayWeekDay == 'true';
+            $isTodayRecurring = $task->reminder->recurring->$currentDayOfWeek == 'true';
 
-            $isSpecificDateEqualToToday = $task->reminder->recurring->specific_date_weekday == $todayWeekDay;
+            $isSpecificDateEqualToToday = $task->reminder->recurring->specific_date_weekday == $currentDayOfWeek;
 
             $isToday =  $isTodayRecurring  || $isSpecificDateEqualToToday;
 
@@ -95,6 +92,6 @@ class JobHandleDurationsStatus implements ShouldQueue
             }
         }
 
-        Log::info('job encerrado');
+        Log::info('job HandleDurationsStatus encerrado');
     }
 }

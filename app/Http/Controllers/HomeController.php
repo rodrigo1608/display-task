@@ -12,6 +12,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
+use App\Jobs\NotificationAtSpecificTime;
+
+use App\Console\Commands\DispatchNotificationAtSpecificTime;
+
 // use function PHPUnit\Framework\isEmpty;
 
 class HomeController extends Controller
@@ -35,142 +39,10 @@ class HomeController extends Controller
 
     public function index(Request $request)
     {
-
-        $now = getCarbonNow()->format('H:i:s');
+        $now = getCarbonNow()->format('H:i');
 
         //Teste
-        $notificationTimes =  getNotificationtimes('specific_notification_time');
-        // dd($notificationTimes);
 
-        foreach ($notificationTimes as $notificationTime) {
-
-            //Se houver um user_id setado na instancia de um Reminder, é lembrete
-            //Se houver um task_id setado na instancia de um Reminder, é uma tarefa
-            $isTask = is_null($notificationTime->reminder->user_id);
-
-            $hasSpecificDate = !is_null($notificationTime->reminder->recurring);
-            $userToNotify =  $notificationTime->user;
-
-            if ($hasSpecificDate) {
-
-                $specificDate = getCarbonDate($notificationTime->reminder->recurring->specific_date);
-                $specificTime = getCarbonTime($notificationTime->specific_notification_time);
-
-                $isNotificationTime = $specificDate->isToday() && ($now !== $specificTime);
-
-                if ($isNotificationTime) {
-
-                    $emailAddress = $userToNotify->email;
-                    // dump($emailAddressToNotify);
-
-                    if ($isTask) {
-
-                        $task = $notificationTime->reminder->task;
-
-                        $start = getCarbonTime($task->durations()
-                            ->where('user_id', $userToNotify->id)
-                            ->where('task_id', $task->id)->first()
-                            ->start);
-
-                        $notificationMessage = getTaskNotificationMessage($task->title, $specificTime, $start);
-
-                        $taskData = $task->getAttributes();
-
-                        $taskData['start'] = $start;
-                        $taskData['message'] = getTaskNotificationMessage($task->title, $specificTime, $start);
-
-                        Mail::to($emailAddress)->send(new TaskNotify($taskData));
-                    } else {
-
-                        Mail::to($emailAddress)->send(new ReminderNotify());
-                    }
-                }
-            }
-
-            $repeatingDays = getRepeatingDays($notificationTime->reminder->recurring);
-
-            foreach ($repeatingDays as $day) {
-            }
-
-            $userToBeNotify = $notificationTime->user;
-
-            $usersEmailsToNotificationsTimes = array();
-
-            // $startTaskReference = $notificationTime->reminder
-            // ->task->durations
-            // ->where('user_id', $userToBeNotify->id)
-            // ->first()
-            // ->start;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //             $startReference;
-            // $notificationTime->reminder->task
-            // $specificNotificationTimePattern = $notificationPattern === 'specific_notification_time' &&
-
-            // if ($notificationPattern === 'specific_notification_time') {
-
-            //     $usersEmailsToNotificationsTimes;
-
-            //     dd($notificationTime->specific_notification_time);
-            // }
-
-            // $startReference;
-            //         }
-
-
-
-
-            // dd($userToBeNotify->reminder->task->get());
-
-            // $startReference = $notificationTime->reminder
-            //     ->task->durations
-            //     ->where('user_id', $userToBeNotify->id)
-            //     ->first()
-            //     ->start;
-
-            // $carbonStartReference = Carbon::createFromFormat('H:i:s', $startReference);
-
-            // $notificationTime = $carbonStartReference->subMinutes(30)->format('H:i:s');
-
-            // // dump($notificationTime);
-        }
-
-        // $tasks = Task::all();
-
-        // foreach ($tasks as $task) {
-
-        //     $notificationTimes = $task->reminder->notificationTimes;
-
-        //     foreach ($notificationTimes as  $notificationTime) {
-
-        //         foreach ($notificationTime->getAttributes() as $timeSlot => $timeSlotValue) {
-
-        //             if ($timeSlotValue === "true") {
-
-        //                 // dd($timeSlot);
-
-        //                 $halfAnHourBefore = "";
-        //             }
-        //         }
-
-        //         if (!is_null($notificationTime->specific_notification_time)) {
-        //         }
-        //     }
-        // }
-
-        // $notificationTimes =
         //termina o teste
 
         // Task::whereHas('durations', function ($query) use ($now) {
@@ -190,9 +62,9 @@ class HomeController extends Controller
         //     dd($isToday);
         // }
 
-        $weekDayOfSelectDate = getWeekDayName($selectedDate);
+        $weekDayOfSelectDate = getDayOfWeek($selectedDate);
 
-        $weekdayInPortuguese = getWeekdayInPortuguese($weekDayOfSelectDate);
+        $weekdayInPortuguese = getDayOfWeek($weekDayOfSelectDate, 'pt-br');
 
         //Rodrigo
         // dd($weekdayInPortuguese);
@@ -301,7 +173,7 @@ class HomeController extends Controller
 
             if (!is_null($notificationTime)) {
 
-                $isNotificationTimeMissing = empty($notificationTime['specific_notification_time']) &&
+                $isNotificationTimeMissing = empty($notificationTime['custom_time']) &&
                     $notificationTime['half_an_hour_before'] === "false" &&
                     $notificationTime['one_hour_before'] === "false" &&
                     $notificationTime['two_hours_before'] === "false" &&

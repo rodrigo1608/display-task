@@ -11,7 +11,7 @@ use App\Mail\TaskInvitationMail;
 
 use Mail;
 
-class JobSendInvitationEmail implements ShouldQueue
+class SendInvitationEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

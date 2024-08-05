@@ -35,9 +35,51 @@ if (!function_exists('getProfilePicturePath')) {
     }
 }
 
-if (!function_exists('getDaysOfWeekInPortuguese')) {
+if (!function_exists('getFormatedDateBR')) {
 
-    function getDaysOfWeekInPortuguese()
+    function getFormatedDateBR($date)
+    {
+        return Carbon::parse($date)->format('d/m/Y');
+    }
+}
+
+if (!function_exists('getCarbonNow')) {
+
+    function getCarbonNow()
+    {
+        return Carbon::now('America/Sao_Paulo');
+    }
+}
+
+if (!function_exists('getCarbonTime')) {
+
+    function getCarbonTime($stringTime)
+    {
+        return Carbon::parse($stringTime, 'America/Sao_Paulo');
+    }
+}
+
+if (!function_exists('getCarbonDate')) {
+
+    function getCarbonDate($date)
+    {
+        return Carbon::parse($date)->timezone('America/Sao_Paulo');
+    }
+}
+
+if (!function_exists('getToday')) {
+
+    function getToday()
+    {
+
+        return Carbon::today('America/Sao_Paulo');
+    }
+}
+
+
+if (!function_exists('getDaysOfWeek')) {
+
+    function getDaysOfWeek()
     {
         return  [
 
@@ -59,13 +101,19 @@ if (!function_exists('getDaysOfWeekInPortuguese')) {
     }
 }
 
-if (!function_exists('getWeekdayInPortuguese')) {
+if (!function_exists('getDayOfWeek')) {
 
-    function getWeekdayInPortuguese($weekDay)
+    function getDayOfWeek($date, $language = 'en')
     {
-        $weekDaysInPortuguese = getDaysOfWeekInPortuguese();
+        $carbonDate = getCarbonDate($date);
 
-        return $weekDaysInPortuguese[$weekDay];
+        $dayName = strtolower($carbonDate->englishDayOfWeek);
+
+        $daysOfWeek = getDaysOfWeek();
+
+        $isPTBR = $language == 'pt-br';
+
+        return $isPTBR ? $daysOfWeek[$dayName] : $dayName;
     }
 }
 
@@ -94,20 +142,44 @@ if (!function_exists('setTask')) {
 
 if (!function_exists('getRepeatingDays')) {
 
-    function getRepeatingDays($recurring, $translated = false)
+    function getRepeatingDays($recurring, $language = 'en')
     {
-        $daysOfWeek = getDaysOfWeekInPortuguese();
+        $daysOfWeek = getDaysOfWeek();
 
         $repeatingDays = [];
+
+        $isPtBr = $language  == 'pt-br';
 
         foreach ($daysOfWeek as $key => $day) {
 
             if ($recurring->$key === 'true') {
 
-                $repeatingDays[] = $translated ? $day : $key;
+                $repeatingDays[] = $isPtBr ? $day : $key;
             }
         }
         return $repeatingDays;
+    }
+}
+
+if (!function_exists('getPredefinedAlerts')) {
+
+    function getPredefinedAlerts($notificationTime, $language = 'en')
+    {
+        $getAlertOptions = getAlertOptions();
+
+        $predefinedAlerts = [];
+
+        $isPtBr = $language  == 'pt-br';
+
+        foreach ($getAlertOptions as $key => $option) {
+
+            if ($notificationTime->$key === 'true') {
+
+                $predefinedAlerts[] = $isPtBr ? $option : $key;
+            }
+        }
+
+        return $predefinedAlerts;
     }
 }
 
@@ -123,7 +195,7 @@ if (!function_exists('getRecurringMessage')) {
 
             // $repeatingDays = getRepeatingDays($daysOfWeek, $recurring);
 
-            $repeatingDays = getRepeatingDays($recurring, true);
+            $repeatingDays = getRepeatingDays($recurring, 'pt-br');
 
             $numberOfRepeatingDays = count($repeatingDays);
 
@@ -148,12 +220,10 @@ if (!function_exists('getRecurringMessage')) {
             }
         } else {
 
-            $weekDaysInPortuguese = getDaysOfWeekInPortuguese();
-
-            $weekday = $weekDaysInPortuguese[getWeekDayName($recurring->specific_date)];
+            $dayOfWeekInPortuguese = getDayOfWeek($recurring->specific_date, 'pt-br');
 
             $formatedDate = '<strong>' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</strong>';
-            $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate, $weekday.";
+            $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate, $dayOfWeekInPortuguese.";
         }
 
         return $recurringMessage;
@@ -179,18 +249,6 @@ if (!function_exists('getParticipantsEmail')) {
     }
 }
 
-if (!function_exists('getWeekDayName')) {
-
-    function getWeekDayName($date)
-    {
-        $carbonDate = Carbon::parse($date);
-
-        $dayName = strtolower($carbonDate->englishDayOfWeek);
-
-        return $dayName;
-    }
-}
-
 if (!function_exists('getRecurringTask')) {
 
     function getRecurringTask(Builder $query, $recurrencePattern, $inputData = null)
@@ -198,26 +256,22 @@ if (!function_exists('getRecurringTask')) {
         //rodrigo
         // dd($inputData);
 
-        $weekDayOfSpecificDate = null;
-
-        $hasSpecificDate = $inputData['specific_date'] !== null;
+        $hasSpecificDate = !is_null($inputData['specific_date']);
 
         $date = $inputData['specific_date'];
 
-        $weekDayOfSpecificDate = $hasSpecificDate ? getWeekDayName($date) : null;
-
-        // dd($date);
+        $dayOfWeek = $hasSpecificDate ? getDayOfWeek($date) : null;
 
         return $hasSpecificDate
             ?
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($date, $weekDayOfSpecificDate) {
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($date, $dayOfWeek) {
                 // dd($taskReminderRecurringQuery);
-                $taskReminderRecurringQuery->where('specific_date', $date)->orWhere($weekDayOfSpecificDate, "true");
+                $taskReminderRecurringQuery->where('specific_date', $date)->orWhere($dayOfWeek, "true");
             })
             :
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern, $weekDayOfSpecificDate) {
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
                 // dd($recurrencePattern);
-                $taskReminderRecurringQuery->where('specific_date_weekday',   $recurrencePattern)->orWhere($recurrencePattern, 'true');
+                $taskReminderRecurringQuery->where('specific_date_weekday', $recurrencePattern)->orWhere($recurrencePattern, 'true');
             });
     }
 }
@@ -240,28 +294,28 @@ if (!function_exists('addDurationOverlapQuery')) {
     }
 }
 
-if (!function_exists('getTaskInArray')) {
+if (!function_exists('getConflitingTaskData')) {
 
-    function getTaskInArray($conflitingTask)
+    function getConflitingTaskData($conflitingTask)
     {
 
-        $conflitingTaskToArray =  $conflitingTask->toArray();
+        $conflitingTaskData =  $conflitingTask->toArray();
 
-        $conflitingTaskToArray['owner'] = $conflitingTask->creator->name . ' ' . $conflitingTask->creator->lastname;
+        $conflitingTaskData['owner'] = $conflitingTask->creator->name . ' ' . $conflitingTask->creator->lastname;
 
-        $conflitingTaskToArray['owner_telehpone'] =  getFormatedTelephone($conflitingTask->creator);
+        $conflitingTaskData['owner_telehpone'] =  getFormatedTelephone($conflitingTask->creator);
 
-        $conflitingTaskToArray['owner_email'] =  $conflitingTask->creator->email;
+        $conflitingTaskData['owner_email'] =  $conflitingTask->creator->email;
 
         $conflictingDuration =  $conflitingTask->durations->first();
 
-        $conflitingTaskToArray['start'] = date('H:i', strtotime($conflictingDuration->start));
+        $conflitingTaskData['start'] = date('H:i', strtotime($conflictingDuration->start));
 
-        $conflitingTaskToArray['end'] =  date('H:i', strtotime($conflictingDuration->end));
+        $conflitingTaskData['end'] =  date('H:i', strtotime($conflictingDuration->end));
 
-        $conflitingTaskToArray['recurringMessage'] = getRecurringMessage($conflitingTask->reminder->recurring);
+        $conflitingTaskData['recurringMessage'] = getRecurringMessage($conflitingTask->reminder->recurring);
 
-        return   $conflitingTaskToArray;
+        return $conflitingTaskData;
     }
 }
 
@@ -316,12 +370,12 @@ if (!function_exists('getConflictingTask')) {
 
         if ($hasConflictingTask) {
 
-            $conflictingTaskInArray = getTaskInArray($conflictingTask);
+            $conflitingTaskData = getConflitingTaskData($conflictingTask);
 
             //rodrigo
-            // dd($conflictingTaskInArray);
+            // dd($conflitingTaskData);
 
-            session()->flash('conflictingTask',  $conflictingTaskInArray);
+            session()->flash('conflictingTask',  $conflitingTaskData);
 
             return redirect()->back()->withErrors([
 
@@ -342,14 +396,6 @@ if (!function_exists('getRecurringTasks')) {
                 $reminderRecurringQuery->where($pattern, 'true');
             });
         });
-    }
-}
-
-if (!function_exists('getFormatedDateBR')) {
-
-    function getFormatedDateBR($date)
-    {
-        return Carbon::parse($date)->format('d/m/Y');
     }
 }
 
@@ -415,7 +461,7 @@ if (!function_exists('getRecurringData')) {
 
             'specific_date' => $request->specific_date ?? null,
 
-            'specific_date_weekday' => $isSpecificDayPattern ? getWeekDayName($request->specific_date) : null,
+            'specific_date_weekday' => $isSpecificDayPattern ? getDayOfWeek($request->specific_date) : null,
 
             'sunday' => $request->sunday ?? 'false',
 
@@ -441,11 +487,11 @@ if (!function_exists('getNotificationTimes')) {
 
     function getNotificationTimes($notificationPattern)
     {
-        $isASpecificNotificationtime = $notificationPattern == 'specific_notification_time';
+        $isASpecificNotificationtime = $notificationPattern == 'custom_time';
 
         return $isASpecificNotificationtime
             ?
-            NotificationTime::with(['user', 'reminder', 'reminder.task'])->whereNotNull('specific_notification_time')->get()
+            NotificationTime::with(['user', 'reminder', 'reminder.task'])->whereNotNull('custom_time')->get()
             :
             NotificationTime::with(['user', 'reminder', 'reminder.task'])->where($notificationPattern, 'true')->get();
     }
@@ -466,7 +512,6 @@ if (!function_exists('getPluralOrSingularTime')) {
     }
 }
 
-
 if (!function_exists('getTaskNotificationMessage')) {
 
     function getTaskNotificationMessage($title, $time, $start)
@@ -481,58 +526,92 @@ if (!function_exists('getTaskNotificationMessage')) {
         $greaterThanAnHourMessage =
             $remainingMinutes == 0
 
-            ? "A tarefa $title foi programada para iniciar em " .
-            getPluralOrSingularTime($diffInHours, 'horas') . "."
+            ? "A tarefa **\"$title\"**, está programada para iniciar em " .
+            getPluralOrSingularTime($diffInHours, 'horas') . " após o envio desta notificação."
 
-            : "A tarefa $title foi programada para iniciar em " .
+            : "A tarefa **\"$title\"**, está programada para iniciar em " .
             getPluralOrSingularTime($diffInHours, 'horas') . " e " .
-            getPluralOrSingularTime($remainingMinutes, 'minutos') . ".";
+            getPluralOrSingularTime($remainingMinutes, 'minutos') . " após o envio desta notificação.";
 
         return  $isLessThanAnHour
-            ? "A tarefa $title foi programada para iniciar em " .
-            getPluralOrSingularTime($diffInMinutes, 'minutos') . "."
+            ? "A tarefa **\"$title\"**, está programada para iniciar em " .
+            getPluralOrSingularTime($diffInMinutes, 'minutos') . " após o envio desta notificação."
 
             : $greaterThanAnHourMessage;
     }
 }
 
-if (!function_exists('getToday')) {
+if (!function_exists('getStartDuration')) {
 
-    function getToday()
+    function getStartDuration($task, $userID)
     {
 
-        return Carbon::today('America/Sao_Paulo');
+        return getCarbonTime((
+                $task->durations()
+                ->where('user_id', $userID)
+                ->where('task_id', $task->id))
+                ->first()
+                ->start
+        );
     }
 }
 
-if (!function_exists('getCarbonNow')) {
+if (!function_exists('checkIfNotificationTimeIsNow')) {
 
-    function getCarbonNow()
+    function checkIfNotificationTimeIsNow($notificationTime, $start = null)
+    // function getAlertOptions()
     {
-        return Carbon::now('America/Sao_Paulo');
+        $now = getCarbonNow();
+
+        $isCustomTime = !is_null($notificationTime->custom_time);
+
+        if ($isCustomTime) {
+
+            $customTime = getCarbonTime($notificationTime->custom_time);
+
+            return ($customTime->format('H:i:s') == $now->format('H:i:s'));
+        } else {
+
+            $predefinedAlerts = getPredefinedAlerts($notificationTime);
+
+            $start = getCarbonTime($start);
+
+            foreach ($predefinedAlerts as $alert) {
+
+                if ($alert == 'half_an_hour_before') {
+
+                    $halfAnHourBefore = $start->copy()->subMinutes(30);
+
+                    return $halfAnHourBefore->format('H:i') === $now->format('H:i');
+                } elseif ($alert == 'one_hour_before') {
+                    $oneHourBefore = $start->copy()->subMinutes(60);
+
+                    return $oneHourBefore->format('H:i') === $now->format('H:i');
+                } elseif ($alert == 'two_hours_before') {
+                    $twoHoursBefore = $start->copy()->subMinutes(120);
+
+                    return $twoHoursBefore->format('H:i') === $now->format('H:i');
+                } elseif ($alert == 'one_day_earlier') {
+
+                    $oneDayEarlier = $start->copy()->subDay();
+
+                    return $oneDayEarlier->format('H:i') === $now->format('H:i');
+                }
+            }
+        }
+
+        // $isNotificationTime = $specificDate->isToday() && ($now !== $customTime);
+
+        return [
+
+            'half_an_hour_before' => 'Meia hora antes',
+
+            'one_hour_before' => 'Uma hora antes',
+
+            'two_hours_before' => 'Duas horas antes',
+
+            'one_day_earlier' => 'Um dia antes'
+
+        ];
     }
 }
-
-if (!function_exists('getCarbonTime')) {
-
-    function getCarbonTime($stringTime)
-    {
-        return Carbon::parse($stringTime, 'America/Sao_Paulo');
-    }
-}
-
-if (!function_exists('getCarbonDate')) {
-
-    function getCarbonDate($date)
-    {
-        return Carbon::parse($date)->timezone('America/Sao_Paulo');
-    }
-}
-
-// if (!function_exists('getTaskStart')) {
-
-//     function getTaskStart($task)
-//     {
-//         return $task->;
-//     }
-// }

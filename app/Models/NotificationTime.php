@@ -11,7 +11,7 @@ class NotificationTime extends Model
 
     protected $fillable = [
 
-        'specific_notification_time',
+        'custom_time',
 
         'half_an_hour_before',
 

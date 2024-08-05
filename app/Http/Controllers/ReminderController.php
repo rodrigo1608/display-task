@@ -41,12 +41,11 @@ class ReminderController extends Controller
 
     public function store(StoreReminderRequest $request)
     {
-
         $reminder = Reminder::create([
 
             'title' => $request->title,
 
-            'notification_message' => $request->description,
+            'notification_message' => $request->notification_message,
 
             'user_id' => auth()->id(),
 
@@ -62,11 +61,11 @@ class ReminderController extends Controller
 
         Recurring::create($recurringData);
 
-        $specificNotificationTime = $request->time ? date('H:i:s', strtotime($request->time)) : null;
+        $customTime = $request->time ? date('H:i:s', strtotime($request->time)) : null;
 
         NotificationTime::create([
 
-            'specific_notification_time' => $specificNotificationTime,
+            'custom_time' => $customTime,
             'reminder_id' => $reminder->id,
             'user_id' => auth()->id(),
         ]);

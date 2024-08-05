@@ -4,21 +4,23 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class DispatchNotificationAtSpecificTime extends Command
+use App\Jobs\HandleDurationsStatus;
+
+class DispatchHandleDurationsStatus extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'dispatch:notification-at-specific-time';
+    protected $signature = 'dispatch:handle-durations-status';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Dispatches a job to send notifications to users about reminders and tasks scheduled for a specific time.';
+    protected $description = 'Dispatches the JobHandleDurationsStatus job';
 
     /**
      * Execute the console command.
@@ -27,7 +29,7 @@ class DispatchNotificationAtSpecificTime extends Command
     {
         try {
 
-            NotificationAtSpecificTime::dispatch();
+            HandleDurationsStatus::dispatch();
 
             $this->info('The command has been executed successfully.');
         } catch (\Exception $e) {

@@ -71,7 +71,7 @@
                                             <div class="accordion-body">
 
                                                 <p class="roboto-light fs-5">
-                                                    {{ $task->reminder->notification_message }}
+                                                    {{ $task->feedbacks[0]->feedback}}
                                                 </p>
 
                                                 @if ($task->isNotificationTimeMissing)

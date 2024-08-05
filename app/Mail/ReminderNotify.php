@@ -13,12 +13,14 @@ class ReminderNotify extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public $reminder;
+
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($reminder)
     {
-        //
+        $this->reminder = $reminder;
     }
 
     /**
@@ -27,7 +29,7 @@ class ReminderNotify extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Reminder Notify',
+            subject: "Lembrete: ". $this->reminder->title,
         );
     }
 

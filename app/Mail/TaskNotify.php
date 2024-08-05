@@ -15,16 +15,16 @@ class TaskNotify extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $task;
+    public $taskData;
     public $url;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(Task $task)
+    public function __construct($taskData)
     {
-        $this->task = $task;
-        $this->url = route('task.show', ['task' => $task->id]);
+        $this->taskData = $taskData;
+        $this->url = route('task.show', ['task' => $taskData['id']]);
     }
 
     /**
@@ -33,7 +33,8 @@ class TaskNotify extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Task Notify',
+            // subject: $this->taskData['message'],
+            subject: "Notificação da tarefa: ". $this->taskData['title'],
         );
     }
 
