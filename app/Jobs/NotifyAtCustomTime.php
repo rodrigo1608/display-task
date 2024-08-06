@@ -65,6 +65,7 @@ class NotifyAtCustomTime implements ShouldQueue
 
                     $customTime = getCarbonTime($notificationTime->custom_time);
 
+                    $isNotToday = !$specificDate->isToday();
 
                     $isBeforeCustomTime = $specificDate->isToday() && ($now->format('H:i') < $customTime->format('H:i'));
 
@@ -72,24 +73,28 @@ class NotifyAtCustomTime implements ShouldQueue
 
                     $isAfterCustomTime = $specificDate->isToday() && ($now->format('H:i') > $customTime->format('H:i'));
 
+                    if($isNotToday){
+                        Log::info("Job NotifyAtCustomTime: A notificação (id: $notificationTime->id) não está programada para hoje.");
 
-                    if( $isBeforeCustomTime){
+                        Log::info('Data atual: ' . getToday()->format('d/m/Y'));
+                        Log::info('Data programada: ' .getCarbonDate($specificDate)->format('d/m/Y'));
+
+                    }elseif($isBeforeCustomTime){
 
                         Log::info("Job NotifyAtCustomTime: A notificação (id: $notificationTime->id) está programada para hoje.");
                         Log::info('Horário atual: ' . $now);
-                        Log::info('Horário customizado:' . $customTime->format('H:i'));
+                        Log::info('Horário programado:' . $customTime->format('H:i'));
 
-                    }elseif($specificDate->isToday() && ($now->format('H:i') > $customTime->format('H:i')))
+                    }elseif($isAfterCustomTime){
 
+                        Log::info("Job NotifyAtCustomTime: A notificação (ID: $notificationTime->id) estava programada para hoje, mas o horário já passou.");
 
-                    ? "Job NotifyAtCustomTime: A notificação (id: $notificationTime->id) está programada para hoje."
-                    : "Job NotifyAtCustomTime: A notificação (id: $notificationTime->id) não está programada para hoje.");
+                        Log::info('Horário atual: ' . $now);
+                        Log::info('Horário programado:' . $customTime->format('H:i'));
 
-                   if($isNotification)
+                    }elseif ($isNotificationTime && $isTask) {
 
-                    if ($isNotificationTime && $isTask) {
-
-                        Log::info('job NotifyAtCustomTime entrou no if que confirma que é uma tarefa e está na hora');
+                        Log::info('Job NotifyAtCustomTime: A condição de verificar se a notificação da tarefa está é agora, foi atendida.');
 
                         $task = $notificationTime->reminder->task;
 
@@ -102,26 +107,22 @@ class NotifyAtCustomTime implements ShouldQueue
                         $taskData['start'] = $start;
                         $taskData['message'] =  $notificationMessage;
 
-                        Log::info('job NotifyAtCustomTime entrou no if de enviar tarefa');
 
                         Mail::to($userToNotify->email)->send(new TaskNotify($taskData));
 
-                        Log::info('job NotifyAtCustomTime finalizado');
+                        Log::info("Job NotifyAtCustomTime: A notificação de tarefa foi enviada $userToNotify->email");
+
                     } elseif ($isNotificationTime) {
 
                         $reminder = $notificationTime->reminder;
-
-                        Log::info('job NotifyAtCustomTime entrou no if de enviar recado');
-
                         Mail::to($userToNotify->email)->send(new ReminderNotify($reminder));
+                        Log::info("Job NotifyAtCustomTime: O lembrete foi enviado para  $userToNotify->email");
                     }
                 }
             }
 
         }
 
-
-
-        Log::info('job NotifyAtCustomTime finalizado');
+        Log::info('Job NotifyAtCustomTime: finalizado');
     }
 }
