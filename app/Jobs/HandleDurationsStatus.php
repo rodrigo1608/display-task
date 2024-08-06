@@ -33,7 +33,8 @@ class HandleDurationsStatus implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('job HandleDurationsStatus iniciado');
+        Log::info('Job HandleDurationsStatus:');
+        Log::info('Job HandleDurationsStatus: INÍCIO');
 
         $now = Carbon::now('America/Sao_Paulo');
 
@@ -45,53 +46,34 @@ class HandleDurationsStatus implements ShouldQueue
 
             $isRecurrentTask = $task->reminder->recurring->specific_date == null;
 
-            $isTodayRecurring = $task->reminder->recurring->$currentDayOfWeek == 'true';
+            if ($isRecurrentTask) {
 
-            $isSpecificDateEqualToToday = $task->reminder->recurring->specific_date_weekday == $currentDayOfWeek;
+                Log::info("Job HandleDurationsStatus: Foi verificado que é uma tarefa  recorrente - (ID: $task->id)");
 
-            $isToday =  $isTodayRecurring  || $isSpecificDateEqualToToday;
+                $isTodayRecurringDay = $task->reminder->recurring->$currentDayOfWeek === 'true';
 
-            if ($isRecurrentTask && $isToday) {
+                if ($isTodayRecurringDay) {
 
-                foreach ($task->durations as $duration) {
+                    Log::info('Job HandleDurationsStatus: A recorrência foi confirmada para ocorrer hoje.');
 
-                    $start =  getCarbonTime($duration->start);
-                    $end =    getCarbonTime($duration->end);
-
-                    $isInProgress = $start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now);
-                    $isFinished = $end->lessThan($now);
-                    $isStarting = $start->greaterThan($now);
-
-                    if ($isInProgress) {
-
-                        $duration->update(['status' => 'in_progress']);
-                    } elseif ($isFinished) {
-
-                        $duration->update(['status' => 'finished']);
-                    } elseif ($isStarting) {
-
-                        $duration->update(['status' => 'starting']);
-                    }
+                    handleDurationStatus($task, $now, 'recurring');
                 }
-            } elseif ($isToday) {
+            } else {
 
-                foreach ($task->durations as $duration) {
+                Log::info("Job HandleDurationsStatus: Foi verificado que é uma tarefa  com data específica - (ID: $task->id)");
 
-                    $start =  getCarbonTime($duration->start);
-                    $end =  getCarbonTime($duration->end);
+                $specificDate = getCarbonDate($task->reminder->recurring->specific_date);
 
-                    $isInProgress = ($start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now));
-                    $isFinished = $end->lessThan($now);
+                $isSpecificDateToday =  $specificDate->isSameDay($now);
 
-                    if ($isInProgress) {
-                        $duration->update(['status' => 'in_progress']);
-                    } elseif ($end->lessThan($now)) {
-                        $duration->update(['status' => 'finished']);
-                    }
+                if ($isSpecificDateToday) {
+
+                    handleDurationStatus($task, $now);
                 }
             }
         }
 
-        Log::info('job HandleDurationsStatus encerrado');
+        Log::info('Job HandleDurationsStatus: FIM');
+        Log::info('Job HandleDurationsStatus');
     }
 }

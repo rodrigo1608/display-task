@@ -1,9 +1,11 @@
 <?php
 
-use Carbon\Carbon;
-use App\Models\Task;
 use App\Models\NotificationTime;
+use App\Models\Task;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Log;
+
 
 if (!function_exists('getFormatedTelephone')) {
 
@@ -613,5 +615,62 @@ if (!function_exists('checkIfNotificationTimeIsNow')) {
             'one_day_earlier' => 'Um dia antes'
 
         ];
+    }
+}
+
+if (!function_exists('getStatusDurationLog')) {
+
+    function getStatusDurationLog($logData, $status)
+    {
+        Log::info("Job HandleDurationsStatus: O status da duração da tarefa (ID: " . $logData['task_id'] . ") pertencente ao usuário " . $logData['user_email'] . ", foi alterado para " . $status);
+
+        Log::info("Job HandleDurationsStatus: Horário atual: " . $logData['now']);
+        Log::info("Job HandleDurationsStatus: Horário de início: " . $logData['start']);
+        Log::info("Job HandleDurationsStatus: Horário de término: " . $logData['end']);
+    }
+}
+
+if (!function_exists('handleDurationStatus')) {
+
+    function handleDurationStatus($task, $now)
+    {
+
+        $durations = $task->durations;
+
+        foreach ($durations as $duration) {
+
+            $start =  getCarbonTime($duration->start);
+            $end =    getCarbonTime($duration->end);
+
+            $isInProgress = $start->lessThanOrEqualTo($now) && $end->greaterThanOrEqualTo($now);
+            $isFinished = $end->lessThan($now);
+            $isStarting = $start->greaterThan($now);
+
+            $shouldChangeStatus =  $duration->status !== 'finished';
+
+            $logData = [
+                'task_id' => $task->id,
+                'user_email' => $task->email,
+                'now' => $now->format('H:i'),
+                'start' => $start->format('H:i'),
+                'end' => $end->format('H:i'),
+            ];
+
+            if ($isInProgress) {
+
+                $duration->update(['status' => 'in_progress']);
+                getStatusDurationLog($logData, 'in_progress');
+            } elseif ($isFinished && $shouldChangeStatus) {
+
+                $duration->update(['status' => 'finished']);
+                getStatusDurationLog($logData, 'finished');
+            } elseif ($isFinished) {
+                Log::info("Job HandleDurationsStatus: A tarefa (ID: $task->id) pertencente ao usuário " . $logData['user_email'] . ", já foi finalizada");
+            } elseif ($isStarting) {
+
+                $duration->update(['status' => 'starting']);
+                getStatusDurationLog($logData, 'starting');
+            }
+        }
     }
 }

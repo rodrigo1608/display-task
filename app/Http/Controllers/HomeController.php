@@ -2,21 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ReminderNotify;
-use App\Mail\TaskNotify;
 use App\Models\NotificationTime;
 use App\Models\Reminder;
 use App\Models\Task;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 
-use App\Jobs\NotificationAtSpecificTime;
 
-use App\Console\Commands\DispatchNotificationAtSpecificTime;
-
-// use function PHPUnit\Framework\isEmpty;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -42,6 +36,7 @@ class HomeController extends Controller
         $now = getCarbonNow()->format('H:i');
 
         //Teste
+
 
         //termina o teste
 
