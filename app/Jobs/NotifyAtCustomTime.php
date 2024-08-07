@@ -46,6 +46,10 @@ class NotifyAtCustomTime implements ShouldQueue
 
             foreach ($customNotificationTimes as $notificationTime) {
 
+                Log::info("Job NotifyAtCustomTime: Início da iteração referente a hora de notifição  ");
+
+                $customTime = getCarbonTime($notificationTime->custom_time);
+
                 $now = getCarbonNow();
 
                 //Se houver um user_id setado na instancia de um Reminder, é lembrete
@@ -58,36 +62,34 @@ class NotifyAtCustomTime implements ShouldQueue
 
                 if ($hasSpecificDate) {
 
-                    Log::info('Job NotifyAtCustomTime: A condição que verifica se é uma tarefa com data específica, foi atendida.');
+                    Log::info('Job NotifyAtCustomTime: A tarefa em análise está configurada para uma data específica.');
 
                     $specificDate = getCarbonDate($notificationTime->reminder->recurring->specific_date);
 
-                    $customTime = getCarbonTime($notificationTime->custom_time);
+                    $isToday = checkIsToday($specificDate);
 
-                    $isNotToday = !$specificDate->isToday();
+                    $isBeforeCustomTime = $isToday && ($now->format('H:i') < $customTime->format('H:i'));
 
-                    $isBeforeCustomTime = $specificDate->isToday() && ($now->format('H:i') < $customTime->format('H:i'));
+                    $isNotificationTime = $isToday && ($now->format('H:i') == $customTime->format('H:i'));
 
-                    $isNotificationTime = $specificDate->isToday() && ($now->format('H:i') == $customTime->format('H:i'));
+                    $isAfterCustomTime = $isToday && ($now->format('H:i') > $customTime->format('H:i'));
 
-                    $isAfterCustomTime = $specificDate->isToday() && ($now->format('H:i') > $customTime->format('H:i'));
-
-                    if ($isNotToday) {
+                    if (!$isToday) {
                         Log::info("Job NotifyAtCustomTime: A notificação (ID: $notificationTime->id) não está programada para hoje.");
 
-                        Log::info('Data atual: ' . getToday()->format('d/m/Y'));
-                        Log::info('Data programada: ' . getCarbonDate($specificDate)->format('d/m/Y'));
+                        Log::info('Job NotifyAtCustomTime: Data atual: ' . getToday()->format('d/m/Y'));
+                        Log::info('Job NotifyAtCustomTime: Data programada: ' . getCarbonDate($specificDate)->format('d/m/Y'));
                     } elseif ($isBeforeCustomTime) {
 
                         Log::info("Job NotifyAtCustomTime: A notificação (ID: $notificationTime->id) está programada para hoje.");
-                        Log::info('Horário atual: ' . $now);
-                        Log::info('Horário programado:' . $customTime->format('H:i'));
+                        Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
+                        Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now);
                     } elseif ($isAfterCustomTime) {
 
                         Log::info("Job NotifyAtCustomTime: O horário da notificação (ID: $notificationTime->id) já passou.");
 
-                        Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
                         Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
+                        Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
                     } elseif ($isNotificationTime && $isTask) {
 
                         Log::info('Job NotifyAtCustomTime: A condição que verifica se o horário da notificação da tarefa é agora, foi atendida.');
@@ -108,14 +110,25 @@ class NotifyAtCustomTime implements ShouldQueue
 
                         Log::info("Job NotifyAtCustomTime: A notificação de tarefa foi enviada $userToNotify->email");
                     } elseif ($isNotificationTime) {
+
                         Log::info('Job NotifyAtCustomTime: A condição de verificar se o horário do lembrete é agora, foi atendida.');
                         $reminder = $notificationTime->reminder;
 
                         Mail::to($userToNotify->email)->send(new ReminderNotify($reminder));
                         Log::info("Job NotifyAtCustomTime: O lembrete foi enviado para  $userToNotify->email");
                     }
+                } else {
+
+                    Log::info('Job NotifyAtCustomTime: A tarefa em análise possui recorrencia(s).');
+
+                    $recurringDays = getRepeatingDays($notificationTime->reminder->recurring);
+
+                    foreach ($recurringDays as $day) {
+                    }
                 }
             }
+
+            Log::info("Job NotifyAtCustomTime: Início da iteração referente a hora de notifição  ");
         }
 
         Log::info('Job NotifyAtCustomTime: FIM');

@@ -119,6 +119,21 @@ if (!function_exists('getDayOfWeek')) {
     }
 }
 
+if (!function_exists('checkIsToday')) {
+
+    function checkIsToday($day)
+    {
+        $today = getToday();
+        $dayOfWeekToday = getDayOfWeek($today);
+
+        if ($day instanceof Carbon) {
+            return $day->isToday();
+        } else {
+            return $dayOfWeekToday === $day;
+        }
+    }
+}
+
 if (!function_exists('setTask')) {
 
     function setTask($task)
@@ -558,63 +573,95 @@ if (!function_exists('getStartDuration')) {
     }
 }
 
-if (!function_exists('checkIfNotificationTimeIsNow')) {
+// if (!function_exists('checkIfNotificationTime')) {
 
-    function checkIfNotificationTimeIsNow($notificationTime, $start = null)
-    // function getAlertOptions()
+//     function checkIfNotificationTime($notificationTime)
+//     // function getAlertOptions()
+//     {
+//         $now = getCarbonNow();
+
+//         $isCustomTime = !is_null($notificationTime->custom_time);
+
+//         if ($isCustomTime) {
+
+//             $customTime = getCarbonTime($notificationTime->custom_time);
+
+//             return ($customTime->format('H:i:s') == $now->format('H:i:s'));
+//         } else {
+
+//             $predefinedAlerts = getPredefinedAlerts($notificationTime);
+
+//             $task = $notificationTime->
+
+//             $start =  getStartDuration($task, $userID);
+
+
+
+//             foreach ($predefinedAlerts as $alert) {
+
+//                 if ($alert == 'half_an_hour_before') {
+
+//                     $halfAnHourBefore = $start->copy()->subMinutes(30);
+
+//                     return $halfAnHourBefore->format('H:i') === $now->format('H:i');
+//                 } elseif ($alert == 'one_hour_before') {
+//                     $oneHourBefore = $start->copy()->subMinutes(60);
+
+//                     return $oneHourBefore->format('H:i') === $now->format('H:i');
+//                 } elseif ($alert == 'two_hours_before') {
+//                     $twoHoursBefore = $start->copy()->subMinutes(120);
+
+//                     return $twoHoursBefore->format('H:i') === $now->format('H:i');
+//                 } elseif ($alert == 'one_day_earlier') {
+
+//                     $oneDayEarlier = $start->copy()->subDay();
+
+//                     return $oneDayEarlier->format('H:i') === $now->format('H:i');
+//                 }
+//             }
+//         }
+
+//         // $isNotificationTime = $specificDate->isToday() && ($now !== $customTime);
+
+//         return [
+
+//             'half_an_hour_before' => 'Meia hora antes',
+
+//             'one_hour_before' => 'Uma hora antes',
+
+//             'two_hours_before' => 'Duas horas antes',
+
+//             'one_day_earlier' => 'Um dia antes'
+
+//         ];
+//     }
+// }
+
+if (!function_exists('getChangeStatusDurationLog')) {
+
+    function getChangeStatusDurationLog($logData, $status)
     {
-        $now = getCarbonNow();
+        Log::info('Job HandleDurationsStatus: O status da duração da tarefa pertencente ao usuário' . $logData['user_email'] . ', foi alterado para ' . $status . '. - Duration ID: ' . $logData['duration_id']);
+    }
+}
 
-        $isCustomTime = !is_null($notificationTime->custom_time);
+if (!function_exists('getStatusLog')) {
+    function getStatusLog($status)
+    {
 
-        if ($isCustomTime) {
+        switch ($status) {
+            case 'starting':
+                return ' irá começar.';
 
-            $customTime = getCarbonTime($notificationTime->custom_time);
+            case 'in_progress':
+                return ' está sendo realizada.';
 
-            return ($customTime->format('H:i:s') == $now->format('H:i:s'));
-        } else {
+            case 'finished':
+                return ' foi finalizada';
 
-            $predefinedAlerts = getPredefinedAlerts($notificationTime);
-
-            $start = getCarbonTime($start);
-
-            foreach ($predefinedAlerts as $alert) {
-
-                if ($alert == 'half_an_hour_before') {
-
-                    $halfAnHourBefore = $start->copy()->subMinutes(30);
-
-                    return $halfAnHourBefore->format('H:i') === $now->format('H:i');
-                } elseif ($alert == 'one_hour_before') {
-                    $oneHourBefore = $start->copy()->subMinutes(60);
-
-                    return $oneHourBefore->format('H:i') === $now->format('H:i');
-                } elseif ($alert == 'two_hours_before') {
-                    $twoHoursBefore = $start->copy()->subMinutes(120);
-
-                    return $twoHoursBefore->format('H:i') === $now->format('H:i');
-                } elseif ($alert == 'one_day_earlier') {
-
-                    $oneDayEarlier = $start->copy()->subDay();
-
-                    return $oneDayEarlier->format('H:i') === $now->format('H:i');
-                }
-            }
+            default:
+                return 'status desconhecido.';
         }
-
-        // $isNotificationTime = $specificDate->isToday() && ($now !== $customTime);
-
-        return [
-
-            'half_an_hour_before' => 'Meia hora antes',
-
-            'one_hour_before' => 'Uma hora antes',
-
-            'two_hours_before' => 'Duas horas antes',
-
-            'one_day_earlier' => 'Um dia antes'
-
-        ];
     }
 }
 
@@ -622,11 +669,18 @@ if (!function_exists('getStatusDurationLog')) {
 
     function getStatusDurationLog($logData, $status)
     {
-        Log::info("Job HandleDurationsStatus: O status da duração da tarefa (ID: " . $logData['task_id'] . ") pertencente ao usuário " . $logData['user_email'] . ", foi alterado para " . $status);
+        $statusLog = getStatusLog($status);
+        Log::info('Job HandleDurationsStatus: A tarefa referente ao usuário ' . $logData['user_email'] . ',' . $statusLog . ' - Duration ID: ' . $logData['duration_id']);
+    }
+}
 
-        Log::info("Job HandleDurationsStatus: Horário atual: " . $logData['now']);
+if (!function_exists('getDurationLog')) {
+
+    function getDurationLog($logData)
+    {
         Log::info("Job HandleDurationsStatus: Horário de início: " . $logData['start']);
         Log::info("Job HandleDurationsStatus: Horário de término: " . $logData['end']);
+        Log::info("Job HandleDurationsStatus: Horário atual: " . $logData['now']);
     }
 }
 
@@ -646,30 +700,41 @@ if (!function_exists('handleDurationStatus')) {
             $isFinished = $end->lessThan($now);
             $isStarting = $start->greaterThan($now);
 
-            $shouldChangeStatus =  $duration->status !== 'finished';
+            $shouldChangeStatusToFinished =  $duration->status  !==  'finished';
+            $shouldChangeStatusToStarting  =  $duration->status  !== 'starting';
+            $shouldChangeStatusToInProgress =  $duration->status  !==  'in_progress';
 
             $logData = [
-                'task_id' => $task->id,
-                'user_email' => $task->email,
+                'duration_id' => $duration->id,
+                'user_email' => $duration->user->email,
                 'now' => $now->format('H:i'),
                 'start' => $start->format('H:i'),
                 'end' => $end->format('H:i'),
             ];
 
-            if ($isInProgress) {
+            if ($isInProgress && $shouldChangeStatusToInProgress) {
 
                 $duration->update(['status' => 'in_progress']);
+                getChangeStatusDurationLog($logData, 'in_progress');
+            } elseif ($isInProgress) {
+
                 getStatusDurationLog($logData, 'in_progress');
-            } elseif ($isFinished && $shouldChangeStatus) {
+                getDurationLog($logData);
+            } elseif ($isFinished &&  $shouldChangeStatusToFinished) {
 
                 $duration->update(['status' => 'finished']);
-                getStatusDurationLog($logData, 'finished');
+                getChangeStatusDurationLog($logData, 'finished');
             } elseif ($isFinished) {
-                Log::info("Job HandleDurationsStatus: A tarefa (ID: $task->id) pertencente ao usuário " . $logData['user_email'] . ", já foi finalizada");
-            } elseif ($isStarting) {
+
+                getStatusDurationLog($logData, 'finished');
+                getDurationLog($logData);
+            } elseif ($isStarting && $shouldChangeStatusToStarting) {
 
                 $duration->update(['status' => 'starting']);
+                getChangeStatusDurationLog($logData, 'starting');
+            } elseif ($isStarting) {
                 getStatusDurationLog($logData, 'starting');
+                getDurationLog($logData);
             }
         }
     }
