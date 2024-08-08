@@ -2,10 +2,12 @@
 
 use App\Models\NotificationTime;
 use App\Models\Task;
+use App\Mail\TaskNotify;
+use App\Mail\ReminderNotify;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
 
 if (!function_exists('getFormatedTelephone')) {
 
@@ -127,8 +129,10 @@ if (!function_exists('checkIsToday')) {
         $dayOfWeekToday = getDayOfWeek($today);
 
         if ($day instanceof Carbon) {
+
             return $day->isToday();
         } else {
+
             return $dayOfWeekToday === $day;
         }
     }
@@ -175,6 +179,34 @@ if (!function_exists('getRepeatingDays')) {
             }
         }
         return $repeatingDays;
+    }
+}
+
+if (!function_exists('getSelectedNotificationTimes')) {
+
+    function getSelectedNotificationTimes($notificationTime)
+    {
+        $defaultTimes = [
+
+            'half_an_hour_before',
+
+            'one_hour_before',
+
+            'two_hours_before',
+
+            'one_day_earlier',
+        ];
+
+        $selectedTimes = [];
+
+        foreach ($defaultTimes as $key => $defaultTime) {
+
+            if ($notificationTime->$key === 'true') {
+
+                $selectedTimes = $key;
+            }
+        }
+        return $selectedTimes;
     }
 }
 
@@ -651,16 +683,16 @@ if (!function_exists('getStatusLog')) {
 
         switch ($status) {
             case 'starting':
-                return ' irá começar.';
+                return ' irá começar';
 
             case 'in_progress':
-                return ' está sendo realizada.';
+                return ' está sendo realizada';
 
             case 'finished':
                 return ' foi finalizada';
 
             default:
-                return 'status desconhecido.';
+                return 'status desconhecido';
         }
     }
 }
@@ -681,6 +713,70 @@ if (!function_exists('getDurationLog')) {
         Log::info("Job HandleDurationsStatus: Horário de início: " . $logData['start']);
         Log::info("Job HandleDurationsStatus: Horário de término: " . $logData['end']);
         Log::info("Job HandleDurationsStatus: Horário atual: " . $logData['now']);
+    }
+}
+
+if (!function_exists('getNotTodayNotifyDateLog')) {
+
+    function getNotTodayNotifyDateLog($data, $dayOfWeek = null)
+    {
+        $isSpecificDate =  $data['has_specific_date'];
+        $specificDate = $data['specific_date'];
+        $ID = $data['notification_time']->id;
+
+        $today = getToday()->format('d/m/Y');
+
+        $dayOfWeek = getDayOfWeek($today, 'pt-br');
+
+        Log::info("Job NotifyAtCustomTime: A notificação (ID: " . $ID . ") não está programada para hoje");
+        Log::info('Job NotifyAtCustomTime: Data atual: ' . ($isSpecificDate ? $today :  $dayOfWeek));
+        Log::info('Job NotifyAtCustomTime: Data programada: ' . ($isSpecificDate ? getCarbonDate($specificDate)->format('d/m/Y') : $dayOfWeek));
+    }
+}
+
+if (!function_exists('getNotifyTimeLog')) {
+
+    function getNotifyLog($data)
+    {
+        $now = getCarbonNow();
+
+        $isBeforeCustomTime = null;
+
+        $isNotificationTime = null;
+
+        $isAfterCustomTime = null;
+
+        $isToday = checkIsToday($now);
+
+        if ($notifyPattern == 'custom_time') {
+
+            $isBeforeCustomTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+            $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+            $isAfterCustomTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+        }
+
+        if ($isBeforeCustomTime) {
+
+            Log::info('Job NotifyAtCustomTime: A notificação (ID: ' . $notificationTime->id . 'está programada para hoje');
+            Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
+            Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
+
+            return false;
+        } elseif ($isAfterCustomTime) {
+
+            Log::info('Job NotifyAtCustomTime: O horário da notificação (ID: ' . $notificationTime->id . 'já passou');
+            Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
+            Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
+
+            return false;
+        } elseif ($isNotificationTime) {
+
+            Log::info('Job NotifyAtCustomTime: A condição que verifica se o horário da notificação da tarefa é agora, foi atendida');
+
+            return true;
+        }
     }
 }
 
@@ -736,6 +832,36 @@ if (!function_exists('handleDurationStatus')) {
                 getStatusDurationLog($logData, 'starting');
                 getDurationLog($logData);
             }
+        }
+    }
+}
+
+if (!function_exists('notify')) {
+
+    function notify($isTask, $userToNotify, $notificationTime, $time)
+    {
+        if ($isTask) {
+
+            $task = $notificationTime->reminder->task;
+
+            $start = getStartDuration($task, $userToNotify->id);
+
+            $notificationMessage = getTaskNotificationMessage($task->title, $time, $start);
+
+            $taskData = $task->getAttributes();
+
+            $taskData['start'] = $start;
+            $taskData['message'] =  $notificationMessage;
+
+            Mail::to($userToNotify->email)->send(new TaskNotify($taskData));
+
+            Log::info("Job NotifyAtCustomTime: A notificação da tarefa em análise foi enviada para: $userToNotify->email");
+        } else {
+            Log::info('Job NotifyAtCustomTime: A condição de verificar se o horário do lembrete é agora, foi atendida');
+            $reminder = $notificationTime->reminder;
+
+            Mail::to($userToNotify->email)->send(new ReminderNotify($reminder));
+            Log::info("Job NotifyAtCustomTime: O lembrete foi enviado para  $userToNotify->email");
         }
     }
 }

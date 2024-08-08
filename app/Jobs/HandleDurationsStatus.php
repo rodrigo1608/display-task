@@ -52,7 +52,7 @@ class HandleDurationsStatus implements ShouldQueue
 
             if ($isRecurrentTask) {
 
-                Log::info('Job HandleDurationsStatus: A tarefa em análise é recorrente. - Recurring ID: ' . $recurring->id);
+                Log::info('Job HandleDurationsStatus: A tarefa em análise é recorrente - Recurring ID: ' . $recurring->id);
 
                 $isTodayRecurringDay = $recurring->$currentDayOfWeek === 'true';
 
@@ -60,14 +60,14 @@ class HandleDurationsStatus implements ShouldQueue
 
                 if ($isTodayRecurringDay) {
 
-                    Log::info('Job HandleDurationsStatus: Existe uma recorrência programada para hoje. (' . $daysOfWeek[$currentDayOfWeek] . ')');
+                    Log::info('Job HandleDurationsStatus: Existe uma recorrência programada para hoje (' . $daysOfWeek[$currentDayOfWeek] . ')');
 
                     handleDurationStatus($task, $now, 'recurring');
                 } else {
 
                     $recurringMessage = getRecurringMessage($recurring);
 
-                    Log::info('Job HandleDurationsStatus: A tarefa em análise não está programada para ocorrer hoje.');
+                    Log::info('Job HandleDurationsStatus: A tarefa em análise não está programada para ocorrer hoje');
                     Log::info('Job HandleDurationsStatus: Dia recorrente: ' . $recurringMessage);
                     Log::info('Job HandleDurationsStatus: Dia atual: ' . $daysOfWeek[$currentDayOfWeek]);
                 }
@@ -81,11 +81,11 @@ class HandleDurationsStatus implements ShouldQueue
 
                 if ($isSpecificDateToday) {
 
-                    Log::info('Job HandleDurationsStatus: A tarefa foi programada para ocorrer especificamente hoje.  (' . $now->format('d/m/Y') . ')');
+                    Log::info('Job HandleDurationsStatus: A tarefa foi programada para ocorrer especificamente hoje -' . $now->format('d/m/Y'));
 
                     handleDurationStatus($task, $now);
                 } else {
-                    Log::info('Job HandleDurationsStatus: A tarefa não está programada para hoje.');
+                    Log::info('Job HandleDurationsStatus: A tarefa não está programada para hoje');
                     Log::info('Job HandleDurationsStatus: Data programada: ' . $specificDate->format('d/m/Y'));
                     Log::info('Job HandleDurationsStatus: Data atual: ' . $now->format('d/m/Y'));
                 }
