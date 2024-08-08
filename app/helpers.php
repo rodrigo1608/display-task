@@ -186,6 +186,7 @@ if (!function_exists('getSelectedNotificationTimes')) {
 
     function getSelectedNotificationTimes($notificationTime)
     {
+
         $defaultTimes = [
 
             'half_an_hour_before',
@@ -199,11 +200,11 @@ if (!function_exists('getSelectedNotificationTimes')) {
 
         $selectedTimes = [];
 
-        foreach ($defaultTimes as $key => $defaultTime) {
+        foreach ($defaultTimes as $defaultTime) {
 
-            if ($notificationTime->$key === 'true') {
+            if ($notificationTime->$defaultTime === 'true') {
 
-                $selectedTimes = $key;
+                $selectedTimes[] = $defaultTime;
             }
         }
         return $selectedTimes;
@@ -738,6 +739,10 @@ if (!function_exists('getNotifyTimeLog')) {
 
     function getNotifyLog($data)
     {
+
+        $selectedNotificationTimes = getSelectedNotificationTimes($data['notification_time']);
+        dd($selectedNotificationTimes);
+
         $now = getCarbonNow();
 
         $isBeforeCustomTime = null;
@@ -748,35 +753,35 @@ if (!function_exists('getNotifyTimeLog')) {
 
         $isToday = checkIsToday($now);
 
-        if ($notifyPattern == 'custom_time') {
+        // if ($notifyPattern == 'custom_time') {
 
-            $isBeforeCustomTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+        //     $isBeforeCustomTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
 
-            $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+        //     $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
 
-            $isAfterCustomTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
-        }
+        //     $isAfterCustomTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+        // }
 
-        if ($isBeforeCustomTime) {
+        // if ($isBeforeCustomTime) {
 
-            Log::info('Job NotifyAtCustomTime: A notificação (ID: ' . $notificationTime->id . 'está programada para hoje');
-            Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
-            Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
+        //     Log::info('Job NotifyAtCustomTime: A notificação (ID: ' . $notificationTime->id . 'está programada para hoje');
+        //     Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
+        //     Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
 
-            return false;
-        } elseif ($isAfterCustomTime) {
+        //     return false;
+        // } elseif ($isAfterCustomTime) {
 
-            Log::info('Job NotifyAtCustomTime: O horário da notificação (ID: ' . $notificationTime->id . 'já passou');
-            Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
-            Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
+        //     Log::info('Job NotifyAtCustomTime: O horário da notificação (ID: ' . $notificationTime->id . 'já passou');
+        //     Log::info('Job NotifyAtCustomTime: Horário programado:' . $customTime->format('H:i'));
+        //     Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
 
-            return false;
-        } elseif ($isNotificationTime) {
+        //     return false;
+        // } elseif ($isNotificationTime) {
 
-            Log::info('Job NotifyAtCustomTime: A condição que verifica se o horário da notificação da tarefa é agora, foi atendida');
+        //     Log::info('Job NotifyAtCustomTime: A condição que verifica se o horário da notificação da tarefa é agora, foi atendida');
 
-            return true;
-        }
+        //     return true;
+        // }
     }
 }
 
