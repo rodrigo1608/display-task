@@ -35,12 +35,20 @@ class HomeController extends Controller
     {
         $now = getCarbonNow()->format('H:i');
 
+
+
         //Teste
+
+
+
+
+
+        checkValidAlertDay('friday');
+
 
         $notificationTimes = NotificationTime::all();
 
         $notificationTime = $notificationTimes[0];
-
 
         $recurring = $notificationTime->reminder->recurring;
 
@@ -59,7 +67,11 @@ class HomeController extends Controller
             ? getCarbonDate($notificationTime->reminder->recurring->specific_date)
             : null;
 
+
+
         $notificationData = [
+
+            'is_task' =>  $isTask,
 
             'notification_time' => $notificationTime,
 
@@ -67,17 +79,20 @@ class HomeController extends Controller
 
             'specific_date' => $specificDate,
 
-            'start' => $start,
+            'has_specific_date' => $hasSpecificDate,
 
-            'task' => $task,
-
-            'isTask' =>  $isTask,
-
-            'user_to_notify' => $userToNotify,
+            // 'user_to_notify' => $userToNotify,
 
         ];
 
-        getNotifyLog($notificationData);
+        $isToday = checkIsToday($specificDate);
+
+        $ID = $notificationData['notification_time']->id;
+
+        // notify($notificationData);
+
+        logNotify($notificationData, $isToday);
+
         //termina o teste
 
         // Task::whereHas('durations', function ($query) use ($now) {

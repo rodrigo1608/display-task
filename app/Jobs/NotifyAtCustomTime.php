@@ -40,77 +40,53 @@ class NotifyAtCustomTime implements ShouldQueue
         } else {
 
             foreach ($notificationTimes as $notificationTime) {
-                Log::info("Job NotifyAtCustomTime: Início da iteração referente a hora de notificação");
+                Log::info("Job NotifyAtCustomTime: Início da iteração referente às notificações programadas");
 
                 $recurring = $notificationTime->reminder->recurring;
-
-                $task = $notificationTime->reminder->task;
-
-                $userToNotify =  $notificationTime->user;
-
-                $start = getStartDuration($task, $userToNotify->id);
-
-                // $customTime = getCarbonTime($notificationTime->custom_time);
-
-                // $now = getCarbonNow();
-
-                //Se houver um user_id setado na instancia de um Reminder, é lembrete
-                //Se houver um task_id setado na instancia de um Reminder, é uma tarefa
-                $isTask = is_null($notificationTime->reminder->user_id);
 
                 $hasSpecificDate = !is_null($recurring->specific_date);
 
                 $specificDate = $hasSpecificDate
-                    ? getCarbonDate($notificationTime->reminder->recurring->specific_date)
+                    ? getCarbonDate($recurring->specific_date)
                     : null;
+
+
+                $isTask = is_null($notificationTime->reminder->user_id);
 
                 $notificationData = [
 
-                    // 'customTime' => $customTime,
+                    'is_task' => $isTask,
 
-                    // 'half_an_hour_before' =>  $halfAnHourBefore,
-
-                    // 'has_specific_date' => $hasSpecificDate,
-
-                    // 'notification_time' => $notificationTime,
-
-                    // 'one_day_earlier' => $oneDayEarlier,
-
-                    // 'one_hour_before' => $oneHourBefore,
+                    'notification_time' => $notificationTime,
 
                     'recurring' => $recurring,
 
                     'specific_date' => $specificDate,
 
-                    'start' => $start,
-
-                    'task' => $task,
-
-                    // 'two_hours_before' => $twoHoursBefore,
-
-                    'user_to_notify' => $userToNotify,
-
+                    'has_specific_date' => $hasSpecificDate,
                 ];
 
                 if ($hasSpecificDate) {
 
-                    $notificationType = $isTask ? 'A tarefa em análise está configurada' : 'O lembrete em análise está configurado';
+                    $notificationPrefix = $isTask
+                        ? 'A tarefa em análise está configurada'
+                        : 'O lembrete em análise está configurado';
 
-                    Log::info('Job NotifyAtCustomTime: ' . $notificationType . '  para uma data específica - Recurring ID: ' . $recurring->id);
+                    Log::info('Job NotifyAtCustomTime: ' . $notificationPrefix . ' para uma data específica - Recurring ID: ' . $recurring->id);
 
-
+                    $isValidAlertDay =checkValidAlertDay
                     $isToday = checkIsToday($specificDate);
 
                     if (!$isToday) {
 
                         getNotTodayNotifyDateLog($notificationData);
-                    } elseif ($isToday) {
+                    } else {
 
-                        $isNotificationTime = getNotifyLog($notificationData);
+                        $isNotificationTime = logNotify($notificationData, $isToday);
 
                         if ($isNotificationTime) {
 
-                            notify($notificationData);
+                            notify($notificationData, $isToday);
                         }
                     }
                 } else {
@@ -134,7 +110,7 @@ class NotifyAtCustomTime implements ShouldQueue
                             getNotTodayNotifyDateLog($notificationTime, $day);
                         } elseif ($isToday) {
 
-                            $isToday = checkIsToday($day);
+                            // $isToday = checkIsToday($day);
 
                             $isBeforeCustomTime = $isToday && ($now->format('H:i') < $customTime->format('H:i'));
 
