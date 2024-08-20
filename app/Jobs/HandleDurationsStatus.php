@@ -40,7 +40,7 @@ class HandleDurationsStatus implements ShouldQueue
 
         $tasks = Task::all();
 
-        $currentDayOfWeek = getDayOfWeek($now->toDateString());
+        $currentDayOfWeek = getDayOfWeek($now);
 
         foreach ($tasks as $task) {
 

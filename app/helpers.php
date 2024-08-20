@@ -109,9 +109,8 @@ if (!function_exists('getDayOfWeek')) {
 
     function getDayOfWeek($date, $language = 'en')
     {
-        $carbonDate = getCarbonDate($date);
 
-        $dayName = strtolower($carbonDate->englishDayOfWeek);
+        $dayName = strtolower($date->englishDayOfWeek);
 
         $daysOfWeek = getDaysOfWeek();
 
@@ -126,6 +125,7 @@ if (!function_exists('checkIsToday')) {
     function checkIsToday($date)
     {
         $today = getToday();
+
         $dayOfWeekToday = getDayOfWeek($today);
 
         if ($date instanceof Carbon) {
@@ -138,48 +138,56 @@ if (!function_exists('checkIsToday')) {
     }
 }
 
-if (!function_exists('checkValidAlertDay')) {
+if (!function_exists('checkIsDayBefore')) {
 
-    function checkValidAlertDay($date)
+    function checkIsDayBefore($date)
     {
+
         $today = getToday();
 
-        $dayOfWeekToday = getDayOfWeek($today);
-
-        $dayOfWeekToday = 'thursday';
+        $dayOfWeekToday  = getDayOfWeek($today);
 
         if ($date instanceof Carbon) {
 
-            $dayBeforeSpecificDate = $date->copy()->subDay();
+            $dayBefore =  $date->copy()->subDay();
 
-            return   $dayBeforeSpecificDate->isToday() || $date->isToday();
+            return $dayBefore->isToday();
         } else {
 
             $carbonDate = Carbon::parse($date);
 
-            $dayBeforeRecurringDate = $carbonDate->subDay()->format('l');
+            $dayBefore = $carbonDate->subDay()->format('l');
 
-            return $dayOfWeekToday ===  strtolower($dayBeforeRecurringDate) || $dayOfWeekToday === $date;
+            return   $dayOfWeekToday === strtolower($dayBefore);
         }
     }
 }
 
 
-if (!function_exists('checkIsYesterday')) {
+// if (!function_exists('checkValidDayAlert')) {
 
-    function checkIsYesterday($date)
-    {
-        $yesterday = Carbon::now()->subDay()->startOfDay(); // Obtém o início do dia de ontem
+//     function checkValidDayAlert($date)
+//     {
+//         $today = getToday();
 
-        if ($date instanceof Carbon) {
-            return $date->isSameDay($yesterday);
-        } else {
-            // Se $date não for uma instância de Carbon, converte-o em Carbon
-            $date = Carbon::parse($date);
-            return $date->isSameDay($yesterday);
-        }
-    }
-}
+//         $dayOfWeekToday = getDayOfWeek($today);
+
+//         if ($date instanceof Carbon) {
+
+//             $dayBeforeSpecificDate = $date->copy()->subDay();
+
+//             return   $dayBeforeSpecificDate->isToday() || $date->isToday();
+//         } else {
+
+//             $carbonDate = Carbon::parse($date);
+
+//             $dayBeforeRecurringDate = $carbonDate->subDay()->format('l');
+
+//             return $dayOfWeekToday ===  strtolower($dayBeforeRecurringDate) || $dayOfWeekToday === $date;
+//         }
+//     }
+// }
+
 
 if (!function_exists('setTask')) {
 
@@ -208,7 +216,9 @@ if (!function_exists('getRepeatingDays')) {
 
     function getRepeatingDays($recurring, $language = 'en')
     {
+
         $daysOfWeek = getDaysOfWeek();
+
 
         $repeatingDays = [];
 
@@ -254,6 +264,24 @@ if (!function_exists('getSelectedNotificationTimes')) {
     }
 }
 
+if (!function_exists('getAlertOptions')) {
+
+    function getAlertOptions()
+    {
+        return [
+
+            'half_an_hour_before' => 'Meia hora antes',
+
+            'one_hour_before' => 'Uma hora antes',
+
+            'two_hours_before' => 'Duas horas antes',
+
+            'one_day_earlier' => 'Um dia antes'
+
+        ];
+    }
+}
+
 if (!function_exists('getPredefinedAlerts')) {
 
     function getPredefinedAlerts($notificationTime, $language = 'en')
@@ -294,7 +322,7 @@ if (!function_exists('getRecurringMessage')) {
 
             if ($numberOfRepeatingDays == 7) {
 
-                $recurringMessage = 'Todos os dias.';
+                $recurringMessage = 'Todos os dias';
             } else {
 
                 if ($numberOfRepeatingDays > 1) {
@@ -303,7 +331,7 @@ if (!function_exists('getRecurringMessage')) {
 
                     $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $repeatingDays);
 
-                    $recurringMessage .= ' e ' . $lastDay . '.';
+                    $recurringMessage .= ' e ' . $lastDay;
                 } else {
 
                     $recurringMessage .=    ($repeatingDays[0]) === "sábado" || ($repeatingDays[0]) === 'domingo'
@@ -313,7 +341,9 @@ if (!function_exists('getRecurringMessage')) {
             }
         } else {
 
-            $dayOfWeekInPortuguese = getDayOfWeek($recurring->specific_date, 'pt-br');
+            $date = getCarbonDate($recurring->specific_date);
+
+            $dayOfWeekInPortuguese = getDayOfWeek($date, 'pt-br');
 
             $formatedDate = '<strong>' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</strong>';
             $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate, $dayOfWeekInPortuguese.";
@@ -322,6 +352,96 @@ if (!function_exists('getRecurringMessage')) {
         return $recurringMessage;
     }
 }
+
+if (!function_exists('getRecurringLog')) {
+
+    function getRecurringLog($notificationTime)
+    {
+
+        $recurring = $notificationTime->reminder->recurring;
+        $isTask = !is_null($notificationTime->reminder->task);
+
+        $notificationSnippetContext  = getNotificationContextSnippet($isTask);
+
+        if (is_null($recurring->specific_date)) {
+
+            $recurringMessage = '';
+
+            // $daysOfWeek = getDaysOfWeekInPortuguese();
+
+            // $repeatingDays = getRepeatingDays($daysOfWeek, $recurring);
+
+            $repeatingDays = getRepeatingDays($recurring, 'pt-br');
+
+            $numberOfRepeatingDays = count($repeatingDays);
+
+            if ($numberOfRepeatingDays == 7) {
+
+                $recurringMessage = $notificationSnippetContext . ' para ser executada todos os dias da semana';
+            } else {
+
+                if ($numberOfRepeatingDays > 1) {
+
+                    $lastDay = array_pop($repeatingDays);
+
+                    $recurringMessage =  $notificationSnippetContext . ' para se repetir a cada ' . implode(', ', $repeatingDays);
+
+                    $recurringMessage .= ' e ' . $lastDay . '.';
+                } else {
+
+                    $recurringMessage .=    ($repeatingDays[0]) === "sábado" || ($repeatingDays[0]) === 'domingo'
+                        ?  $notificationSnippetContext . 'para se repetir todos os ' . ($repeatingDays[0]) . 's'
+                        :  $notificationSnippetContext . 'para se repetir todas as ' . $repeatingDays[0] . 's';
+                }
+            }
+        } else {
+
+            $date = getCarbonDate($recurring->specific_date);
+
+            $dayOfWeekInPortuguese = getDayOfWeek($date, 'pt-br');
+
+            $formatedDate =   Carbon::parse($recurring->specific_date)->format('d/m/Y');
+
+            $recurringMessage = $notificationSnippetContext . ' para ser executada exclusivamente no dia: ' . $formatedDate . ', ' . $dayOfWeekInPortuguese;
+        }
+
+        return $recurringMessage;
+    }
+}
+
+
+if (!function_exists('formatAlertDays')) {
+
+    function formatAlertDays($recurringDays)
+    {
+
+        $recurringMessage = '';
+
+        $numberOfRepeatingDays = count($recurringDays);
+
+        if ($numberOfRepeatingDays == 7) {
+
+            $recurringMessage =  'Todos os dias da semana';
+        } else {
+
+            if ($numberOfRepeatingDays > 1) {
+
+                $lastDay = array_pop($recurringDays);
+
+                $recurringMessage =  implode(', ', $recurringDays);
+
+                $recurringMessage .= ' e ' . $lastDay . '.';
+            } else {
+
+                $recurringMessage .=   $recurringDays[0];
+            }
+        }
+
+        return $recurringMessage;
+    }
+}
+
+
 
 if (!function_exists('getParticipantsEmail')) {
 
@@ -351,15 +471,17 @@ if (!function_exists('getRecurringTask')) {
 
         $hasSpecificDate = !is_null($inputData['specific_date']);
 
-        $date = $inputData['specific_date'];
+        $specificDate = $inputData['specific_date'];
+
+        $date = getCarbonDate($specificDate);
 
         $dayOfWeek = $hasSpecificDate ? getDayOfWeek($date) : null;
 
         return $hasSpecificDate
             ?
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($date, $dayOfWeek) {
+            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($specificDate, $dayOfWeek) {
                 // dd($taskReminderRecurringQuery);
-                $taskReminderRecurringQuery->where('specific_date', $date)->orWhere($dayOfWeek, "true");
+                $taskReminderRecurringQuery->where('specific_date',  $specificDate)->orWhere($dayOfWeek, "true");
             })
             :
             $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
@@ -492,24 +614,6 @@ if (!function_exists('getRecurringTasks')) {
     }
 }
 
-if (!function_exists('getAlertOptions')) {
-
-    function getAlertOptions()
-    {
-        return [
-
-            'half_an_hour_before' => 'Meia hora antes',
-
-            'one_hour_before' => 'Uma hora antes',
-
-            'two_hours_before' => 'Duas horas antes',
-
-            'one_day_earlier' => 'Um dia antes'
-
-        ];
-    }
-}
-
 if (!function_exists('getNotificationQuery')) {
 
     function getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID)
@@ -539,12 +643,13 @@ if (!function_exists('getRecurringData')) {
 
     function getRecurringData($request, $isSpecificDayPattern, $reminder)
     {
+        $specificDate = getCarbonDate($request->specific_date);
 
         return [
 
             'specific_date' => $request->specific_date ?? null,
 
-            'specific_date_weekday' => $isSpecificDayPattern ? getDayOfWeek($request->specific_date) : null,
+            'specific_date_weekday' => $isSpecificDayPattern ? getDayOfWeek($specificDate) : null,
 
             'sunday' => $request->sunday ?? 'false',
 
@@ -580,43 +685,15 @@ if (!function_exists('getPluralOrSingularTime')) {
     }
 }
 
-if (!function_exists('getTaskNotificationMessage')) {
-
-    function getTaskNotificationMessage($title, $time, $start)
-    {
-
-        $diffInMinutes = $time->diffInMinutes($start);
-
-        $diffInHours = intdiv($diffInMinutes, 60);
-        $remainingMinutes = $diffInMinutes % 60;
-        $isLessThanAnHour = $diffInMinutes < 60;
-
-        $greaterThanAnHourMessage =
-            $remainingMinutes == 0
-
-            ? "A tarefa **\"$title\"**, está programada para iniciar em " .
-            getPluralOrSingularTime($diffInHours, 'horas') . " após o envio desta notificação."
-
-            : "A tarefa **\"$title\"**, está programada para iniciar em " .
-            getPluralOrSingularTime($diffInHours, 'horas') . " e " .
-            getPluralOrSingularTime($remainingMinutes, 'minutos') . " após o envio desta notificação.";
-
-        return  $isLessThanAnHour
-            ? "A tarefa **\"$title\"**, está programada para iniciar em " .
-            getPluralOrSingularTime($diffInMinutes, 'minutos') . " após o envio desta notificação."
-
-            : $greaterThanAnHourMessage;
-    }
-}
 
 if (!function_exists('getStartDuration')) {
 
-    function getStartDuration($task, $userID)
+    function getStartDuration($task, $user)
     {
 
         return getCarbonTime((
                 $task->durations()
-                ->where('user_id', $userID)
+                ->where('user_id', $user->id)
                 ->where('task_id', $task->id))
                 ->first()
                 ->start
@@ -688,16 +765,16 @@ if (!function_exists('getStartDuration')) {
 //     }
 // }
 
-if (!function_exists('getChangeStatusDurationLog')) {
+if (!function_exists('logChangeStatusDuration')) {
 
-    function getChangeStatusDurationLog($logData, $status)
+    function logChangeStatusDuration($logData, $status)
     {
         Log::info('Job HandleDurationsStatus: O status da duração da tarefa pertencente ao usuário' . $logData['user_email'] . ', foi alterado para ' . $status . '. - Duration ID: ' . $logData['duration_id']);
     }
 }
 
-if (!function_exists('getStatusLog')) {
-    function getStatusLog($status)
+if (!function_exists('getLogStatus')) {
+    function getLogStatus($status)
     {
 
         switch ($status) {
@@ -716,18 +793,18 @@ if (!function_exists('getStatusLog')) {
     }
 }
 
-if (!function_exists('getStatusDurationLog')) {
+if (!function_exists('logStatusDuration')) {
 
-    function getStatusDurationLog($logData, $status)
+    function logStatusDuration($logData, $status)
     {
-        $statusLog = getStatusLog($status);
+        $statusLog = getLogStatus($status);
         Log::info('Job HandleDurationsStatus: A tarefa referente ao usuário ' . $logData['user_email'] . ',' . $statusLog . ' - Duration ID: ' . $logData['duration_id']);
     }
 }
 
-if (!function_exists('getDurationLog')) {
+if (!function_exists('logDuration')) {
 
-    function getDurationLog($logData)
+    function logDuration($logData)
     {
         Log::info("Job HandleDurationsStatus: Horário de início: " . $logData['start']);
         Log::info("Job HandleDurationsStatus: Horário de término: " . $logData['end']);
@@ -735,27 +812,96 @@ if (!function_exists('getDurationLog')) {
     }
 }
 
-if (!function_exists('getNotTodayNotifyDateLog')) {
+if (!function_exists('getNotificationContextSnippet')) {
 
-    function getNotTodayNotifyDateLog($data, $dayOfWeek = null)
+    function getNotificationTimeContextSnippet($isTask)
     {
-        $isSpecificDate =  $data['has_specific_date'];
-        $specificDate = $data['specific_date'];
-        $ID = $data['notification_time']->id;
 
-        $today = getToday()->format('d/m/Y');
-
-        $dayOfWeek = getDayOfWeek($today, 'pt-br');
-
-        Log::info("Job NotifyAtCustomTime: A notificação (ID: " . $ID . ") não está programada para hoje");
-        Log::info('Job NotifyAtCustomTime: Data atual: ' . ($isSpecificDate ? $today :  $dayOfWeek));
-        Log::info('Job NotifyAtCustomTime: Data programada: ' . ($isSpecificDate ? getCarbonDate($specificDate)->format('d/m/Y') : $dayOfWeek));
+        return $isTask
+            ? 'Há uma notificação relativa a tarefa em análise programada para'
+            : 'Há uma notificação relativa ao lembrete em análise programado para';
     }
 }
 
-if (!function_exists('getCustomTimeAlert')) {
+if (!function_exists('getNotificationContextSnippet')) {
 
-    function getCustomTimeAlert($notificationPattern, $start)
+    function getNotificationContextSnippet($isTask)
+    {
+
+        return $isTask
+            ? 'A tarefa em análise está configurada'
+            : 'O lembrete em análise está configurado';
+    }
+}
+
+if (!function_exists('logNotificationNotScheduledForToday')) {
+
+    function logNotificationNotScheduledForToday($data)
+    {
+
+        $isSpecificDate =  $data['has_specific_date'];
+
+        $notificationTime = $data['notification_time'];
+
+        $scheduledDate = $data['scheduled_date'] ?? null;
+
+        $isTask  = !is_null($data['task']);
+
+        $today = getToday();
+
+        $currentDayOfWeek = getDayOfWeek($today, 'pt-br');
+        $notificationContext = getNotificationTimeContextSnippet($isTask);
+
+        Log::info('Job NotifyAtCustomTime: ' . $notificationContext . ' para outro dia ' .  ' - NotificationTime ID: ' . $notificationTime->id);
+        Log::info('Job NotifyAtCustomTime: Data programada: ' . ($isSpecificDate ? getCarbonDate($scheduledDate)->format('d/m/Y') : formatAlertDays($scheduledDate)));
+        Log::info('Job NotifyAtCustomTime: Data atual: ' . ($isSpecificDate ? $today->format('d/m/Y') :  $currentDayOfWeek));
+    }
+}
+
+if (!function_exists('logNotificationTime')) {
+
+    function logNotificationTime($data)
+    {
+        $alertTime = $data['alert_time'];
+
+        $isAfterTime = $data['is_after_time'];
+
+        $isBeforeTime =  $data['is_before_time'];
+
+        $isNotificationTime = $data['is_notification_time'];
+
+        $notificationTime = $data['notification_time'];
+
+        $isTask = !is_null($notificationTime->reminder->task);
+
+        $now = $data['now'];
+
+        $contextString = getNotificationTimeContextSnippet($isTask);
+
+        if ($isBeforeTime) {
+
+            Log::info('Job NotifyAtCustomTime: ' . $contextString  . ' hoje - NotificationTime ID: ' . $notificationTime->id);
+        } elseif ($isNotificationTime) {
+
+            Log::info('Job NotifyAtCustomTime: ' . $contextString . ' hoje e o horário de notificação é agora');
+            return true;
+        } else {
+
+            Log::info('Job NotifyAtCustomTime: ' . $contextString . ' hoje, mas o horário de notificação já ocorreu' . ' - NotificationTime ID: ' . $notificationTime->id);
+        }
+
+        if ($isBeforeTime ||  $isAfterTime) {
+
+            Log::info('Job NotifyAtCustomTime: Horário programado: ' . $alertTime->format('H:i'));
+            Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
+            return false;
+        }
+    }
+}
+
+if (!function_exists('getDefaultTimeAlert')) {
+
+    function getDefaultTimeAlert($notificationPattern, $start)
     {
         switch ($notificationPattern) {
 
@@ -769,139 +915,98 @@ if (!function_exists('getCustomTimeAlert')) {
                 return $start->copy()->subMinutes(120);
 
             case 'one_day_earlier':
-                return  $start->copy()->subDay();
+                return  $start->copy()->subday();
         }
     }
 }
 
-if (!function_exists('getNotifyTimeLog')) {
+if (!function_exists('getNotificationTimeData')) {
 
-    function getNotifyTimeLog($data)
+    function getNotificationTimeData($notificationTime, $notificationPattern)
     {
-
-        $isBeforeCustomTime =  $data['is_before_custom_time'];
-
-        $isNotificationTime = $data['is_notification_time'];
-
-        $isAfterCustomTime = $data['is_after_custom_time'];
-
-        $notificationTime = $data['notification_time'];
-
-        $time = $data['time'];
-
-        $now = $data['now'];
-
-        if ($isBeforeCustomTime) {
-
-            Log::info('Job NotifyAtCustomTime: A notificação (ID: ' . $notificationTime->id . 'está programada para hoje');
-        } elseif ($isNotificationTime) {
-
-            Log::info('Job NotifyAtCustomTime: A condição que verifica se o horário da notificação da tarefa é agora, foi atendida');
-        } else {
-
-            Log::info('Job NotifyAtCustomTime: O horário da notificação (ID: ' . $notificationTime->id . 'já passou');
-        }
-        if ($isBeforeCustomTime ||  $isAfterCustomTime) {
-            Log::info('Job NotifyAtCustomTime: Horário programado:' . $time->format('H:i'));
-            Log::info('Job NotifyAtCustomTime: Horário atual: ' . $now->format('H:i'));
-        }
-    }
-}
-
-if (!function_exists('logNotify')) {
-
-    function logNotify($data, $isToday,)
-    {
-        $notificationTime = $data['notification_time'];
+        // dd($notificationPattern);
 
         $now = getCarbonNow();
 
-        $customTime = $notificationTime->custom_time;
+        $task = $notificationTime->reminder->task;
 
-        $isBeforeCustomTime = null;
+        $userToNotify = $notificationTime->user;
 
-        $isNotificationTime = null;
+        $start = !is_null($task)
+            ? getStartDuration($task, $userToNotify)
+            : $notificationTime->custom_time;
 
-        $isAfterCustomTime = null;
+        $alertTime = $notificationPattern === 'custom_time'
+            ? getCarbonTime($notificationTime->custom_time)
+            : getDefaultTimeAlert($notificationPattern, $start);
 
-        // $start = getStartDuration($task, $userToNotify->id);
+        $isBeforeTime =  $now->format('H:i') < $alertTime->format('H:i');
 
-        if (is_null($customTime)) {
+        $isNotificationTime =  $now->format('H:i') == $alertTime->format('H:i');
 
-            $selectedNotificationTimes = getSelectedNotificationTimes($data['notification_time']);
+        $isAfterTime =  $now->format('H:i') > $alertTime->format('H:i');
 
-            $task = $notificationTime->reminder->task;
+        return [
 
-            $userID = $notificationTime->user->id;
+            'is_before_time' => $isBeforeTime,
 
-            $start = getStartDuration($task, $userID);
-
-            foreach ($selectedNotificationTimes as $selectedTime) {
-
-                $time  = getCustomTimeAlert($selectedTime, $start);
-
-                $isBeforeCustomTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
-
-                $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
-
-                //aqui
-                $isAfterCustomTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
-            }
-        } else {
-
-            $time = getCarbonTime($notificationTime->custom_time);
-
-            $isBeforeCustomTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
-
-            $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
-
-            $isAfterCustomTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
-        }
-
-        $selectedNotificationTimes = getSelectedNotificationTimes($data['notification_time']);
-
-        $notificationTime = $data['notification_time'];
-
-        $notifyTimeData = [
-
-            'is_before_custom_time' => $isBeforeCustomTime,
             'is_notification_time' => $isNotificationTime,
-            'is_after_custom_time' => $isAfterCustomTime,
+
+            'is_after_time' => $isAfterTime,
+
+            'notification_pattern' => $notificationPattern,
+
             'notification_time' => $notificationTime,
-            'time' => $time,
+
+            'alert_time' => $alertTime,
+
             'now' => $now
 
         ];
+    }
+}
 
-        if ($isBeforeCustomTime) {
+if (!function_exists('getTaskNotificationMessage')) {
 
-            getNotifyTimeLog($notifyTimeData);
-            return false;
-        } elseif ($isAfterCustomTime) {
+    function getTaskNotificationMessage($title, $time, $start)
+    {
 
-            getNotifyTimeLog($notifyTimeData);
-            return false;
-        } elseif ($isNotificationTime) {
+        $diffInMinutes = $time->diffInMinutes($start);
 
-            getNotifyTimeLog($notifyTimeData);
-            return true;
-        }
+        $diffInHours = intdiv($diffInMinutes, 60);
+        $remainingMinutes = $diffInMinutes % 60;
+        $isLessThanAnHour = $diffInMinutes < 60;
+
+        $greaterThanAnHourMessage =
+            $remainingMinutes == 0
+
+            ? "A tarefa **\"$title\"**, está programada para iniciar em " .
+            getPluralOrSingularTime($diffInHours, 'horas') . " após o envio desta notificação."
+
+            : "A tarefa **\"$title\"**, está programada para iniciar em " .
+            getPluralOrSingularTime($diffInHours, 'horas') . " e " .
+            getPluralOrSingularTime($remainingMinutes, 'minutos') . " após o envio desta notificação.";
+
+        return  $isLessThanAnHour
+            ? "A tarefa **\"$title\"**, está programada para iniciar em " .
+            getPluralOrSingularTime($diffInMinutes, 'minutos') . " após o envio desta notificação."
+
+            : $greaterThanAnHourMessage;
     }
 }
 
 if (!function_exists('notify')) {
 
-    function notify($data)
+    function notify($notificationTime, $time)
     {
-        $notificationTime = $data['notification_time'];
-        $isTask =  $data['is_task'];
+
         $userToNotify = $notificationTime->user;
 
-        if ($isTask) {
+        $task = $notificationTime->reminder->task;
 
-            $task = $notificationTime->reminder->task;
+        if (!is_null($task)) {
 
-            $start = getStartDuration($task, $userToNotify->id);
+            $start =  getStartDuration($task, $userToNotify);
 
             $notificationMessage = getTaskNotificationMessage($task->title, $time, $start);
 
@@ -914,7 +1019,7 @@ if (!function_exists('notify')) {
 
             Log::info("Job NotifyAtCustomTime: A notificação da tarefa em análise foi enviada para: $userToNotify->email");
         } else {
-            Log::info('Job NotifyAtCustomTime: A condição de verificar se o horário do lembrete é agora, foi atendida');
+
             $reminder = $notificationTime->reminder;
 
             Mail::to($userToNotify->email)->send(new ReminderNotify($reminder));
@@ -923,6 +1028,262 @@ if (!function_exists('notify')) {
     }
 }
 
+// if (!function_exists('logNotify')) {
+
+//     function logNotify($data)
+//     {
+//         $notificationTime = $data['notification_time'];
+
+//         $now = getCarbonNow();
+
+//         $customTime = $notificationTime->custom_time;
+
+//         $isBeforeTime = null;
+
+//         $isNotificationTime = null;
+
+//         $isAfterTime = null;
+
+//         // $start = getStartDuration($task, $userToNotify->id);
+
+//         if (is_null($customTime)) {
+
+//             $selectedNotificationTimes = getSelectedNotificationTimes($notificationTime);
+
+//             $task = $notificationTime->reminder->task;
+
+//             $userID = $notificationTime->user->id;
+
+//             $start = getStartDuration($task, $userID);
+
+//             foreach ($selectedNotificationTimes as $selectedTime) {
+
+//                 // $isToday = checkIsToday($specificDate);
+
+
+//                 $time  = getCustomTimeAlert($selectedTime, $start);
+
+//                 $isBeforeTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+//                 $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+//                 //aqui
+//                 $isAfterTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+//             }
+//         } else {
+
+//             $time = getCarbonTime($notificationTime->custom_time);
+
+//             $isBeforeTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+//             $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+//             $isAfterTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+//         }
+
+//         $notifyTimeData = [
+
+//             'is_before_time' => $isBeforETime,
+//             'is_notification_time' => $isNotificationTime,
+//             'is_after_time' => $isAfteRTime,
+//             'notification_time' => $notificationTime,
+//             'time' => $time,
+//             'now' => $now
+
+//         ];
+
+//         if ($isBeforeTime) {
+
+//             logNotificationTime($notifyTimeData);
+//             return false;
+//         } elseif ($isAfterTime) {
+
+//             logNotificationTime($notifyTimeData);
+//             return false;
+//         } elseif ($isNotificationTime) {
+
+//             logNotificationTime($notifyTimeData);
+//             return true;
+//         }
+//     }
+// }
+
+
+// if (!function_exists('logNotify')) {
+
+//     function logNotify($data)
+//     {
+//         $notificationTime = $data['notification_time'];
+
+//         $now = getCarbonNow();
+
+//         $customTime = $notificationTime->custom_time;
+
+//         $isBeforeTime = null;
+
+//         $isNotificationTime = null;
+
+//         $isAfterTime = null;
+
+//         // $start = getStartDuration($task, $userToNotify->id);
+
+//         if (is_null($customTime)) {
+
+//             $selectedNotificationTimes = getSelectedNotificationTimes($notificationTime);
+
+//             $task = $notificationTime->reminder->task;
+
+//             $userID = $notificationTime->user->id;
+
+//             $start = getStartDuration($task, $userID);
+
+//             foreach ($selectedNotificationTimes as $selectedTime) {
+
+//                 // $isToday = checkIsToday($specificDate);
+
+
+//                 $time  = getCustomTimeAlert($selectedTime, $start);
+
+//                 $isBeforeTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+//                 $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+//                 //aqui
+//                 $isAfterTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+//             }
+//         } else {
+
+//             $time = getCarbonTime($notificationTime->custom_time);
+
+//             $isBeforeTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+//             $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+//             $isAfterTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+//         }
+
+//         $notifyTimeData = [
+
+//             'is_before_time' => $isBeforETime,
+//             'is_notification_time' => $isNotificationTime,
+//             'is_after_time' => $isAfteRTime,
+//             'notification_time' => $notificationTime,
+//             'time' => $time,
+//             'now' => $now
+
+//         ];
+
+//         if ($isBeforeTime) {
+
+//             logNotificationTime($notifyTimeData);
+//             return false;
+//         } elseif ($isAfterTime) {
+
+//             logNotificationTime($notifyTimeData);
+//             return false;
+//         } elseif ($isNotificationTime) {
+
+//             logNotificationTime($notifyTimeData);
+//             return true;
+//         }
+//     }
+// }
+
+
+// if (!function_exists('logDefaultNotificationTime')) {
+
+//     function logDefaultNotificationTime($data, $isToday)
+//     {
+//         $notificationTime = $data['notification_time'];
+
+//         $selectedNotificationTimes = getSelectedNotificationTimes($notificationTime);
+
+//         $task = $notificationTime->reminder->task;
+
+//         $userID = $notificationTime->user->id;
+
+//         $start = getStartDuration($task, $userID);
+
+//         foreach ($selectedNotificationTimes as $selectedTime) {
+
+//             $time  = getDefaultTimeAlert($selectedTime, $start);
+
+//             $isBeforeTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+//             $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+//             $isAfterTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+//         }
+//     }
+// }
+
+// if (!function_exists('logCustomNotificationTime')) {
+
+//     function logCustomNotificationTime($data, $isToday)
+//     {
+//         $notificationTime = $data['notification_time'];
+
+//         $now = getCarbonNow();
+
+//         $customTime = getCarbonTime($notificationTime->custom_time);
+
+//         $isBeforeTime = null;
+
+//         $isAfterTime = null;
+
+//         // $start = getStartDuration($task, $userToNotify->id);
+
+//         $time = getCarbonTime($notificationTime->custom_time);
+
+//         $isBeforeTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
+
+//         $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
+
+//         $isAfterTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
+
+//         $notifyTimeData = [
+
+//             'is_before_time' => $isBeforeTime,
+//             'is_notification_time' => $isNotificationTime,
+//             'is_after_time' => $isAfterTime,
+//             'notification_time' => $notificationTime,
+//             'time' => $customTime,
+//             'now' => $now
+
+//         ];
+
+//         if ($isBeforeTime) {
+
+//             logNotificationTime($notifyTimeData, 'custom_time');
+//             return false;
+//         } elseif ($isAfterTime) {
+
+//             logNotificationTime($notifyTimeData, 'custom_time');
+//             return false;
+//         } elseif ($isNotificationTime) {
+
+//             logNotificationTime($notifyTimeData, 'custom_time');
+//             return true;
+//         }
+//     }
+// }
+
+
+
+
+// if ($isBeforeTime) {
+
+//     logNotificationTime($notifyTimeData, 'custom_time');
+//     return false;
+// } elseif ($isAfterTime) {
+
+//     logNotificationTime($notifyTimeData, 'custom_time');
+//     return false;
+// } elseif ($isNotificationTime) {
+
+//     logNotificationTime($notifyTimeData, 'custom_time');
+//     return true;
+// }
 
 if (!function_exists('handleDurationStatus')) {
 
@@ -955,31 +1316,30 @@ if (!function_exists('handleDurationStatus')) {
             if ($isInProgress && $shouldChangeStatusToInProgress) {
 
                 $duration->update(['status' => 'in_progress']);
-                getChangeStatusDurationLog($logData, 'in_progress');
+                logStatusDuration($logData, 'in_progress');
             } elseif ($isInProgress) {
 
-                getStatusDurationLog($logData, 'in_progress');
-                getDurationLog($logData);
+                logStatusDuration($logData, 'in_progress');
+                logDuration($logData);
             } elseif ($isFinished &&  $shouldChangeStatusToFinished) {
 
                 $duration->update(['status' => 'finished']);
-                getChangeStatusDurationLog($logData, 'finished');
+                logStatusDuration($logData, 'finished');
             } elseif ($isFinished) {
 
-                getStatusDurationLog($logData, 'finished');
-                getDurationLog($logData);
+                logStatusDuration($logData, 'finished');
+                logDuration($logData);
             } elseif ($isStarting && $shouldChangeStatusToStarting) {
 
                 $duration->update(['status' => 'starting']);
-                getChangeStatusDurationLog($logData, 'starting');
+                logStatusDuration($logData, 'starting');
             } elseif ($isStarting) {
-                getStatusDurationLog($logData, 'starting');
-                getDurationLog($logData);
+                logStatusDuration($logData, 'starting');
+                logDuration($logData);
             }
         }
     }
 }
-
 
 // $notificationTime = $data['notification_time'];
 

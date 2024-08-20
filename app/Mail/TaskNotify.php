@@ -34,7 +34,7 @@ class TaskNotify extends Mailable
     {
         return new Envelope(
             // subject: $this->taskData['message'],
-            subject: "Notificação da tarefa: ". $this->taskData['title'],
+            subject: "Notificação da tarefa: " . $this->taskData['title'],
         );
     }
 

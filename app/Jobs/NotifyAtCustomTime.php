@@ -50,10 +50,11 @@ class NotifyAtCustomTime implements ShouldQueue
                     ? getCarbonDate($recurring->specific_date)
                     : null;
 
-
                 $isTask = is_null($notificationTime->reminder->user_id);
 
                 $notificationData = [
+
+                    'has_specific_date' => $hasSpecificDate,
 
                     'is_task' => $isTask,
 
@@ -63,7 +64,6 @@ class NotifyAtCustomTime implements ShouldQueue
 
                     'specific_date' => $specificDate,
 
-                    'has_specific_date' => $hasSpecificDate,
                 ];
 
                 if ($hasSpecificDate) {
@@ -72,21 +72,27 @@ class NotifyAtCustomTime implements ShouldQueue
                         ? 'A tarefa em análise está configurada'
                         : 'O lembrete em análise está configurado';
 
+                    Log::info('');
                     Log::info('Job NotifyAtCustomTime: ' . $notificationPrefix . ' para uma data específica - Recurring ID: ' . $recurring->id);
 
-                    $isValidAlertDay =checkValidAlertDay
-                    $isToday = checkIsToday($specificDate);
+                    $hasCustomTime = !is_null($notificationTime->custom_time);
+                    $customTime =  $hasCustomTime ? getCarbonTime($notificationTime->custom_time) : null;
 
-                    if (!$isToday) {
+                    if ($hasCustomTime) {
 
-                        getNotTodayNotifyDateLog($notificationData);
-                    } else {
+                        $isToday = checkIsToday($specificDate);
 
-                        $isNotificationTime = logNotify($notificationData, $isToday);
+                        if (!$isToday) {
 
-                        if ($isNotificationTime) {
+                            logNotificationNotScheduledForToday($notificationData);
+                        } else {
 
-                            notify($notificationData, $isToday);
+                            $isNotificationTime = logCustomNotificationTime($notificationData, $isToday);
+
+                            if ($isNotificationTime) {
+
+                                notify($notificationData, $customTime);
+                            }
                         }
                     }
                 } else {
@@ -103,20 +109,14 @@ class NotifyAtCustomTime implements ShouldQueue
 
                     foreach ($recurringDays as $day) {
 
-                        $isToday = checkIsToday($day);
+                        // $isToday = checkIsToday($day);
 
-                        if (!$isToday) {
+                        $isValidAlertDay = checkValidDayAlert($day);
 
-                            getNotTodayNotifyDateLog($notificationTime, $day);
-                        } elseif ($isToday) {
+                        if (! $isValidAlertDay) {
 
-                            // $isToday = checkIsToday($day);
-
-                            $isBeforeCustomTime = $isToday && ($now->format('H:i') < $customTime->format('H:i'));
-
-                            $isNotificationTime = $isToday && ($now->format('H:i') == $customTime->format('H:i'));
-
-                            $isAfterCustomTime = $isToday && ($now->format('H:i') > $customTime->format('H:i'));;
+                            logNotificationTime($notificationTime, $day);
+                        } elseif ($isValidAlertDay) {
                         }
                     }
                 }

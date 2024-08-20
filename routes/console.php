@@ -12,5 +12,4 @@ Artisan::command('inspire', function () {
 
 Schedule::command('dispatch:handle-durations-status')->everyMinute();
 
-
 Schedule::command('dispatch:notification-at-specific-time')->everyMinute();
