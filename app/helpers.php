@@ -377,7 +377,7 @@ if (!function_exists('getRecurringLog')) {
 
             if ($numberOfRepeatingDays == 7) {
 
-                $recurringMessage = $notificationSnippetContext . ' para ser executada todos os dias da semana';
+                $recurringMessage = $notificationSnippetContext . ' para ocorrer todos os dias da semana';
             } else {
 
                 if ($numberOfRepeatingDays > 1) {
@@ -402,13 +402,12 @@ if (!function_exists('getRecurringLog')) {
 
             $formatedDate =   Carbon::parse($recurring->specific_date)->format('d/m/Y');
 
-            $recurringMessage = $notificationSnippetContext . ' para ser executada exclusivamente no dia: ' . $formatedDate . ', ' . $dayOfWeekInPortuguese;
+            $recurringMessage = $notificationSnippetContext . ' para ocorrer exclusivamente no dia: ' . $formatedDate . ', ' . $dayOfWeekInPortuguese;
         }
 
         return $recurringMessage;
     }
 }
-
 
 if (!function_exists('formatAlertDays')) {
 

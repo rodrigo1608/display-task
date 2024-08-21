@@ -33,7 +33,7 @@ class HandleDurationsStatus implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('Job HandleDurationsStatus:');
+        Log::info('');
         Log::info('Job HandleDurationsStatus: INÍCIO');
 
         $now = Carbon::now('America/Sao_Paulo');
@@ -43,7 +43,7 @@ class HandleDurationsStatus implements ShouldQueue
         $currentDayOfWeek = getDayOfWeek($now);
 
         foreach ($tasks as $task) {
-
+            Log::info('Job HandleDurationsStatus:');
             Log::info('Job HandleDurationsStatus: Início da iteração referente a tarefas');
 
             $recurring = $task->reminder->recurring;
@@ -93,7 +93,7 @@ class HandleDurationsStatus implements ShouldQueue
             Log::info('Job HandleDurationsStatus: Fim da iteração referente a tarefas');
         }
 
-        Log::info('Job HandleDurationsStatus: FIM');
         Log::info('Job HandleDurationsStatus');
+        Log::info('Job HandleDurationsStatus: FIM');
     }
 }

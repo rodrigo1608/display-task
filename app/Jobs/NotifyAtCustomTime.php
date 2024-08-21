@@ -29,101 +29,269 @@ class NotifyAtCustomTime implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('Job NotifyAtCustomTime:');
+        Log::info('');
         Log::info('Job NotifyAtCustomTime: INÍCIO');
 
         $notificationTimes = NotificationTime::all();
 
-        if ($notificationTimes->isEmpty()) {
-
-            Log::info('Job NotifyAtCustomTime: Não foi encontrado nenhuma notificação programada');
-        } else {
+        if (!$notificationTimes->isEmpty()) {
 
             foreach ($notificationTimes as $notificationTime) {
-                Log::info("Job NotifyAtCustomTime: Início da iteração referente às notificações programadas");
 
                 $recurring = $notificationTime->reminder->recurring;
 
                 $hasSpecificDate = !is_null($recurring->specific_date);
 
-                $specificDate = $hasSpecificDate
-                    ? getCarbonDate($recurring->specific_date)
-                    : null;
+                $task = $notificationTime->reminder->task;
 
-                $isTask = is_null($notificationTime->reminder->user_id);
+                $userToNotify = $notificationTime->user;
 
                 $notificationData = [
 
                     'has_specific_date' => $hasSpecificDate,
 
-                    'is_task' => $isTask,
-
                     'notification_time' => $notificationTime,
 
                     'recurring' => $recurring,
 
-                    'specific_date' => $specificDate,
+                    'task' => $task,
+
+                    'user_to_notify' => $userToNotify,
 
                 ];
 
                 if ($hasSpecificDate) {
 
-                    $notificationPrefix = $isTask
-                        ? 'A tarefa em análise está configurada'
-                        : 'O lembrete em análise está configurado';
+                    $specificDate = getCarbonDate($recurring->specific_date);
 
-                    Log::info('');
-                    Log::info('Job NotifyAtCustomTime: ' . $notificationPrefix . ' para uma data específica - Recurring ID: ' . $recurring->id);
+                    Log::info('Job NotifyAtCustomTime:');
+                    Log::info('Job NotifyAtCustomTime: ' . getRecurringLog($notificationTime) . ' - Recurring ID: ' . $recurring->id);
 
                     $hasCustomTime = !is_null($notificationTime->custom_time);
-                    $customTime =  $hasCustomTime ? getCarbonTime($notificationTime->custom_time) : null;
 
                     if ($hasCustomTime) {
+
+                        $customTime = getCarbonTime($notificationTime->custom_time);
 
                         $isToday = checkIsToday($specificDate);
 
                         if (!$isToday) {
 
+                            $notificationData['scheduled_date'] = $specificDate;
+
                             logNotificationNotScheduledForToday($notificationData);
                         } else {
 
-                            $isNotificationTime = logCustomNotificationTime($notificationData, $isToday);
+                            $notificationPattern = 'custom_time';
+
+                            $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+                            $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
 
                             if ($isNotificationTime) {
 
-                                notify($notificationData, $customTime);
+                                notify($notificationTime, $customTime);
+                            }
+                        }
+                    } else {
+
+                        $selectedTimes = getSelectedNotificationTimes($notificationTime);
+
+                        foreach ($selectedTimes as $time) {
+
+                            if ($time === 'one_day_earlier') {
+
+
+                                $isTodayADayBefore =  checkIsDayBefore($specificDate);
+
+                                if (!$isTodayADayBefore) {
+
+                                    $notificationData['scheduled_date'] = $specificDate->copy()->subDay();
+
+                                    logNotificationNotScheduledForToday($notificationData);
+                                } else {
+
+                                    $notificationPattern = 'one_day_earlier';
+
+                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+                                    $isNotificationTime = logNotificationTime($notificationTimeData, $isTodayADayBefore);
+
+                                    if ($isNotificationTime) {
+
+                                        $start = getStartDuration($task, $userToNotify);
+                                        $alertTime = $start->copy()->subDay();
+
+                                        notify($notificationTime, $alertTime);
+                                    }
+                                }
+                            } else {
+
+                                $isToday = checkIsToday($specificDate);
+
+                                if (!$isToday) {
+
+                                    $notificationData['scheduled_date'] = $specificDate;
+                                    logNotificationNotScheduledForToday($notificationData);
+                                } else {
+
+                                    $notificationPattern = $time;
+
+                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+                                    $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+
+                                    if ($isNotificationTime) {
+
+                                        $userToNotify = $notificationTime->user;
+
+                                        $start = getStartDuration($task, $userToNotify);
+
+                                        $alertTime = getDefaultTimeAlert($notificationPattern, $start);
+
+                                        notify($notificationTime, $alertTime);
+                                    }
+                                }
                             }
                         }
                     }
                 } else {
 
-                    Log::info('Job NotifyAtCustomTime: A tarefa em análise possui recorrencia(s) - Recurring ID: ' . $recurring->id);
-
-                    $recurring = $notificationTime->reminder->recurring;
+                    $isTask = !is_null($task);
+                    Log::info('Job NotifyAtCustomTime:');
+                    Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dias selecionados - Recurring ID: ' . $recurring->id);
 
                     $recurringDays = getRepeatingDays($recurring);
 
-                    $recurringMessage = getRecurringMessage($recurring);
 
-                    Log::info('Job NotifyAtCustomTime: ' . $recurringMessage);
+                    $today = getToday();
+                    $todayWeekday = getDayOfWeek($today);
+                    $oneDayAfterWeekday = getDayOfWeek($today->copy()->addDay());
 
-                    foreach ($recurringDays as $day) {
+                    // dd($oneDayAfterWeekday);
+                    // dd($todayWeekday);
 
-                        // $isToday = checkIsToday($day);
+                    $hasCustomTime = !is_null($notificationTime->custom_time);
 
-                        $isValidAlertDay = checkValidDayAlert($day);
+                    if ($hasCustomTime) {
 
-                        if (! $isValidAlertDay) {
+                        $customTime = getCarbonTime($notificationTime->custom_time);
 
-                            logNotificationTime($notificationTime, $day);
-                        } elseif ($isValidAlertDay) {
+                        $hasNoTodayWeekday = !in_array($todayWeekday, $recurringDays);
+
+                        if ($hasNoTodayWeekday) {
+
+                            $scheduledDate = [];
+
+                            foreach ($recurringDays  as $day) {
+
+                                $scheduledDate[] = getDaysOfWeek()[$day];
+                            }
+
+                            $notificationData['scheduled_date'] = $scheduledDate;
+
+                            logNotificationNotScheduledForToday($notificationData);
+                        } else {
+
+                            $notificationPattern = 'custom_time';
+
+                            $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+                            $isNotificationTime = logNotificationTime($notificationTimeData, $todayWeekday);
+
+                            if ($isNotificationTime) {
+
+                                notify($notificationTime, $customTime);
+                            }
+                        }
+                    } else {
+
+                        $selectedTimes = getSelectedNotificationTimes($notificationTime);
+
+                        foreach ($selectedTimes as $time) {
+
+                            if ($time === 'one_day_earlier') {
+
+                                $isOneDayAfterWeekday = in_array($oneDayAfterWeekday, $recurringDays);
+
+                                if (!$isOneDayAfterWeekday) {
+
+                                    // $scheduledDate = getDaysOfWeek()[strtolower(Carbon::parse($oneDayAfterWeekday)->subDay()->format('l'))];
+
+                                    $oneDayAfterWeekdays = [];
+
+                                    foreach ($recurringDays  as $day) {
+
+                                        $oneDayAfterWeekdays[] = getDaysOfWeek()[strtolower(getCarbonDate($day)->subDay()->format('l'))];
+                                    }
+
+                                    $notificationData['scheduled_date'] = $oneDayAfterWeekdays;
+
+                                    logNotificationNotScheduledForToday($notificationData);
+                                } else {
+
+                                    $notificationPattern = 'one_day_earlier';
+
+                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+                                    $isNotificationTime = logNotificationTime($notificationTimeData, $isOneDayAfterWeekday);
+
+                                    if ($isNotificationTime) {
+
+                                        $start = getStartDuration($task, $userToNotify);
+
+                                        $alertTime = $start->copy()->subDay();
+
+                                        notify($notificationTime, $alertTime);
+                                    }
+                                }
+                            } else {
+
+                                $todayWeekday = in_array($todayWeekday, $recurringDays);
+
+                                if (!$todayWeekday) {
+
+                                    $alertDays = [];
+
+                                    foreach ($recurringDays  as $day) {
+                                        $alertDays[] = getDaysOfWeek()[$day];
+                                    }
+
+
+                                    $notificationData['scheduled_date'] = $alertDays;
+
+                                    logNotificationNotScheduledForToday($notificationData);
+                                } else {
+
+                                    $notificationPattern = $time;
+
+                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+                                    $isNotificationTime = logNotificationTime($notificationTimeData, $todayWeekday);
+
+                                    if ($isNotificationTime) {
+
+                                        $userToNotify = $notificationTime->user;
+
+                                        $start = getStartDuration($task, $userToNotify);
+
+                                        $alertTime = getDefaultTimeAlert($notificationPattern, $start);
+
+                                        notify($notificationTime, $alertTime);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-                Log::info("Job NotifyAtCustomTime: Fim da iteração referente a hora de notificação");
             }
+        } else {
+            Log::info('Job NotifyAtCustomTime:');
+            Log::info('Job NotifyAtCustomTime: Não foram encontradas notificações pendentes');
         }
 
+
+        Log::info('Job NotifyAtCustomTime:');
         Log::info('Job NotifyAtCustomTime: FIM');
     }
 }

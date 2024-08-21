@@ -40,416 +40,468 @@ class HomeController extends Controller
 
         //-----------------------------------------------------------------------------------------------Teste
 
-        $notificationTimes = NotificationTime::all();
+        // $notificationTimes = NotificationTime::all();
 
-        if (!$notificationTimes->isEmpty()) {
+        // if (!$notificationTimes->isEmpty()) {
 
-            foreach ($notificationTimes as $notificationTime) {
+        //     foreach ($notificationTimes as $notificationTime) {
 
-                $recurring = $notificationTime->reminder->recurring;
+        //         $recurring = $notificationTime->reminder->recurring;
 
-                $hasSpecificDate = !is_null($recurring->specific_date);
+        //         $hasSpecificDate = !is_null($recurring->specific_date);
 
-                $task = $notificationTime->reminder->task;
+        //         $task = $notificationTime->reminder->task;
 
-                $userToNotify = $notificationTime->user;
+        //         $userToNotify = $notificationTime->user;
 
-                $notificationData = [
+        //         $notificationData = [
 
-                    'has_specific_date' => $hasSpecificDate,
+        //             'has_specific_date' => $hasSpecificDate,
 
-                    'notification_time' => $notificationTime,
+        //             'notification_time' => $notificationTime,
 
-                    'recurring' => $recurring,
+        //             'recurring' => $recurring,
 
-                    'task' => $task,
+        //             'task' => $task,
 
-                    'user_to_notify' => $userToNotify,
+        //             'user_to_notify' => $userToNotify,
 
-                ];
+        //         ];
 
-                if ($hasSpecificDate) {
+        //         if ($hasSpecificDate) {
 
-                    $specificDate = getCarbonDate($recurring->specific_date);
+        //             $specificDate = getCarbonDate($recurring->specific_date);
 
-                    Log::info('');
-                    Log::info('Job NotifyAtCustomTime: ' . getRecurringLog($notificationTime) . ' - Recurring ID: ' . $recurring->id);
+        //             Log::info('');
+        //             Log::info('Job NotifyAtCustomTime: ' . getRecurringLog($notificationTime) . ' - Recurring ID: ' . $recurring->id);
 
-                    $hasCustomTime = !is_null($notificationTime->custom_time);
+        //             $hasCustomTime = !is_null($notificationTime->custom_time);
 
-                    if ($hasCustomTime) {
+        //             if ($hasCustomTime) {
 
-                        $customTime = getCarbonTime($notificationTime->custom_time);
+        //                 $customTime = getCarbonTime($notificationTime->custom_time);
 
-                        $isToday = checkIsToday($specificDate);
+        //                 $isToday = checkIsToday($specificDate);
 
-                        if (!$isToday) {
+        //                 if (!$isToday) {
 
-                            $notificationData['scheduled_date'] = $specificDate;
+        //                     $notificationData['scheduled_date'] = $specificDate;
 
-                            logNotificationNotScheduledForToday($notificationData);
-                        } else {
+        //                     logNotificationNotScheduledForToday($notificationData);
+        //                 } else {
 
-                            $notificationPattern = 'custom_time';
+        //                     $notificationPattern = 'custom_time';
 
-                            $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //                     $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                            $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+        //                     $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
 
-                            if ($isNotificationTime) {
+        //                     if ($isNotificationTime) {
 
-                                notify($notificationTime, $customTime);
-                            }
-                        }
-                    } else {
+        //                         notify($notificationTime, $customTime);
+        //                     }
+        //                 }
+        //             } else {
 
-                        $selectedTimes = getSelectedNotificationTimes($notificationTime);
+        //                 $selectedTimes = getSelectedNotificationTimes($notificationTime);
 
-                        foreach ($selectedTimes as $time) {
+        //                 foreach ($selectedTimes as $time) {
 
-                            if ($time === 'one_day_earlier') {
+        //                     if ($time === 'one_day_earlier') {
 
 
-                                $isTodayADayBefore =  checkIsDayBefore($specificDate);
+        //                         $isTodayADayBefore =  checkIsDayBefore($specificDate);
 
-                                if (!$isTodayADayBefore) {
+        //                         if (!$isTodayADayBefore) {
 
-                                    $notificationData['scheduled_date'] = $specificDate->copy()->subDay();
+        //                             $notificationData['scheduled_date'] = $specificDate->copy()->subDay();
 
-                                    logNotificationNotScheduledForToday($notificationData);
-                                } else {
+        //                             logNotificationNotScheduledForToday($notificationData);
+        //                         } else {
 
-                                    $notificationPattern = 'one_day_earlier';
+        //                             $notificationPattern = 'one_day_earlier';
 
-                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //                             $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                                    $isNotificationTime = logNotificationTime($notificationTimeData, $isTodayADayBefore);
+        //                             $isNotificationTime = logNotificationTime($notificationTimeData, $isTodayADayBefore);
 
-                                    if ($isNotificationTime) {
+        //                             if ($isNotificationTime) {
 
-                                        $start = getStartDuration($task, $userToNotify);
-                                        $alertTime = $start->copy()->subDay();
+        //                                 $start = getStartDuration($task, $userToNotify);
+        //                                 $alertTime = $start->copy()->subDay();
 
-                                        notify($notificationTime, $alertTime);
-                                    }
-                                }
-                            } else {
+        //                                 notify($notificationTime, $alertTime);
+        //                             }
+        //                         }
+        //                     } else {
 
-                                $isToday = checkIsToday($specificDate);
+        //                         $isToday = checkIsToday($specificDate);
 
-                                if (!$isToday) {
+        //                         if (!$isToday) {
 
-                                    $notificationData['scheduled_date'] = $specificDate;
-                                    logNotificationNotScheduledForToday($notificationData);
-                                } else {
+        //                             $notificationData['scheduled_date'] = $specificDate;
+        //                             logNotificationNotScheduledForToday($notificationData);
+        //                         } else {
 
-                                    $notificationPattern = $time;
+        //                             $notificationPattern = $time;
 
-                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //                             $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                                    $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+        //                             $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
 
-                                    if ($isNotificationTime) {
+        //                             if ($isNotificationTime) {
 
-                                        $userToNotify = $notificationTime->user;
+        //                                 $userToNotify = $notificationTime->user;
 
-                                        $start = getStartDuration($task, $userToNotify);
+        //                                 $start = getStartDuration($task, $userToNotify);
 
-                                        $alertTime = getDefaultTimeAlert($notificationPattern, $start);
+        //                                 $alertTime = getDefaultTimeAlert($notificationPattern, $start);
 
-                                        notify($notificationTime, $alertTime);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
+        //                                 notify($notificationTime, $alertTime);
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         } else {
 
-                    $isTask = !is_null($task);
-                    Log::info('');
-                    Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dias selecionados - Recurring ID: ' . $recurring->id);
+        //             $isTask = !is_null($task);
+        //             Log::info('');
+        //             Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dias selecionados - Recurring ID: ' . $recurring->id);
 
-                    $recurringDays = getRepeatingDays($recurring);
+        //             $recurringDays = getRepeatingDays($recurring);
 
 
-                    $today = getToday();
-                    $todayWeekday = getDayOfWeek($today);
-                    $oneDayAfterWeekday = getDayOfWeek($today->copy()->addDay());
+        //             $today = getToday();
+        //             $todayWeekday = getDayOfWeek($today);
+        //             $oneDayAfterWeekday = getDayOfWeek($today->copy()->addDay());
 
-                    // dd($oneDayAfterWeekday);
-                    // dd($todayWeekday);
+        //             // dd($oneDayAfterWeekday);
+        //             // dd($todayWeekday);
 
-                    $hasCustomTime = !is_null($notificationTime->custom_time);
+        //             $hasCustomTime = !is_null($notificationTime->custom_time);
 
-                    if ($hasCustomTime) {
+        //             if ($hasCustomTime) {
 
-                        $customTime = getCarbonTime($notificationTime->custom_time);
+        //                 $customTime = getCarbonTime($notificationTime->custom_time);
 
-                        $hasNoTodayWeekday = !in_array($todayWeekday, $recurringDays);
+        //                 $hasNoTodayWeekday = !in_array($todayWeekday, $recurringDays);
 
-                        if ($hasNoTodayWeekday) {
+        //                 if ($hasNoTodayWeekday) {
 
-                            $scheduledDate = [];
+        //                     $scheduledDate = [];
 
-                            foreach ($recurringDays  as $day) {
+        //                     foreach ($recurringDays  as $day) {
 
-                                $scheduledDate[] = getDaysOfWeek()[$day];
-                            }
+        //                         $scheduledDate[] = getDaysOfWeek()[$day];
+        //                     }
 
-                            $notificationData['scheduled_date'] = $scheduledDate;
+        //                     $notificationData['scheduled_date'] = $scheduledDate;
 
-                            logNotificationNotScheduledForToday($notificationData);
-                        } else {
+        //                     logNotificationNotScheduledForToday($notificationData);
+        //                 } else {
 
-                            $notificationPattern = 'custom_time';
+        //                     $notificationPattern = 'custom_time';
 
-                            $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //                     $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                            $isNotificationTime = logNotificationTime($notificationTimeData, $todayWeekday);
+        //                     $isNotificationTime = logNotificationTime($notificationTimeData, $todayWeekday);
 
-                            if ($isNotificationTime) {
+        //                     if ($isNotificationTime) {
 
-                                notify($notificationTime, $customTime);
-                            }
-                        }
-                    } else {
+        //                         notify($notificationTime, $customTime);
+        //                     }
+        //                 }
+        //             } else {
 
-                        $selectedTimes = getSelectedNotificationTimes($notificationTime);
+        //                 $selectedTimes = getSelectedNotificationTimes($notificationTime);
 
-                        foreach ($selectedTimes as $time) {
+        //                 foreach ($selectedTimes as $time) {
 
-                            if ($time === 'one_day_earlier') {
+        //                     if ($time === 'one_day_earlier') {
 
-                                $isOneDayAfterWeekday = in_array($oneDayAfterWeekday, $recurringDays);
+        //                         $isOneDayAfterWeekday = in_array($oneDayAfterWeekday, $recurringDays);
 
-                                if (!$isOneDayAfterWeekday) {
+        //                         if (!$isOneDayAfterWeekday) {
 
-                                    // $scheduledDate = getDaysOfWeek()[strtolower(Carbon::parse($oneDayAfterWeekday)->subDay()->format('l'))];
+        //                             // $scheduledDate = getDaysOfWeek()[strtolower(Carbon::parse($oneDayAfterWeekday)->subDay()->format('l'))];
 
-                                    $oneDayAfterWeekdays = [];
+        //                             $oneDayAfterWeekdays = [];
 
-                                    foreach ($recurringDays  as $day) {
+        //                             foreach ($recurringDays  as $day) {
 
-                                        $oneDayAfterWeekdays[] = getDaysOfWeek()[strtolower(Carbon::parse($day)->subDay()->format('l'))];
-                                    }
+        //                                 $oneDayAfterWeekdays[] = getDaysOfWeek()[strtolower(getCarbonDate($day)->subDay()->format('l'))];
+        //                             }
+        //                             $notificationData['scheduled_date'] = $oneDayAfterWeekdays;
 
-                                    $notificationData['scheduled_date'] = $oneDayAfterWeekdays;
+        //                             logNotificationNotScheduledForToday($notificationData);
+        //                         } else {
 
-                                    logNotificationNotScheduledForToday($notificationData);
-                                } else {
+        //                             $notificationPattern = 'one_day_earlier';
 
-                                    $notificationPattern = 'one_day_earlier';
+        //                             $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //                             $isNotificationTime = logNotificationTime($notificationTimeData, $isOneDayAfterWeekday);
 
-                                    $isNotificationTime = logNotificationTime($notificationTimeData, $isOneDayAfterWeekday);
+        //                             if ($isNotificationTime) {
 
-                                    if ($isNotificationTime) {
+        //                                 $start = getStartDuration($task, $userToNotify);
 
-                                        $start = getStartDuration($task, $userToNotify);
+        //                                 $alertTime = $start->copy()->subDay();
 
-                                        $alertTime = $start->copy()->subDay();
+        //                                 notify($notificationTime, $alertTime);
+        //                             }
+        //                         }
+        //                     } else {
 
-                                        notify($notificationTime, $alertTime);
-                                    }
-                                }
-                            } else {
+        //                         $todayWeekday = in_array($todayWeekday, $recurringDays);
 
-                                $todayWeekday = in_array($todayWeekday, $recurringDays);
+        //                         if (!$todayWeekday) {
 
-                                if (!$todayWeekday) {
+        //                             $alertDays = [];
 
-                                    $alertDays = [];
+        //                             foreach ($recurringDays  as $day) {
+        //                                 $alertDays[] = getDaysOfWeek()[$day];
+        //                             }
 
-                                    foreach ($recurringDays  as $day) {
-                                        $alertDays[] = getDaysOfWeek()[$day];
-                                    }
 
+        //                             $notificationData['scheduled_date'] = $alertDays;
 
-                                    $notificationData['scheduled_date'] = $alertDays;
+        //                             logNotificationNotScheduledForToday($notificationData);
+        //                         } else {
 
-                                    logNotificationNotScheduledForToday($notificationData);
-                                } else {
+        //                             $notificationPattern = $time;
 
-                                    $notificationPattern = $time;
+        //                             $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                                    $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //                             $isNotificationTime = logNotificationTime($notificationTimeData, $todayWeekday);
 
-                                    $isNotificationTime = logNotificationTime($notificationTimeData, $todayWeekday);
+        //                             if ($isNotificationTime) {
 
-                                    if ($isNotificationTime) {
+        //                                 $userToNotify = $notificationTime->user;
 
-                                        $userToNotify = $notificationTime->user;
+        //                                 $start = getStartDuration($task, $userToNotify);
 
-                                        $start = getStartDuration($task, $userToNotify);
+        //                                 $alertTime = getDefaultTimeAlert($notificationPattern, $start);
 
-                                        $alertTime = getDefaultTimeAlert($notificationPattern, $start);
+        //                                 notify($notificationTime, $alertTime);
+        //                             }
+        //                         }
+        //                     }
+        //                 }
+        //             }
 
-                                        notify($notificationTime, $alertTime);
-                                    }
-                                }
-                            }
-                        }
-                    }
 
-                    // $oneDayBeforeWeekday = getDayOfWeek($today->copy()->subDay());
 
-                    // $recurringNotificationToday =  $notificationTime->reminder->recurring->where($todayWeekday, 'true')->exists();
 
-                    // $oneDayBeforeRecurringNotification =  $notificationTime->with('reminder.recurring')
 
-                    //     ->where('one_day_earlier', 'true')
 
-                    //     ->whereHas('reminder', function ($query) use ($oneDayAfterWeekday) {
 
-                    //         $query->whereHas('recurring', function ($query) use ($oneDayAfterWeekday) {
 
-                    //             $query->where($oneDayAfterWeekday, 'true');
-                    //         });
-                    //     })->first();
 
-                    // dd($oneDayBeforeRecurringNotification);
 
-                    // if ($oneDayBeforeRecurringNotification->isNotEmpty()) {
 
-                    //     $notificationPattern = $time;
 
-                    //     $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                    //     $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
 
-                    //     if ($isNotificationTime) {
 
-                    //         $userToNotify = $notificationTime->user;
 
-                    //         $start = getStartDuration($task, $userToNotify);
 
-                    //         $alertTime = getDefaultTimeAlert($notificationPattern, $start);
 
-                    //         notify($notificationTime, $alertTime);
-                    //     }
-                    // }
 
-                    // if ($hasOneDayBeforeRecurringNotification) {
 
-                    //     logNotificationNotScheduledForToday($notificationData);
-                    // } else {
 
-                    //     $isTask = !is_null($notificationTime->reminder->task);
 
-                    //     Log::info('');
-                    //     Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dia(s) selecionado(s) - Recurring ID: ' . $recurring->id);
-                    // }
 
-                    // foreach ($recurringDays as $day) {
 
-                    //     $isToday =  checkIsToday($day);
 
-                    //     if (!$isToday) {
 
-                    //         $notificationData['day'] = $day;
 
-                    //         logNotificationNotScheduledForToday($notificationData);
-                    //     } else {
-                    //         $isTask = !is_null($notificationTime->reminder->task);
-                    //         Log::info('');
-                    //         Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dias selecionados - Recurring ID: ' . $recurring->id);
 
-                    //         $hasCustomTime = !is_null($notificationTime->custom_time);
 
 
-                    //         $customTime =  $hasCustomTime
-                    //             ? getCarbonTime($notificationTime->custom_time)
-                    //             : null;
 
-                    //         if ($hasCustomTime) {
 
-                    //             $isToday = checkIsToday($day);
 
-                    //             if (!$isToday) {
 
-                    //                 logNotificationNotScheduledForToday($notificationData);
-                    //             } else {
 
-                    //                 $notificationPattern = 'custom_time';
+        //             // $oneDayBeforeWeekday = getDayOfWeek($today->copy()->subDay());
 
-                    //                 $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //             // $recurringNotificationToday =  $notificationTime->reminder->recurring->where($todayWeekday, 'true')->exists();
 
-                    //                 $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+        //             // $oneDayBeforeRecurringNotification =  $notificationTime->with('reminder.recurring')
 
-                    //                 if ($isNotificationTime) {
+        //             //     ->where('one_day_earlier', 'true')
 
-                    //                     notify($notificationTime, $customTime);
-                    //                 }
-                    //             }
-                    //         }
+        //             //     ->whereHas('reminder', function ($query) use ($oneDayAfterWeekday) {
 
+        //             //         $query->whereHas('recurring', function ($query) use ($oneDayAfterWeekday) {
 
-                    //         // else
-                    //         // {
+        //             //             $query->where($oneDayAfterWeekday, 'true');
+        //             //         });
+        //             //     })->first();
 
-                    //         //     $selectedTimes = getSelectedNotificationTimes($notificationTime);
+        //             // dd($oneDayBeforeRecurringNotification);
 
-                    //         //     foreach ($selectedTimes as $time) {
+        //             // if ($oneDayBeforeRecurringNotification->isNotEmpty()) {
 
-                    //         //         if ($time === 'one_day_earlier') {
+        //             //     $notificationPattern = $time;
 
-                    //         //             $oneDayBefore = $specificDate->copy()->subDay();
+        //             //     $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
 
-                    //         //             $notificationData['specific_date'] = $oneDayBefore;
+        //             //     $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
 
-                    //         //             $isToday =  checkIsToday($oneDayBefore);
+        //             //     if ($isNotificationTime) {
 
-                    //         //             $notificationPattern = 'one_day_earlier';
+        //             //         $userToNotify = $notificationTime->user;
 
-                    //         //             if (!$isToday) {
+        //             //         $start = getStartDuration($task, $userToNotify);
 
-                    //         //                 logNotificationNotScheduledForToday($notificationData);
-                    //         //             } else {
+        //             //         $alertTime = getDefaultTimeAlert($notificationPattern, $start);
 
-                    //         //                 $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //             //         notify($notificationTime, $alertTime);
+        //             //     }
+        //             // }
 
-                    //         //                 $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+        //             // if ($hasOneDayBeforeRecurringNotification) {
 
-                    //         //                 if ($isNotificationTime) {
+        //             //     logNotificationNotScheduledForToday($notificationData);
+        //             // } else {
 
-                    //         //                     notify($notificationData, $customTime);
-                    //         //                 }
-                    //         //             }
-                    //         //         } else {
+        //             //     $isTask = !is_null($notificationTime->reminder->task);
 
-                    //         //             $isToday =  checkIsToday($specificDate);
+        //             //     Log::info('');
+        //             //     Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dia(s) selecionado(s) - Recurring ID: ' . $recurring->id);
+        //             // }
 
-                    //         //             if (!$isToday) {
+        //             // foreach ($recurringDays as $day) {
 
-                    //         //                 logNotificationNotScheduledForToday($notificationData);
-                    //         //             } else {
+        //             //     $isToday =  checkIsToday($day);
 
-                    //         //                 $notificationPattern = $time;
+        //             //     if (!$isToday) {
 
-                    //         //                 $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+        //             //         $notificationData['day'] = $day;
 
-                    //         //                 $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+        //             //         logNotificationNotScheduledForToday($notificationData);
+        //             //     } else {
+        //             //         $isTask = !is_null($notificationTime->reminder->task);
+        //             //         Log::info('');
+        //             //         Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dias selecionados - Recurring ID: ' . $recurring->id);
 
-                    //         //                 if ($isNotificationTime) {
+        //             //         $hasCustomTime = !is_null($notificationTime->custom_time);
 
-                    //         //                     $userToNotifyID = $notificationTime->user->id;
 
-                    //         //                     $start = getStartDuration($task, $userToNotifyID);
+        //             //         $customTime =  $hasCustomTime
+        //             //             ? getCarbonTime($notificationTime->custom_time)
+        //             //             : null;
 
-                    //         //                     $timeAlert = getDefaultTimeAlert($notificationPattern, $start);
+        //             //         if ($hasCustomTime) {
 
-                    //         //                     notify($notificationData, $customTime);
-                    //         //                 }
-                    //         //             }
-                    //         //         }
-                    //         //     }
-                    //         // }
-                    //     }
-                    // }
-                }
-            }
-        }
+        //             //             $isToday = checkIsToday($day);
+
+        //             //             if (!$isToday) {
+
+        //             //                 logNotificationNotScheduledForToday($notificationData);
+        //             //             } else {
+
+        //             //                 $notificationPattern = 'custom_time';
+
+        //             //                 $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+        //             //                 $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+
+        //             //                 if ($isNotificationTime) {
+
+        //             //                     notify($notificationTime, $customTime);
+        //             //                 }
+        //             //             }
+        //             //         }
+
+
+        //             //         // else
+        //             //         // {
+
+        //             //         //     $selectedTimes = getSelectedNotificationTimes($notificationTime);
+
+        //             //         //     foreach ($selectedTimes as $time) {
+
+        //             //         //         if ($time === 'one_day_earlier') {
+
+        //             //         //             $oneDayBefore = $specificDate->copy()->subDay();
+
+        //             //         //             $notificationData['specific_date'] = $oneDayBefore;
+
+        //             //         //             $isToday =  checkIsToday($oneDayBefore);
+
+        //             //         //             $notificationPattern = 'one_day_earlier';
+
+        //             //         //             if (!$isToday) {
+
+        //             //         //                 logNotificationNotScheduledForToday($notificationData);
+        //             //         //             } else {
+
+        //             //         //                 $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+        //             //         //                 $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+
+        //             //         //                 if ($isNotificationTime) {
+
+        //             //         //                     notify($notificationData, $customTime);
+        //             //         //                 }
+        //             //         //             }
+        //             //         //         } else {
+
+        //             //         //             $isToday =  checkIsToday($specificDate);
+
+        //             //         //             if (!$isToday) {
+
+        //             //         //                 logNotificationNotScheduledForToday($notificationData);
+        //             //         //             } else {
+
+        //             //         //                 $notificationPattern = $time;
+
+        //             //         //                 $notificationTimeData = getNotificationTimeData($notificationTime, $notificationPattern);
+
+        //             //         //                 $isNotificationTime = logNotificationTime($notificationTimeData, $isToday);
+
+        //             //         //                 if ($isNotificationTime) {
+
+        //             //         //                     $userToNotifyID = $notificationTime->user->id;
+
+        //             //         //                     $start = getStartDuration($task, $userToNotifyID);
+
+        //             //         //                     $timeAlert = getDefaultTimeAlert($notificationPattern, $start);
+
+        //             //         //                     notify($notificationData, $customTime);
+        //             //         //                 }
+        //             //         //             }
+        //             //         //         }
+        //             //         //     }
+        //             //         // }
+        //             //     }
+        //             // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        //         }
+        //     }
+        // }
 
         //------------------------------------------------------------------------------------------termina o teste
 
