@@ -205,7 +205,7 @@ class TaskController extends Controller
 
         $task = Task::find($id);
 
-        if (!is_null($task)) {
+        if (isset($task)) {
 
             $view = request()->query('view', 'default');
 
@@ -227,17 +227,9 @@ class TaskController extends Controller
 
             $task['end'] = $duration->end ? date('H:i', strtotime($duration->end)) : null;
 
-            //rodrigo
-            // $startTime = Carbon::parse($duration->start_time)->format('H:i');
-
             $recurring = $task->reminder->recurring;
 
-            //rodrigo
-            // dd($recurring);
-
             $task['recurringMessage'] = getRecurringMessage($recurring);
-            //rodrigo
-            // dd($task->getAttributes());
 
             $alertOptions = getAlertOptions();
 
