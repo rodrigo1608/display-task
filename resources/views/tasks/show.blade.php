@@ -5,105 +5,17 @@
 
         <div class="row">
 
+            <div class="w-100">
+
+
+
+            </div>
             <div class="col-md-9 container p-0">
+
 
                 <div class="card mt-5">
 
-                    @if (auth()->id() == $task->created_by)
-                        <div class="card-header text-end">
-                            <div>
-                                @if ($participants->isNotEmpty())
-                                    <button id="participants-button" type="button" class="btn btn-primary me-3"
-                                        data-bs-toggle="modal" data-bs-target="#participantsModal">
-                                        Adicionar participantes
-                                        <span id="participantCounterDisplay"></span>
-                                    </button>
-                                @endif
 
-                                <!-- Modal -->
-                                <div class="modal fade" id="participantsModal" tabindex="-1"
-                                    aria-labelledby="exampleModalLabel" aria-hidden="true">
-
-                                    <div class="modal-dialog">
-
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-
-                                                <h1 class="modal-title fs-5 poppins-semibold" id="exampleModalLabel">
-                                                    Participantes
-                                                </h1>
-
-                                            </div>
-
-                                            <div class="modal-body">
-
-                                                @foreach ($participants as $index => $participant)
-                                                    <div class="list-group">
-
-                                                        <div class="form-check">
-
-                                                            <input class="form-check-input participant-checkbox"
-                                                                type="checkbox" value=" {{ $participant->email }}"
-                                                                name="participant{{ $index }}"
-                                                                id="participant{{ $index }}CheckDefault"
-                                                                {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
-
-                                                            <label class="form-check-label"
-                                                                for="participant{{ $index }}CheckDefault">
-                                                                {{ $participant->email }}
-                                                            </label>
-                                                        </div>
-
-                                                    </div>
-                                                @endforeach
-                                            </div>
-
-                                            <div class="modal-footer">
-
-                                                <button type="button" data-bs-dismiss="modal"
-                                                    class="btn btn-primary">Adicionar</button>
-                                            </div>
-
-                                        </div>
-
-                                        <script>
-                                            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-                                            const participantCounterDisplay = document.getElementById('participantCounterDisplay');
-
-                                            function updateParticipantCounter() {
-
-                                                const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
-                                                const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
-
-                                                const checkedCounter = checkedParticipants.length;
-
-                                                const hasAnyParticipant = checkedCounter > 0;
-
-                                                if (hasAnyParticipant) {
-                                                    participantCounterDisplay.innerText = '(' + checkedCounter + ')';
-                                                } else {
-                                                    participantCounterDisplay.innerText = '';
-                                                }
-                                            }
-
-                                            // updateParticipantCounter();
-
-                                            participantCheckboxes.forEach(participantCheckbox => participantCheckbox.addEventListener('change', () =>
-                                                updateParticipantCounter()));
-
-                                            updateParticipantCounter();
-                                        </script>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-                            <a href="#" class="btn btn-secondary">Marcar como concluída</a>
-
-                        </div>
-                    @endif
 
                     <div class="card-body p-5">
 
@@ -344,20 +256,120 @@
 
             <div class="h-100 m-5">
 
-                <div class="bg-danger m-5">
 
-                </div>
+
 
             </div>
         @endif
 
     </div>
 
-    <div class="fixed-bottom w-100 bg-white p-3 text-end" style=" right: 300px;">
+    <!-- Modal -->
 
-        <button type="button" class="btn btn-secondary me-5" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    <form method="post" action="{{ route('participant.add', ['taskID' => $task->id]) }}">
+
+        @csrf
+        <div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="participantsModalLabel"
+            aria-hidden="true">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h1 class="modal-title fs-5 poppins-semibold" id="participantsModalLabel">
+                            Participantes
+                        </h1>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        @foreach ($participants as $index => $participant)
+                            <div class="list-group">
+
+                                <div class="form-check">
+
+                                    <input class="form-check-input participant-checkbox" type="checkbox"
+                                        value=" {{ $participant->email }}" name="participant{{ $index }}"
+                                        id="participant{{ $index }}CheckDefault"
+                                        {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
+
+                                    <label class="form-check-label" for="participant{{ $index }}CheckDefault">
+                                        {{ $participant->email }}
+                                    </label>
+                                </div>
+
+                            </div>
+                        @endforeach
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+
+    <div class="fixed-bottom w-100 bg-white p-4 text-end" style="right: 130px;">
+
+        <button type="button" class="btn btn-primary me-5" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
             Criar Feedback
         </button>
+
+        @if (auth()->id() == $task->created_by)
+            @if ($participants->isNotEmpty())
+                <button id="participants-button" type="button" class="btn btn-primary me-4" data-bs-toggle="modal"
+                    data-bs-target="#participantsModal">
+
+                    Adicionar participantes
+
+                    <span id="participantCounterDisplay"></span>
+
+                </button>
+            @endif
+
+            <script>
+                const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+
+                const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+
+                console.log(participantCounterDisplay);
+
+                function updateParticipantCounter() {
+
+                    const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
+                    const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+
+                    const checkedCounter = checkedParticipants.length;
+
+                    const hasAnyParticipant = checkedCounter > 0;
+
+                    if (hasAnyParticipant) {
+                        participantCounterDisplay.innerText = '(' + checkedCounter + ')';
+                    } else {
+                        participantCounterDisplay.innerText = '';
+                    }
+                }
+
+                // updateParticipantCounter();
+
+                participantCheckboxes.forEach(
+                    participantCheckbox => participantCheckbox.addEventListener('change', () =>
+                        updateParticipantCounter()));
+
+                updateParticipantCounter();
+            </script>
+
+            <a href="#" class="btn btn-secondary me-4">Marcar como concluída</a>
+        @endif
+
     </div>
 
     <!-- Modal -->
@@ -417,15 +429,12 @@
                         task_attachments.addEventListener('change', () => {
 
                             const selectedFiles = fileInput.files;
-
                             const pluralOrSingularString = selectedFiles.length > 1 ? `(${selectedFiles.length}) arquivos` :
                                 `(${selectedFiles.length}) arquivo`;
 
                             fileLabel.innerText = pluralOrSingularString;
                         });
                     </script>
-
-
 
                     <button type="submit" form="feedbackForm" class="btn btn-secondary">Salvar lembrete</button>
 
@@ -434,7 +443,6 @@
             </div>
 
         </div>
-
 
     </div>
 @endsection

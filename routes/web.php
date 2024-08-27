@@ -28,6 +28,7 @@ Route::put('task/{task}/accept-pending-task', [TaskController::class, 'acceptPen
 Route::get('user/{id}', [UserController::class, 'edit'])->name('user.edit');
 Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');
 
+Route::post('participant/{taskID}', [ParticipantController::class, 'add'])->name('participant.add');
 Route::delete('participant', [ParticipantController::class, 'destroy'])->name('participant.destroy');
 
 Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.store');

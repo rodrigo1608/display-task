@@ -205,6 +205,12 @@ class TaskController extends Controller
 
         $task = Task::find($id);
 
+        $taskID = $task->id;
+
+        $participants = User::whereDoesntHave('participatingTasks', function ($query) use ($taskID) {
+            $query->where('task_id', $taskID);
+        })->where('id', '!=', auth()->id())->get();
+
         if (isset($task)) {
 
             $view = request()->query('view', 'default');
@@ -235,7 +241,7 @@ class TaskController extends Controller
 
             return $view === 'pending'
                 ?  view('tasks/showPending', compact('task', 'alertOptions'))
-                :  view('tasks/show', compact('task'));
+                :  view('tasks/show', compact('participants', 'task'));
         } else {
 
             return redirect('home');

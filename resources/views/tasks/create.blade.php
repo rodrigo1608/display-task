@@ -149,7 +149,7 @@
                                                 <strong>{{ $message }}</strong>
                                             </div>
                                         @enderror
-
+                                        data-bs-dismiss="modal"
                                     </div>
 
                                     <div class="col-md-3 offset-md-1">
