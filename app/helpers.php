@@ -1,9 +1,10 @@
 <?php
 
-use App\Models\NotificationTime;
-use App\Models\Task;
 use App\Mail\TaskNotify;
 use App\Mail\ReminderNotify;
+use App\Models\NotificationTime;
+use App\Models\Task;
+use App\Models\Reminder;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
@@ -79,7 +80,6 @@ if (!function_exists('getToday')) {
         return Carbon::today('America/Sao_Paulo');
     }
 }
-
 
 if (!function_exists('getDaysOfWeek')) {
 
@@ -871,6 +871,8 @@ if (!function_exists('logNotificationTime')) {
 
         $notificationTime = $data['notification_time'];
 
+        $reminder = $notificationTime->reminder;
+
         $isTask = !is_null($notificationTime->reminder->task);
 
         $now = $data['now'];
@@ -887,6 +889,12 @@ if (!function_exists('logNotificationTime')) {
         } else {
 
             Log::info('Job NotifyAtCustomTime: ' . $contextString . ' hoje, mas o horário de notificação já ocorreu' . ' - NotificationTime ID: ' . $notificationTime->id);
+
+            if (!$isTask && isset($reminder->recurring->specific_date)) {
+
+                $reminder->available = 'false';
+                $reminder->save();
+            }
         }
 
         if ($isBeforeTime ||  $isAfterTime) {
@@ -1023,6 +1031,11 @@ if (!function_exists('notify')) {
 
             Mail::to($userToNotify->email)->send(new ReminderNotify($reminder));
             Log::info("Job NotifyAtCustomTime: O lembrete foi enviado para  $userToNotify->email");
+
+            if (isset($reminder->recurring->specific_date)) {
+                $reminder->available = 'false';
+                $reminder->save();
+            }
         }
     }
 }
@@ -1375,3 +1388,55 @@ if (!function_exists('handleDurationStatus')) {
 // $isAfterCustomTime = null;
 
 // $isToday = checkIsToday($now);
+
+if (!function_exists('getWeekDaysStartingFromToday')) {
+
+    function getWeekDaysStartingFromToday($weekDayReminders)
+    {
+        $today = strtolower(Carbon::now()->format('l'));
+
+        $week = array_keys($weekDayReminders);
+
+        $startIndex = array_search($today, $week);
+
+        $partAfterToday = array_slice($week, $startIndex);
+
+        $partBeforeStartIndex = array_slice($week, 0, $startIndex);
+
+        $reorderedDaysOfWeek = array_merge($partAfterToday, $partBeforeStartIndex);
+
+        $reorderedWeekDayReminders = [];
+
+        foreach ($reorderedDaysOfWeek as $day) {
+
+            $reorderedWeekDayReminders[$day] = $weekDayReminders[$day];
+        }
+
+        return $reorderedWeekDayReminders;
+    }
+}
+
+if (!function_exists('getRemindersByWeekday')) {
+    function getRemindersByWeekday($daysOfWeek)
+    {
+        $weekDayReminders = [];
+
+        foreach (array_keys($daysOfWeek) as $dayOfWeek) {
+
+            $weekDayReminders[$dayOfWeek] = Reminder::with('recurring')->whereNotNull('reminders.user_id')->where('available', 'true')
+
+                ->whereHas('recurring', function ($query) use ($dayOfWeek) {
+
+                    $query->where($dayOfWeek, true)->orWhere('specific_date_weekday', $dayOfWeek);
+                })->join('notification_times', 'reminders.id', '=', 'notification_times.reminder_id')
+                ->select('reminders.*', 'notification_times.custom_time')
+                ->orderBy('notification_times.custom_time')
+                ->get();
+        }
+
+        return array_filter($weekDayReminders, function ($reminders) {
+
+            return $reminders->isNotEmpty();
+        });
+    }
+}

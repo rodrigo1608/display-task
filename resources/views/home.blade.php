@@ -47,20 +47,45 @@
 
                             <div class="accordion" id="accordionFlushExample">
 
-                                @foreach ($selectedCurrentUserTasks as $index => $task)
+                                @foreach ($selectedUserTasks as $index => $task)
                                     <div class="accordion-item">
 
-                                        <h2 class="accordion-header">
+                                        <h2 class="accordion-header d-flex">
 
                                             <button class="accordion-button poppins-semibold collapsed" type="button"
                                                 data-bs-toggle="collapse"
                                                 data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
                                                 aria-controls="flush-collapseOne">
-                                                <span class="fs-5">{{ $task->start }}</span> <span
-                                                    class="mx-2">-</span>
-                                                <span class="fs-5">{{ $task->end }}</span> <span
-                                                    class="mx-2">:</span>
-                                                {{ $task->title }}
+
+                                                <div class="w-100 d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <span class="fs-5">{{ $task->start }}</span> <span
+                                                            class="mx-1">-</span>
+                                                        <span class="fs-5">{{ $task->end }}</span> <span
+                                                            class="mx-1">:</span>
+                                                        <span class="fs-5"> {{ $task->title }}</span>
+                                                    </div>
+
+                                                    <div class="me-3 text-end">
+                                                        <p class="roboto fs-6 my-2 ms-4 ps-4">
+
+                                                            <svg stroke="currentColor" @class([
+                                                                'text-success' => $task->isStarting,
+                                                                'text-danger' => $task->isFinished,
+                                                                'text-warning' => !$task->isStarting && !$task->isFinished,
+                                                            ])
+                                                                stroke-width="2" xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                                class="size-6" style="width: 1em; height: 1em;">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                            </svg>
+
+                                                        </p>
+
+                                                    </div>
+                                                </div>
+
 
                                             </button>
 
@@ -98,6 +123,19 @@
                                                     {!! $task->recurringMessage !!}
                                                 </p>
 
+                                                @if ($task->isStarting)
+                                                    <p class="text-success roboto fs-6">
+                                                        Irá começar</p>
+                                                @elseIf($task->isFinished)
+                                                    <p class="text-danger roboto fs-6">
+                                                        Tempo expirado</p>
+                                                @else
+                                                    <p class="text-warning roboto fs-6">
+                                                        Sendo realizada</p>
+                                                    </p>
+                                                @endif
+
+
                                                 <div class="text-end">
                                                     <a href="{{ route('task.show', ['task' => $task->id]) }}"
                                                         class="btn btn-secondary">Ver
@@ -105,7 +143,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 @endforeach
                             </div>
@@ -122,8 +159,10 @@
                                     <div class="card-body text-secondary">
 
                                         <ul class="roboto text-black" style="list-style-type: circle">
-                                            @foreach ($currentUserReminders->take(5) as $reminder)
-                                                <li class="mt-2">{{ $reminder->title }}</li>
+                                            @foreach ($orderedReminders as $reminders)
+                                                @foreach ($reminders as $reminder)
+                                                    <li class="mt-2">{{ $reminder->title }}</li>
+                                                @endforeach
                                             @endforeach
                                         </ul>
 
@@ -135,7 +174,7 @@
 
                                             <a href="{{ route('reminder.index') }}" class="poppins fs-6 py-2 text-black">
 
-                                                {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }}
+                                                {{-- {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }} --}}
 
                                             </a>
 

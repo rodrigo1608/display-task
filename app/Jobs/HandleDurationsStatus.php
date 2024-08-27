@@ -42,55 +42,64 @@ class HandleDurationsStatus implements ShouldQueue
 
         $currentDayOfWeek = getDayOfWeek($now);
 
-        foreach ($tasks as $task) {
+        if ($tasks->isEmpty()) {
+
             Log::info('Job HandleDurationsStatus:');
-            Log::info('Job HandleDurationsStatus: Início da iteração referente a tarefas');
+            Log::info('Job HandleDurationsStatus: Nenhuma tarefa encontrada.');
+        } else {
 
-            $recurring = $task->reminder->recurring;
+            foreach ($tasks as $task) {
 
-            $isRecurrentTask =  $recurring->specific_date == null;
+                Log::info('Job HandleDurationsStatus:');
+                Log::info('Job HandleDurationsStatus: Início da iteração referente a tarefas');
 
-            if ($isRecurrentTask) {
+                $recurring = $task->reminder->recurring;
 
-                Log::info('Job HandleDurationsStatus: A tarefa em análise é recorrente - Recurring ID: ' . $recurring->id);
+                $isRecurrentTask =  $recurring->specific_date == null;
 
-                $isTodayRecurringDay = $recurring->$currentDayOfWeek === 'true';
+                if ($isRecurrentTask) {
 
-                $daysOfWeek = getDaysOfWeek();
+                    Log::info('Job HandleDurationsStatus: A tarefa em análise é recorrente - Recurring ID: ' . $recurring->id);
 
-                if ($isTodayRecurringDay) {
+                    $isTodayRecurringDay = $recurring->$currentDayOfWeek === 'true';
 
-                    Log::info('Job HandleDurationsStatus: Existe uma recorrência programada para hoje (' . $daysOfWeek[$currentDayOfWeek] . ')');
+                    $daysOfWeek = getDaysOfWeek();
+                    $dayOfWeek = $daysOfWeek[$currentDayOfWeek];
 
-                    handleDurationStatus($task, $now, 'recurring');
+                    if ($isTodayRecurringDay) {
+
+                        Log::info('Job HandleDurationsStatus: Existe uma recorrência programada para hoje (' . $dayOfWeek . ')');
+
+                        handleDurationStatus($task, $now, 'recurring');
+                    } else {
+
+                        $recurringMessage = getRecurringMessage($recurring);
+
+                        Log::info('Job HandleDurationsStatus: A tarefa em análise não está programada para ocorrer hoje');
+                        Log::info('Job HandleDurationsStatus: Dia recorrente: ' . $recurringMessage);
+                        Log::info('Job HandleDurationsStatus: Dia atual: ' . $daysOfWeek[$currentDayOfWeek]);
+                    }
                 } else {
 
-                    $recurringMessage = getRecurringMessage($recurring);
+                    Log::info('Job HandleDurationsStatus: Foi verificado que é uma tarefa  com data específica - Recurring ID: ' . $recurring->id);
 
-                    Log::info('Job HandleDurationsStatus: A tarefa em análise não está programada para ocorrer hoje');
-                    Log::info('Job HandleDurationsStatus: Dia recorrente: ' . $recurringMessage);
-                    Log::info('Job HandleDurationsStatus: Dia atual: ' . $daysOfWeek[$currentDayOfWeek]);
+                    $specificDate = getCarbonDate($recurring->specific_date);
+
+                    $isSpecificDateToday =  $specificDate->isSameDay($now);
+
+                    if ($isSpecificDateToday) {
+
+                        Log::info('Job HandleDurationsStatus: A tarefa foi programada para ocorrer especificamente hoje -' . $now->format('d/m/Y'));
+
+                        handleDurationStatus($task, $now);
+                    } else {
+                        Log::info('Job HandleDurationsStatus: A tarefa não está programada para hoje');
+                        Log::info('Job HandleDurationsStatus: Data programada: ' . $specificDate->format('d/m/Y'));
+                        Log::info('Job HandleDurationsStatus: Data atual: ' . $now->format('d/m/Y'));
+                    }
                 }
-            } else {
-
-                Log::info('Job HandleDurationsStatus: Foi verificado que é uma tarefa  com data específica - Recurring ID: ' . $recurring->id);
-
-                $specificDate = getCarbonDate($recurring->specific_date);
-
-                $isSpecificDateToday =  $specificDate->isSameDay($now);
-
-                if ($isSpecificDateToday) {
-
-                    Log::info('Job HandleDurationsStatus: A tarefa foi programada para ocorrer especificamente hoje -' . $now->format('d/m/Y'));
-
-                    handleDurationStatus($task, $now);
-                } else {
-                    Log::info('Job HandleDurationsStatus: A tarefa não está programada para hoje');
-                    Log::info('Job HandleDurationsStatus: Data programada: ' . $specificDate->format('d/m/Y'));
-                    Log::info('Job HandleDurationsStatus: Data atual: ' . $now->format('d/m/Y'));
-                }
+                Log::info('Job HandleDurationsStatus: Fim da iteração referente a tarefas');
             }
-            Log::info('Job HandleDurationsStatus: Fim da iteração referente a tarefas');
         }
 
         Log::info('Job HandleDurationsStatus');
