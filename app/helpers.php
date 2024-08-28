@@ -282,6 +282,8 @@ if (!function_exists('getAlertOptions')) {
     }
 }
 
+
+
 if (!function_exists('getPredefinedAlerts')) {
 
     function getPredefinedAlerts($notificationTime, $language = 'en')
@@ -1438,5 +1440,31 @@ if (!function_exists('getRemindersByWeekday')) {
 
             return $reminders->isNotEmpty();
         });
+    }
+}
+
+
+if (!function_exists('getTaskStatus')) {
+
+    function getTaskStatus($duration)
+    {
+        $now = getCarbonNow();
+        $start = getCarbonTime($duration->start);
+        $end = getCarbonTime($duration->end);
+
+        $isStarting = $start->greaterThan($now);
+
+        $isFinished = isset($end) ? $end->lessThan($now) : null;
+
+        if ($isStarting) {
+
+            return 'starting';
+        } elseif ($isFinished) {
+
+            return 'finished';
+        } else {
+
+            return 'in_progress';
+        }
     }
 }

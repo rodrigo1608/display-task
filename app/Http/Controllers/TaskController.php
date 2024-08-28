@@ -207,9 +207,11 @@ class TaskController extends Controller
 
         $taskID = $task->id;
 
-        $participants = User::whereDoesntHave('participatingTasks', function ($query) use ($taskID) {
+        $possibleParticipants = User::whereDoesntHave('participatingTasks', function ($query) use ($taskID) {
             $query->where('task_id', $taskID);
         })->where('id', '!=', auth()->id())->get();
+
+        // dd($possibleParticipants);
 
         if (isset($task)) {
 
@@ -239,9 +241,61 @@ class TaskController extends Controller
 
             $alertOptions = getAlertOptions();
 
+            if ($task->participants->isEmpty()) {
+
+                $task->emailsParticipants = "Nenhum participante";
+            } else {
+
+                $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
+            }
+            if ($task->participants->isEmpty()) {
+
+                $task->emailsParticipants = "Nenhum participante";
+            } else {
+
+                $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
+            }
+
+            $today = getToday();
+
+            if (isset($recurring->specific_date)) {
+
+                $specificDate = getCarbonDate($recurring->specific_date);
+
+                $isPast = $specificDate->isBefore($today);
+
+                $isTodaySpecificDate = checkIsToday($specificDate);
+
+                if ($isPast) {
+
+                    $task['tatus'] = 'finished';
+                } elseif ($isTodaySpecificDate) {
+
+                    $task['status'] = getTaskStatus($duration);
+                } else {
+
+                    $task['status'] = 'starting';
+                }
+            } else {
+
+                $todayWeekday = getDayOfWeek($today);
+
+                $repeatingDays = getRepeatingDays($recurring);
+
+                foreach ($repeatingDays as $day) {
+
+                    if ($day ===  $todayWeekday) {
+
+                        $task['status'] = getTaskStatus($duration);
+                    } else {
+                        $task['status'] = 'finished';
+                    }
+                }
+            }
+
             return $view === 'pending'
                 ?  view('tasks/showPending', compact('task', 'alertOptions'))
-                :  view('tasks/show', compact('participants', 'task'));
+                :  view('tasks/show', compact('possibleParticipants', 'task'));
         } else {
 
             return redirect('home');
@@ -305,7 +359,7 @@ class TaskController extends Controller
         //rodrigo
         // dd($recurrencePatterns);
 
-        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
+        $isSpecificDayPattern = isset($recurrencePatterns['specific_date']);
         //rodrigo
         // dd($isSpecificDayPattern);
 

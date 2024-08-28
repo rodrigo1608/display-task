@@ -34,7 +34,6 @@ class HomeController extends Controller
     {
         // //-----------------------------------------------------------------------------------------------Teste
 
-
         //------------------------------------------------------------------------------------------termina o teste
 
         $now = getCarbonNow()->format('H:i');
@@ -108,24 +107,26 @@ class HomeController extends Controller
 
             $notificationTime = null;
 
-            if ($creatorOrParticipant == 'creator') {
+            $notificationTime = $task->reminder->notificationTimes()->where('user_id', $currentUserID)->first()?->getAttributes();
 
-                $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
+            // if ($creatorOrParticipant == 'creator') {
 
-                    $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
+            //     $notificationTime = NotificationTime::whereHas('reminder', function ($query) use ($currentUserID, $taskID) {
 
-                        $query->where('created_by', $currentUserID)->where('id', $taskID);
-                    });
-                })->first()->getAttributes();
-            } else {
-                $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($taskID) {
+            //         $query->whereHas('task', function ($query) use ($currentUserID, $taskID) {
 
-                    $query->whereHas('task', function ($query) use ($taskID) {
+            //             $query->where('created_by', $currentUserID)->where('id', $taskID);
+            //         });
+            //     })->first()->getAttributes();
+            // } else {
+            //     $notificationTime = NotificationTime::where('user_id', $currentUserID)->whereHas('reminder', function ($query) use ($taskID) {
 
-                        $query->where('task_id', $taskID);
-                    });
-                })->first()->getAttributes();
-            }
+            //         $query->whereHas('task', function ($query) use ($taskID) {
+
+            //             $query->where('task_id', $taskID);
+            //         });
+            //     })->first()->getAttributes();
+            // }
 
             if (!is_null($notificationTime)) {
 
@@ -138,17 +139,22 @@ class HomeController extends Controller
                 // dd($isNotificationTimeMissing);
 
                 $task->isNotificationTimeMissing = $isNotificationTimeMissing;
+            } else {
+                $task->isNotificationTimeMissing = true;
             }
 
             if ($task->participants->isEmpty()) {
 
                 $task->emailsParticipants = "Nenhum participante";
             } else {
+
                 $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
             }
 
-            $task->start = substr($task->durations[0]->start, 0, 5);
-            $task->end =  substr($task->durations[0]->end, 0, 5);
+            $duration = $task->durations()->where('user_id', $currentUserID)->where('task_id', $task->id)->first();
+
+            $task->start = substr($duration->start, 0, 5);
+            $task->end =  substr($duration->end, 0, 5);
 
             $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
 
@@ -156,10 +162,44 @@ class HomeController extends Controller
             $start = isset($task->start) ? getCarbonTime($task->start) : null;
             $end = isset($task->end) ? getCarbonTime($task->end) : null;
 
-            $task->isStarting = isset($start) ? $isStarting = $start->greaterThan($now) : null;
-            $task->isFinished = isset($end) ? getCarbonTime($task->end)->lessThan($now) : null;
-        }
 
+            $recurring = $task->reminder->recurring;
+
+            if (isset($recurring->specific_date)) {
+
+                $specificDate = getCarbonDate($recurring->specific_date);
+
+                $isPast = $specificDate->isBefore($today);
+                $isTodaySpecificDate = checkIsToday($specificDate);
+
+                if ($isPast) {
+
+                    $task->status = 'finished';
+                } elseif ($isTodaySpecificDate) {
+
+
+                    $task->status = getTaskStatus($duration);
+                } else {
+
+                    $task->status = 'starting';
+                }
+            } else {
+
+                $todayWeekday = getDayOfWeek($today);
+
+                $repeatingDays = getRepeatingDays($recurring);
+
+                foreach ($repeatingDays as $day) {
+
+                    if ($day ===  $todayWeekday) {
+
+                        $task->status = getTaskStatus($duration);
+                    } else {
+                        $task->status = 'finished';
+                    }
+                }
+            }
+        }
 
         return view('home', compact('isThereAnyReminder', 'selectedUserTasks', 'orderedReminders', 'labelOverview'));
     }

@@ -29,6 +29,20 @@
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                         Detalhes
+
+                                        <div class="ms-2">
+                                            <svg stroke="currentColor" @class([
+                                                'text-success' => $task->status === 'starting',
+                                                'text-warning' => $task->status === 'in_progress',
+                                                'text-danger' => $task->status === 'finished',
+                                            ]) stroke-width="2"
+                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" class="size-6" style="width: 1em; height: 1em;">
+
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                        </div>
                                     </button>
                                 </h2>
 
@@ -48,6 +62,10 @@
                                         <p><span class="poppins-semibold">Email do responsável:</span>
 
                                             {{ $task->creator_email }}</p>
+
+                                        <p class="roboto"><span class="poppins-medium">Participantes:</span>
+                                            {{ $task->emailsParticipants }}
+                                        </p>
 
                                         @if (!empty($task->attachments))
                                             <p><span class="poppins-semibold">Anexos:</span></p>
@@ -104,6 +122,20 @@
 
                                         <span class="fs-5">{{ $task->start }}</span> <span class="mx-2">-</span>
                                         <span class="fs-5">{{ $task->end }}</span>
+
+                                        @if ($task->status === 'starting')
+                                            <span class="text-success roboto fs-6 ms-4">
+                                                Irá começar
+                                            </span>
+                                        @elseIf($task->status === 'in_progress')
+                                            <span class="text-warning roboto fs-6 ms-4">
+                                                Sendo realizada
+                                            </span>
+                                        @else
+                                            <span class="text-danger roboto fs-6 ms-4">
+                                                Tempo expirado
+                                            </span>
+                                        @endif
                                     </div>
 
                                 </div>
@@ -286,18 +318,18 @@
 
                     <div class="modal-body">
 
-                        @foreach ($participants as $index => $participant)
+                        @foreach ($possibleParticipants as $index => $possibleParticipant)
                             <div class="list-group">
 
                                 <div class="form-check">
 
                                     <input class="form-check-input participant-checkbox" type="checkbox"
-                                        value=" {{ $participant->email }}" name="participant{{ $index }}"
+                                        value=" {{ $possibleParticipant->email }}" name="participant{{ $index }}"
                                         id="participant{{ $index }}CheckDefault"
-                                        {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
+                                        {{ old('participant' . $index) == $possibleParticipant->email ? 'checked' : '' }}>
 
                                     <label class="form-check-label" for="participant{{ $index }}CheckDefault">
-                                        {{ $participant->email }}
+                                        {{ $possibleParticipant->email }}
                                     </label>
                                 </div>
 
@@ -324,7 +356,7 @@
         </button>
 
         @if (auth()->id() == $task->created_by)
-            @if ($participants->isNotEmpty())
+            @if ($possibleParticipants->isNotEmpty())
                 <button id="participants-button" type="button" class="btn btn-primary me-4" data-bs-toggle="modal"
                     data-bs-target="#participantsModal">
 

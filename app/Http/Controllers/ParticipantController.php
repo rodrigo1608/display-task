@@ -27,7 +27,6 @@ class ParticipantController extends Controller
             }
         }
 
-
         // Participant::create([
 
         //     'user_id' => User::where('email', $value)->first()->id,

@@ -70,9 +70,9 @@
                                                         <p class="roboto fs-6 my-2 ms-4 ps-4">
 
                                                             <svg stroke="currentColor" @class([
-                                                                'text-success' => $task->isStarting,
-                                                                'text-danger' => $task->isFinished,
-                                                                'text-warning' => !$task->isStarting && !$task->isFinished,
+                                                                'text-success' => $task->status === 'starting',
+                                                                'text-warning' => $task->status === 'in_progress',
+                                                                'text-danger' => $task->status === 'finished',
                                                             ])
                                                                 stroke-width="2" xmlns="http://www.w3.org/2000/svg"
                                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -85,7 +85,6 @@
 
                                                     </div>
                                                 </div>
-
 
                                             </button>
 
@@ -101,8 +100,7 @@
 
                                                 @if ($task->isNotificationTimeMissing)
                                                     <p class="text-danger roboto fs-6">Crie um lembrete para ser
-                                                        avisado
-                                                        antecipadamente, <a href="#"
+                                                        avisado antecipadamente, <a href="#"
                                                             class="roboto-bold text-danger">clique
                                                             aqui.</a></p>
                                                 @endif
@@ -123,22 +121,23 @@
                                                     {!! $task->recurringMessage !!}
                                                 </p>
 
-                                                @if ($task->isStarting)
+                                                @if ($task->status === 'starting')
                                                     <p class="text-success roboto fs-6">
-                                                        Irá começar</p>
-                                                @elseIf($task->isFinished)
-                                                    <p class="text-danger roboto fs-6">
-                                                        Tempo expirado</p>
-                                                @else
+                                                        Irá começar
+                                                    </p>
+                                                @elseIf($task->status === 'in_progress')
                                                     <p class="text-warning roboto fs-6">
-                                                        Sendo realizada</p>
+                                                        Sendo realizada
+                                                    </p>
+                                                @else
+                                                    <p class="text-danger roboto fs-6">
+                                                        Tempo expirado
                                                     </p>
                                                 @endif
 
                                                 <div class="text-end">
                                                     <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                                        class="btn btn-secondary">Ver
-                                                        tarefa</a>
+                                                        class="btn btn-secondary">Ver tarefa</a>
                                                 </div>
                                             </div>
                                         </div>
