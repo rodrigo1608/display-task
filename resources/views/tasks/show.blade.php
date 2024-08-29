@@ -18,10 +18,15 @@
 
 
                     <div class="card-body p-5">
+                        <div class="d-flex justify-content-between align-items-end flex-row">
 
-                        <h1 class="poppins-semibold fs-4">{{ $task->title }}</h1>
+                            <div>
+                                <h1 class="poppins-semibold fs-4">{{ $task->title }}</h1>
 
-                        <p class="roboto fs-5"> {{ $task->description }}</p>
+                                <p class="roboto fs-5"> {{ $task->description }}</p>
+                            </div>
+                            <a class="h-50 btn btn-primary" href="{{ route('task.edit', ['task' => $task->id]) }}">Editar</a>
+                        </div>
 
                         <div class="accordion" id="accordionExample">
                             <div class="accordion-item my-4">

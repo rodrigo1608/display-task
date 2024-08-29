@@ -30,7 +30,6 @@
                                             data-bs-toggle="collapse" data-bs-target="#flush-collapse{{ $index }}"
                                             aria-expanded="false" aria-controls="flush-collapseOne">
 
-
                                             {{ $task->title }}
 
                                         </button>

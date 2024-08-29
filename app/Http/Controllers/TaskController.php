@@ -17,9 +17,6 @@ use App\Models\User;
 use App\Models\Participant;
 use App\Models\Recurring;
 use App\Models\Reminder;
-
-use Carbon\Carbon;
-
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
@@ -314,17 +311,30 @@ class TaskController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $user  = auth()->id();
+
+        $task = Task::find($id);
+
+        $alertOptions = getAlertOptions();
+
+        $participants = User::where('id', '!=', auth()->id())->get();
+
+        return view('tasks/edit', compact('alertOptions', 'participants', 'task'));
+
+        // $task->created_by === $user ?
+
+        // if()
+
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreTaskRequest $request, string $id)
     {
 
-        $startTime = $request->start_time ? date('Y-m-d H:i:s', strtotime($request->start_time)) : null;
-        $endTime = $request->end_time ? date('Y-m-d H:i:s', strtotime($request->end_time)) : null;
+        $startTime = $request->start_time ? date('H:i:s', strtotime($request->start_time)) : null;
+        $endTime = $request->end_time ? date('H:i:s', strtotime($request->end_time)) : null;
 
         $duration = Duration::create([
 
