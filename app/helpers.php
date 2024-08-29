@@ -1414,13 +1414,15 @@ if (!function_exists('getWeekDaysStartingFromToday')) {
 }
 
 if (!function_exists('getRemindersByWeekday')) {
+
     function getRemindersByWeekday($daysOfWeek)
     {
         $weekDayReminders = [];
+        $userID = auth()->id();
 
         foreach (array_keys($daysOfWeek) as $dayOfWeek) {
 
-            $weekDayReminders[$dayOfWeek] = Reminder::with('recurring')->whereNotNull('reminders.user_id')->where('available', 'true')
+            $weekDayReminders[$dayOfWeek] = Reminder::with('recurring')->where('reminders.user_id', $userID)->where('available', 'true')
 
                 ->whereHas('recurring', function ($query) use ($dayOfWeek) {
 
