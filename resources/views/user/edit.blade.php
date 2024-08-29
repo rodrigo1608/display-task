@@ -53,7 +53,7 @@
                                 <div class="col-md-6">
                                     <input id="name" type="text"
                                         class="input-form-text form-control @error('name') is-invalid @enderror"
-                                        name="name" value="{{ $user->name }}" required autocomplete="name" autofocus>
+                                        name="name" value="{{ $user->name }}" autocomplete="name" autofocus>
 
                                     @error('name')
                                         <span class="invalid-feedback" role="alert">
@@ -71,7 +71,7 @@
 
                                     <input id="lastname" type="text"
                                         class="form-control @error('lastname') is-invalid @enderror" name="lastname"
-                                        value="{{ $user->lastname }}" required autocomplete="lastname" autofocus>
+                                        value="{{ $user->lastname }}" autocomplete="lastname" autofocus>
 
                                     @error('lastname')
                                         <span class="invalid-feedback" role="alert">
@@ -90,7 +90,7 @@
 
                                     <input id="role" type="text"
                                         class="form-control @error('role') is-invalid @enderror" name="role"
-                                        value="{{ $user->role }}" required autocomplete="role" autofocus>
+                                        value="{{ $user->role }}" autocomplete="role" autofocus>
 
                                     @error('role')
                                         <span class="invalid-feedback" role="alert">
@@ -108,7 +108,7 @@
                                 <div class="col-md-6">
                                     <input id="email" type="email"
                                         class="form-control @error('email') is-invalid @enderror" name="email"
-                                        value="{{ $user->email }}" required autocomplete="email">
+                                        value="{{ $user->email }}" autocomplete="email">
 
                                     @error('email')
                                         <span class="invalid-feedback" role="alert">

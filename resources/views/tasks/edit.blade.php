@@ -34,8 +34,12 @@
 
                                 <div class="col-3 d-flex justify-content-end">
 
+                                    @php
+                                        $specificDate = $task->reminder->recurring->specific_date;
+                                    @endphp
+
                                     <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                        value="{{ old('specific_date', Carbon\Carbon::now()->format('Y-m-d')) }}"
+                                        value="{{ old('specific_date', $specificDate ? Carbon\Carbon::parse($specificDate)->format('Y-m-d') : Carbon\Carbon::now()->format('Y-m-d')) }}"
                                         min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
                                 </div>
 
