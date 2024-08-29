@@ -330,24 +330,10 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreTaskRequest $request, string $id)
+    public function update(StoreTaskRequest $request, int $id)
     {
 
-        $startTime = $request->start_time ? date('H:i:s', strtotime($request->start_time)) : null;
-        $endTime = $request->end_time ? date('H:i:s', strtotime($request->end_time)) : null;
 
-        $duration = Duration::create([
-
-            'start_time' => $startTime,
-            'end_time' => $endTime,
-            'task_id' => $id,
-            'user_id' => $request->user_id
-        ]);
-
-        $participant = Participant::where('user_id', $request->user_id)->where('task_id', $id)->first();
-        $participant->status = 'accepted';
-
-        $participant->save();
 
         return redirect('home');
     }
