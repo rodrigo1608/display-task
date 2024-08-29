@@ -316,180 +316,195 @@
                                                 </div>
 
                                             </div>
+                                            <div class="mt-2">
+                                                @php
+                                                    $firstError = null;
+                                                @endphp
 
+                                                @foreach (['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'] as $alertIndex)
+                                                    @if ($errors->has($alertIndex))
+                                                        @php
+                                                            $firstError = $errors->first($alertIndex);
+                                                        @endphp
+                                                    @break
+                                                @endif
+                                            @endforeach
+                                            @if ($firstError)
+                                                <div class="invalid-feedback d-block">{{ $firstError }}</div>
+                                            @endif
                                         </div>
 
                                     </div>
 
                                 </div>
 
-                                {{-- Título da tarefa --}}
-                                <div class="row mt-3">
-                                    <div class="">
-                                        <label for="title" class="poppins-regular fs-6">Título </label>
+                            </div>
 
-                                        <input id="title" type="text"
-                                            class="form-control fs-6 @error('title') is-invalid @enderror" name="title"
-                                            value="{{ old('title') }}">
+                            {{-- Título da tarefa --}}
+                            <div class="row mt-3">
+                                <div class="">
+                                    <label for="title" class="poppins-regular fs-6">Título </label>
 
-                                        @error('title')
-                                            <div class="invalid-feedback">
-                                                <strong>{{ $message }}</strong>
-                                            </div>
-                                        @enderror
-                                    </div>
+                                    <input id="title" type="text"
+                                        class="form-control fs-6 @error('title') is-invalid @enderror" name="title"
+                                        value="{{ old('title') }}">
+
+                                    @error('title')
+                                        <div class="invalid-feedback">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+                                </div>
+
+                            </div>
+
+                            {{-- Descrição da tarefa --}}
+                            <div class="row mt-3">
+
+                                <div class="">
+                                    <label for="description" class="fs-6">Descrição</label>
+                                    <textarea name="description" id="description" cols="30" rows="5"
+                                        class="form-control roboto @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+                                </div>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between mt-4">
+
+                                <div class>
+
+                                    <a class="btn btn-primary me-3" href="{{ route('home') }}">voltar</a>
+
+                                    <label for="task_attachments" class="btn-custom btn btn-primary">
+                                        Anexar imagens
+                                        <span id="imageCountDisplay"></span>
+                                    </label>
+
+                                    <input id="task_attachments" name="task_attachments[]" type="file"
+                                        accept="image/*" multiple class="d-none" />
+
+                                    <script>
+                                        const fileInput = document.querySelector('#task_attachments');
+                                        const fileLabel = document.querySelector('#imageCountDisplay');
+
+                                        task_attachments.addEventListener('change', () => {
+
+                                            const selectedFiles = fileInput.files;
+
+                                            const pluralOrSingularString = selectedFiles.length > 1 ? `(${selectedFiles.length}) arquivos` :
+                                                `(${selectedFiles.length}) arquivo`;
+
+                                            fileLabel.innerText = pluralOrSingularString;
+                                        });
+                                    </script>
 
                                 </div>
 
-                                {{-- Descrição da tarefa --}}
-                                <div class="row mt-3">
+                                <div class="d-flex justify-content-between">
 
-                                    <div class="">
-                                        <label for="description" class="fs-6">Descrição</label>
-                                        <textarea name="description" id="description" cols="30" rows="5"
-                                            class="form-control roboto @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
-                                        @error('description')
-                                            <div class="invalid-feedback">
-                                                <strong>{{ $message }}</strong>
-                                            </div>
-                                        @enderror
-                                    </div>
+                                    <div>
+                                        @if ($participants->isNotEmpty())
+                                            <button id="participants-button" type="button"
+                                                class="btn btn-primary me-3" data-bs-toggle="modal"
+                                                data-bs-target="#participantsModal">
+                                                Adicionar participantes
+                                                <span id="participantCounterDisplay"></span>
+                                            </button>
+                                        @endif
 
-                                </div>
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="participantsModal" tabindex="-1"
+                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
 
-                                <div class="d-flex justify-content-between mt-4">
+                                            <div class="modal-dialog">
 
-                                    <div class>
+                                                <div class="modal-content">
 
-                                        <a class="btn btn-primary me-3" href="{{ route('home') }}">voltar</a>
+                                                    <div class="modal-header">
 
-                                        <label for="task_attachments" class="btn-custom btn btn-primary">
-                                            Anexar imagens
-                                            <span id="imageCountDisplay"></span>
-                                        </label>
-
-                                        <input id="task_attachments" name="task_attachments[]" type="file"
-                                            accept="image/*" multiple class="d-none" />
-
-                                        <script>
-                                            const fileInput = document.querySelector('#task_attachments');
-                                            const fileLabel = document.querySelector('#imageCountDisplay');
-
-                                            task_attachments.addEventListener('change', () => {
-
-                                                const selectedFiles = fileInput.files;
-
-                                                const pluralOrSingularString = selectedFiles.length > 1 ? `(${selectedFiles.length}) arquivos` :
-                                                    `(${selectedFiles.length}) arquivo`;
-
-                                                fileLabel.innerText = pluralOrSingularString;
-                                            });
-                                        </script>
-
-                                    </div>
-
-                                    <div class="d-flex justify-content-between">
-
-                                        <div>
-                                            @if ($participants->isNotEmpty())
-                                                <button id="participants-button" type="button"
-                                                    class="btn btn-primary me-3" data-bs-toggle="modal"
-                                                    data-bs-target="#participantsModal">
-                                                    Adicionar participantes
-                                                    <span id="participantCounterDisplay"></span>
-                                                </button>
-                                            @endif
-
-                                            <!-- Modal -->
-                                            <div class="modal fade" id="participantsModal" tabindex="-1"
-                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-
-                                                <div class="modal-dialog">
-
-                                                    <div class="modal-content">
-
-                                                        <div class="modal-header">
-
-                                                            <h1 class="modal-title fs-5 poppins-semibold"
-                                                                id="exampleModalLabel">Participantes
-                                                            </h1>
-
-                                                        </div>
-
-                                                        <div class="modal-body">
-
-                                                            @foreach ($participants as $index => $participant)
-                                                                <div class="list-group">
-
-                                                                    <div class="form-check">
-
-                                                                        <input
-                                                                            class="form-check-input participant-checkbox"
-                                                                            type="checkbox"
-                                                                            value=" {{ $participant->email }}"
-                                                                            name="participant{{ $index }}"
-                                                                            id="participant{{ $index }}CheckDefault"
-                                                                            {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
-
-                                                                        <label class="form-check-label"
-                                                                            for="participant{{ $index }}CheckDefault">
-                                                                            {{ $participant->email }}
-                                                                        </label>
-                                                                    </div>
-
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-
-                                                        <div class="modal-footer">
-
-                                                            <button type="button" data-bs-dismiss="modal"
-                                                                class="btn btn-primary">Adicionar</button>
-                                                        </div>
+                                                        <h1 class="modal-title fs-5 poppins-semibold"
+                                                            id="exampleModalLabel">Participantes
+                                                        </h1>
 
                                                     </div>
 
-                                                    <script>
-                                                        const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-                                                        const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+                                                    <div class="modal-body">
 
-                                                        function updateParticipantCounter() {
+                                                        @foreach ($participants as $index => $participant)
+                                                            <div class="list-group">
 
-                                                            const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
-                                                            const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+                                                                <div class="form-check">
 
-                                                            const checkedCounter = checkedParticipants.length;
+                                                                    <input
+                                                                        class="form-check-input participant-checkbox"
+                                                                        type="checkbox"
+                                                                        value=" {{ $participant->email }}"
+                                                                        name="participant{{ $index }}"
+                                                                        id="participant{{ $index }}CheckDefault"
+                                                                        {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
 
-                                                            const hasAnyParticipant = checkedCounter > 0;
+                                                                    <label class="form-check-label"
+                                                                        for="participant{{ $index }}CheckDefault">
+                                                                        {{ $participant->email }}
+                                                                    </label>
+                                                                </div>
 
-                                                            if (hasAnyParticipant) {
-                                                                participantCounterDisplay.innerText = '(' + checkedCounter + ')';
-                                                            } else {
-                                                                participantCounterDisplay.innerText = '';
-                                                            }
-                                                        }
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
 
-                                                        // updateParticipantCounter();
+                                                    <div class="modal-footer">
 
-                                                        participantCheckboxes.forEach(participantCheckbox => participantCheckbox.addEventListener('change', () =>
-                                                            updateParticipantCounter()));
-
-                                                        updateParticipantCounter();
-                                                    </script>
+                                                        <button type="button" data-bs-dismiss="modal"
+                                                            class="btn btn-primary">Adicionar</button>
+                                                    </div>
 
                                                 </div>
+
+                                                <script>
+                                                    const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+                                                    const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+
+                                                    function updateParticipantCounter() {
+
+                                                        const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
+                                                        const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+
+                                                        const checkedCounter = checkedParticipants.length;
+
+                                                        const hasAnyParticipant = checkedCounter > 0;
+
+                                                        if (hasAnyParticipant) {
+                                                            participantCounterDisplay.innerText = '(' + checkedCounter + ')';
+                                                        } else {
+                                                            participantCounterDisplay.innerText = '';
+                                                        }
+                                                    }
+
+                                                    // updateParticipantCounter();
+
+                                                    participantCheckboxes.forEach(participantCheckbox => participantCheckbox.addEventListener('change', () =>
+                                                        updateParticipantCounter()));
+
+                                                    updateParticipantCounter();
+                                                </script>
 
                                             </div>
 
                                         </div>
 
-                                        <button type="submit" class="btn btn-secondary">Salvar</button>
                                     </div>
+
+                                    <button type="submit" class="btn btn-secondary">Salvar</button>
                                 </div>
+                            </div>
 
-                            </form>
-
-                        </div>
+                        </form>
 
                     </div>
 
@@ -497,254 +512,256 @@
 
             </div>
 
-            {{-- Script baixo:Lida com a dinâmica do label de criação de lembrete --}}
-            <script>
-                const taskLabel = document.getElementById('task-label');
+        </div>
 
-                const inputDate = document.getElementById('input-date');
+        {{-- Script baixo:Lida com a dinâmica do label de criação de lembrete --}}
+        <script>
+            const taskLabel = document.getElementById('task-label');
 
-                const weekDaysCheckBoxesInputsCollection = document.querySelectorAll('.check-box-input');
+            const inputDate = document.getElementById('input-date');
 
-                const weekDaysCheckBoxesInputs = Array.from(weekDaysCheckBoxesInputsCollection);
+            const weekDaysCheckBoxesInputsCollection = document.querySelectorAll('.check-box-input');
 
-                const currentDate = new Date();
+            const weekDaysCheckBoxesInputs = Array.from(weekDaysCheckBoxesInputsCollection);
 
-                const formattedDate = currentDate.toISOString().slice(0, 10);
+            const currentDate = new Date();
 
+            const formattedDate = currentDate.toISOString().slice(0, 10);
 
-                const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
-                    const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
+            const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
-                    const affectedInputIsEmpty = affectedInput.value.trim() == '';
+                const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
 
-                    const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
+                const affectedInputIsEmpty = affectedInput.value.trim() == '';
 
-                    affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
+                const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
 
-                }
+                affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
 
-                let weekDaysInString = [];
+            }
 
-                const getDaysAfterUncheck = (weekdays, weekDay) => weekdays.filter(day => day !== weekDay)
+            let weekDaysInString = [];
 
-                const handleWeekDaysInString = (weekDayString, status) =>
-                    status ?
-                    weekDaysInString.push(weekDayString) :
+            const getDaysAfterUncheck = (weekdays, weekDay) => weekdays.filter(day => day !== weekDay)
 
-                    weekDaysInString = getDaysAfterUncheck(weekDaysInString, weekDayString);
+            const handleWeekDaysInString = (weekDayString, status) =>
+                status ?
+                weekDaysInString.push(weekDayString) :
 
-                const getOrderedWeekDays = unorderedWeekdays => {
+                weekDaysInString = getDaysAfterUncheck(weekDaysInString, weekDayString);
 
-                    const sortedWeekDays = [
-                        ' Domingo',
-                        ' Segunda',
-                        ' Terça',
-                        ' Quarta',
-                        ' Quinta',
-                        ' Sexta',
-                        ' Sábado'
-                    ];
+            const getOrderedWeekDays = unorderedWeekdays => {
 
-                    return unorderedWeekdays
-                        .sort((a, b) => sortedWeekDays.indexOf(a) - sortedWeekDays.indexOf(b));
-                }
+                const sortedWeekDays = [
+                    ' Domingo',
+                    ' Segunda',
+                    ' Terça',
+                    ' Quarta',
+                    ' Quinta',
+                    ' Sexta',
+                    ' Sábado'
+                ];
 
-                const setTaskLabelFromCheckboxes = weekDaysInString => {
+                return unorderedWeekdays
+                    .sort((a, b) => sortedWeekDays.indexOf(a) - sortedWeekDays.indexOf(b));
+            }
 
-                    if (weekDaysInString.length === 7) {
+            const setTaskLabelFromCheckboxes = weekDaysInString => {
 
-                        return 'Todos os dias';
+                if (weekDaysInString.length === 7) {
 
-                    } else {
+                    return 'Todos os dias';
 
-                        return weekDaysInString.reduce((acc, day, index) => {
+                } else {
 
-                            if (index === 0) {
+                    return weekDaysInString.reduce((acc, day, index) => {
 
-                                return `A cada ${day}`;
+                        if (index === 0) {
 
-                            } else if (index === weekDaysInString.length - 1) {
+                            return `A cada ${day}`;
 
-                                return `${acc} e ${day}`;
+                        } else if (index === weekDaysInString.length - 1) {
 
-                            } else {
+                            return `${acc} e ${day}`;
 
-                                return `${acc}, ${day}`;
-                            }
+                        } else {
 
-                        }, '');
-                    }
-                }
-
-                const checkIsToday = someDate => {
-
-                    const todayObject = new Date();
-
-                    const inputDateObject = new Date(someDate.value)
-
-                    const formatedToday = todayObject.getFullYear() +
-                        '-' + (todayObject.getMonth() + 1) +
-                        '-' + todayObject.getDate();
-
-                    const formatedInputDateValue = inputDateObject.getFullYear() +
-                        '-' + (inputDateObject.getMonth() + 1) +
-                        '-' + inputDateObject.getDate();
-
-                    return formatedToday == formatedInputDateValue
-
-                }
-
-                const setTaskLabelFromInputDate = () => {
-
-                    const selectedDate = new Date(inputDate.value);
-
-                    if (isNaN(selectedDate.getTime())) {
-
-                        taskLabel.innerText = "Defina uma data válida para tarefa.";
-
-                        return;
-                    }
-
-                    const formattedDate = selectedDate.toLocaleDateString('pt-BR', {
-                        weekday: 'long',
-                        day: 'numeric',
-                        month: 'long'
-                    });
-
-                    const isTodayDate = checkIsToday(inputDate);
-
-                    const todayString = isTodayDate ? " Hoje, " : "";
-
-                    const labelContent = `${todayString}${formattedDate}`;
-
-                    taskLabel.innerText = labelContent;
-
-                };
-
-                //Abaixo: Manipula o label de aviso do lembrete em relação ao input de uma data específica.
-
-                inputDate.addEventListener('change', () => {
-
-                    weekDaysCheckBoxesInputs.forEach(checkBox => {
-
-                        checkBox.checked = false;
-
-                        weekDaysInString = [];
-                    });
-
-                    setTaskLabelFromInputDate();
-
-                });
-
-                weekDaysCheckBoxesInputs.forEach((checkBox, index) => {
-
-                    checkBox.addEventListener('change', () => {
-
-                        const isChecked = checkBox.checked;
-
-                        const checkboxId = checkBox.id;
-
-                        switch (checkboxId) {
-
-                            case 'btn-check-outlined-sunday':
-
-                                handleWeekDaysInString(' Domingo', isChecked)
-
-                                break;
-
-                            case 'btn-check-outlined-monday':
-
-                                handleWeekDaysInString(' Segunda', isChecked)
-
-                                break;
-
-                            case 'btn-check-outlined-tuesday':
-
-                                handleWeekDaysInString(' Terça', isChecked)
-
-                                break;
-
-                            case 'btn-check-outlined-wednesday':
-
-                                handleWeekDaysInString(' Quarta', isChecked)
-
-                                break;
-
-                            case 'btn-check-outlined-thursday':
-                                handleWeekDaysInString(' Quinta', isChecked)
-
-                                break;
-
-                            case 'btn-check-outlined-friday':
-                                handleWeekDaysInString(' Sexta', isChecked)
-
-                                break;
-
-                            case 'btn-check-outlined-saturday':
-                                handleWeekDaysInString(' Sábado', isChecked)
-                                break;
-                        };
-
-                        const orderedWeekDays = getOrderedWeekDays(weekDaysInString);
-
-                        taskLabel.innerText = setTaskLabelFromCheckboxes(orderedWeekDays);
-
-                        handleInputBasedOnCheckboxSelection(inputDate, weekDaysCheckBoxesInputs,
-                            formattedDate);
-
-                        if (!weekDaysCheckBoxesInputs.some(cb => cb.checked)) {
-                            setTaskLabelFromInputDate();
+                            return `${acc}, ${day}`;
                         }
 
-                    });
+                    }, '');
+                }
+            }
 
+            const checkIsToday = someDate => {
+
+                const todayObject = new Date();
+
+                const inputDateObject = new Date(someDate.value)
+
+                const formatedToday = todayObject.getFullYear() +
+                    '-' + (todayObject.getMonth() + 1) +
+                    '-' + todayObject.getDate();
+
+                const formatedInputDateValue = inputDateObject.getFullYear() +
+                    '-' + (inputDateObject.getMonth() + 1) +
+                    '-' + inputDateObject.getDate();
+
+                return formatedToday == formatedInputDateValue
+
+            }
+
+            const setTaskLabelFromInputDate = () => {
+
+                const selectedDate = new Date(inputDate.value);
+
+                if (isNaN(selectedDate.getTime())) {
+
+                    taskLabel.innerText = "Defina uma data válida para tarefa.";
+
+                    return;
+                }
+
+                const formattedDate = selectedDate.toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
+
+                const isTodayDate = checkIsToday(inputDate);
+
+                const todayString = isTodayDate ? " Hoje, " : "";
+
+                const labelContent = `${todayString}${formattedDate}`;
+
+                taskLabel.innerText = labelContent;
+
+            };
+
+            //Abaixo: Manipula o label de aviso do lembrete em relação ao input de uma data específica.
+
+            inputDate.addEventListener('change', () => {
+
+                weekDaysCheckBoxesInputs.forEach(checkBox => {
+
+                    checkBox.checked = false;
+
+                    weekDaysInString = [];
                 });
 
                 setTaskLabelFromInputDate();
 
-                //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
+            });
 
-                const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
+            weekDaysCheckBoxesInputs.forEach((checkBox, index) => {
 
-                const customAlertTime = document.querySelector('#custom-alert-time');
+                checkBox.addEventListener('change', () => {
 
-                const alertOptionsCollection = document.querySelectorAll('.alertOption');
+                    const isChecked = checkBox.checked;
 
-                const alertOptions = Array.from(alertOptionsCollection);
+                    const checkboxId = checkBox.id;
 
-                const displaySelectedAlertCounter = () => {
+                    switch (checkboxId) {
 
-                    const checkedOptions = alertOptions.filter(option => option.checked);
-                    const checkedRegister = checkedOptions.length;
+                        case 'btn-check-outlined-sunday':
 
-                    checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
-                            checkedRegister + ')') :
-                        alertOptionsCounterLabel.innerText = "";
-                }
+                            handleWeekDaysInString(' Domingo', isChecked)
 
-                displaySelectedAlertCounter();
+                            break;
 
-                alertOptions.forEach(optionAlert => {
+                        case 'btn-check-outlined-monday':
 
-                    optionAlert.addEventListener('click', () => {
+                            handleWeekDaysInString(' Segunda', isChecked)
 
-                        displaySelectedAlertCounter();
+                            break;
 
-                        handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
+                        case 'btn-check-outlined-tuesday':
 
-                    })
+                            handleWeekDaysInString(' Terça', isChecked)
 
-                    customAlertTime.addEventListener('change', () => {
-                        alertOptions.forEach(checkBox => {
+                            break;
 
-                            checkBox.checked = false;
-                            alertOptionsCounterLabel.innerText = '';
-                        });
-                    })
+                        case 'btn-check-outlined-wednesday':
+
+                            handleWeekDaysInString(' Quarta', isChecked)
+
+                            break;
+
+                        case 'btn-check-outlined-thursday':
+                            handleWeekDaysInString(' Quinta', isChecked)
+
+                            break;
+
+                        case 'btn-check-outlined-friday':
+                            handleWeekDaysInString(' Sexta', isChecked)
+
+                            break;
+
+                        case 'btn-check-outlined-saturday':
+                            handleWeekDaysInString(' Sábado', isChecked)
+                            break;
+                    };
+
+                    const orderedWeekDays = getOrderedWeekDays(weekDaysInString);
+
+                    taskLabel.innerText = setTaskLabelFromCheckboxes(orderedWeekDays);
+
+                    handleInputBasedOnCheckboxSelection(inputDate, weekDaysCheckBoxesInputs,
+                        formattedDate);
+
+                    if (!weekDaysCheckBoxesInputs.some(cb => cb.checked)) {
+                        setTaskLabelFromInputDate();
+                    }
+
+                });
+
+            });
+
+            setTaskLabelFromInputDate();
+
+            //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
+
+            const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
+
+            const customAlertTime = document.querySelector('#custom-alert-time');
+
+            const alertOptionsCollection = document.querySelectorAll('.alertOption');
+
+            const alertOptions = Array.from(alertOptionsCollection);
+
+            const displaySelectedAlertCounter = () => {
+
+                const checkedOptions = alertOptions.filter(option => option.checked);
+                const checkedRegister = checkedOptions.length;
+
+                checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                        checkedRegister + ')') :
+                    alertOptionsCounterLabel.innerText = "";
+            }
+
+            displaySelectedAlertCounter();
+
+            alertOptions.forEach(optionAlert => {
+
+                optionAlert.addEventListener('click', () => {
+
+                    displaySelectedAlertCounter();
+
+                    handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
 
                 })
-            </script>
 
-        </div>
-    @endsection
+                customAlertTime.addEventListener('change', () => {
+                    alertOptions.forEach(checkBox => {
+
+                        checkBox.checked = false;
+                        alertOptionsCounterLabel.innerText = '';
+                    });
+                })
+
+            })
+        </script>
+
+    </div>
+@endsection

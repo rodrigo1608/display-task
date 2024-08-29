@@ -4,6 +4,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Validation\Validator;
+
+use Carbon\Carbon;
+
 class StoreTaskRequest extends FormRequest
 {
     /**
@@ -53,5 +57,58 @@ class StoreTaskRequest extends FormRequest
             'description.required' => 'Descrição é importante para que todos os participantes entendam o propósito, as etapas e outros detalhes da tarefa.',
 
         ];
+    }
+
+    public function withValidator(Validator $validator)
+    {
+        $validator->after(function ($validator) {
+
+            $start = Carbon::createFromFormat('H:i', $this->input('start'));
+
+            $specificDate = $this->filled('specific_date')
+                ? getCarbonDate($this->input('specific_date'))
+                : null;
+
+            $alertOptions = [
+                'half_an_hour_before' => 30,
+                'one_hour_before' => 60,
+                'two_hours_before' => 120,
+            ];
+
+            foreach ($alertOptions as $alertIndex => $minutes) {
+
+                if ($this->input($alertIndex) === 'true') {
+
+                    $timeDifference = $start->diffInMinutes(now()->addMinutes($minutes), false);
+
+
+                    $hours = floor($minutes / 60);
+                    $minutesRemaining = $minutes % 60;
+
+                    // Create message with hours and minutes
+                    $timeText = $hours > 0 ? $hours . ' hora' . ($hours > 1 ? 's' : '') : '';
+                    $timeText .= $minutesRemaining > 0 ? ($timeText ? ' e ' : '') . $minutesRemaining . ' minuto' . ($minutesRemaining > 1 ? 's' : '') : '';
+
+                    // dd($timeDifference);
+
+                    if ($timeDifference < $minutes) {
+                        $validator->errors()->add($alertIndex, 'O horário de notificação selecionado (' . $timeText . ' antes), pois não há tempo suficiente antes do início da tarefa.');
+                    }
+                }
+            }
+
+            $isOneDayBeforeSelected = isset($specificDate) && $this->input('one_day_earlier') === 'true';
+
+            if ($isOneDayBeforeSelected) {
+
+                $timeDifferenceInDays = $specificDate->diffInDays(now(), false);
+
+                // dd($timeDifferenceInDays);
+
+                if ($timeDifferenceInDays) {
+                    $validator->errors()->add('one_day_earlier', 'A notificação de um dia antes não é válida, pois não há tempo suficiente entre a data da notificação e início da tarefa.');
+                }
+            }
+        });
     }
 }

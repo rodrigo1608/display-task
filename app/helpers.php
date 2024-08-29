@@ -282,8 +282,6 @@ if (!function_exists('getAlertOptions')) {
     }
 }
 
-
-
 if (!function_exists('getPredefinedAlerts')) {
 
     function getPredefinedAlerts($notificationTime, $language = 'en')
@@ -441,8 +439,6 @@ if (!function_exists('formatAlertDays')) {
         return $recurringMessage;
     }
 }
-
-
 
 if (!function_exists('getParticipantsEmail')) {
 
@@ -630,15 +626,15 @@ if (!function_exists('getNotificationQuery')) {
     }
 }
 
-if (!function_exists('getCurrentUserTasks')) {
+// if (!function_exists('getCurrentUserTasks')) {
 
-    function getCurrentUserTasks($creatorOrParticipant, $currentUserID, $taskID)
-    {
-        return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
-            getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
-        })->first()->get();
-    }
-}
+//     function getCurrentUserTasks($creatorOrParticipant, $currentUserID, $taskID)
+//     {
+//         return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
+//             getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
+//         })->first()->get();
+//     }
+// } q viagem é essa?
 
 if (!function_exists('getRecurringData')) {
 
@@ -685,7 +681,6 @@ if (!function_exists('getPluralOrSingularTime')) {
             : "$time $measurementUnit";
     }
 }
-
 
 if (!function_exists('getStartDuration')) {
 
