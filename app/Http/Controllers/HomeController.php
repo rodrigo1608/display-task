@@ -87,16 +87,13 @@ class HomeController extends Controller
             return $task->durations->where('user_id', $currentUserID)->first()->start ?? '23:59:59';
         });
 
-        // rodrigo
-        // dd($selectedUserTasks, $selectedDate, $weekDayOfSelectDate);
-
         $labelOverview = "";
 
         if ($selectedUserTasks->isEmpty()) {
 
             $labelOverview = $isToday ? "Nenhuma tarefa agendada para hoje, " . getFormatedDateBR($today) : " Nenhuma tarefa agendada para  " . getFormatedDateBR($selectedDate) . ",  $weekdayInPortuguese.";
         } else {
-            $labelOverview = $isToday ? "Agenda de hoje," . getFormatedDateBR($today) : "Agenda de " . getFormatedDateBR($selectedDate) . ",  $weekdayInPortuguese.";
+            $labelOverview = $isToday ? "Agenda de hoje, " . getFormatedDateBR($today) : "Agenda de " . getFormatedDateBR($selectedDate) . ",  $weekdayInPortuguese.";
         }
 
         foreach ($selectedUserTasks as $task) {
@@ -128,21 +125,6 @@ class HomeController extends Controller
             //     })->first()->getAttributes();
             // }
 
-            if (!is_null($notificationTime)) {
-
-                $isNotificationTimeMissing = empty($notificationTime['custom_time']) &&
-                    $notificationTime['half_an_hour_before'] === 'false' &&
-                    $notificationTime['one_hour_before'] === 'false' &&
-                    $notificationTime['two_hours_before'] === 'false' &&
-                    $notificationTime['one_day_earlier'] === 'false';
-
-                // dd($isNotificationTimeMissing);
-
-                $task->isNotificationTimeMissing = $isNotificationTimeMissing;
-            } else {
-                $task->isNotificationTimeMissing = true;
-            }
-
             if ($task->participants->isEmpty()) {
 
                 $task->emailsParticipants = "Nenhum participante";
@@ -158,47 +140,46 @@ class HomeController extends Controller
 
             $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
 
-
             $start = isset($task->start) ? getCarbonTime($task->start) : null;
             $end = isset($task->end) ? getCarbonTime($task->end) : null;
 
-
             $recurring = $task->reminder->recurring;
 
-            if (isset($recurring->specific_date)) {
+            $task->status = $duration->status;
 
-                $specificDate = getCarbonDate($recurring->specific_date);
+            // if (isset($recurring->specific_date)) {
 
-                $isPast = $specificDate->isBefore($today);
-                $isTodaySpecificDate = checkIsToday($specificDate);
+            //     $specificDate = getCarbonDate($recurring->specific_date);
 
-                if ($isPast) {
+            //     $isPast = $specificDate->isBefore($today);
+            //     $isTodaySpecificDate = checkIsToday($specificDate);
 
-                    $task->status = 'finished';
-                } elseif ($isTodaySpecificDate) {
+            //     if ($isPast) {
 
+            //         $task->status = 'finished';
+            //     } elseif ($isTodaySpecificDate) {
 
-                    $task->status = getTaskStatus($duration);
-                } else {
+            //         $task->status = getTaskStatus($duration);
+            //     } else {
 
-                    $task->status = 'starting';
-                }
-            } else {
+            //         $task->status = 'starting';
+            //     }
+            // } else {
 
-                $todayWeekday = getDayOfWeek($today);
+            //     $todayWeekday = getDayOfWeek($today);
 
-                $repeatingDays = getRepeatingDays($recurring);
+            //     $repeatingDays = getRepeatingDays($recurring);
 
-                foreach ($repeatingDays as $day) {
+            //     foreach ($repeatingDays as $day) {
 
-                    if ($day ===  $todayWeekday) {
+            //         if ($day ===  $todayWeekday) {
 
-                        $task->status = getTaskStatus($duration);
-                    } else {
-                        $task->status = 'finished';
-                    }
-                }
-            }
+            //             $task->status = getTaskStatus($duration);
+            //         } else {
+            //             $task->status = 'finished';
+            //         }
+            //     }
+            // }
         }
 
         return view('home', compact('isThereAnyReminder', 'selectedUserTasks', 'orderedReminders', 'labelOverview'));

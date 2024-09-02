@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -63,11 +63,9 @@ class UserController extends Controller
         return view('user/edit', compact('avaliableColors', 'user'));
     }
 
-    public function update(Request $request, int $id)
+    public function update(UpdateUserRequest $request, int $id)
     {
         $user = User::findOrFail($id);
-
-        // dd($request->all());
 
         $user->name = $request->input('name');
 

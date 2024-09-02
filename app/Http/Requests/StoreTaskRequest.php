@@ -8,8 +8,13 @@ use Illuminate\Validation\Validator;
 
 use Carbon\Carbon;
 
+use function PHPUnit\Framework\isEmpty;
+
 class StoreTaskRequest extends FormRequest
 {
+
+    private $pastMessage = 'Ops! Esse horário já passou.';
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -24,11 +29,9 @@ class StoreTaskRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
 
+
     public function rules(): array
     {
-
-        // $defaultTimeData = ['required', 'date_format:H:i'];
-
         return [
             'start' => ['required', 'date_format:H:i'],
             'end' => ['required', 'date_format:H:i', 'after:start'],
@@ -59,56 +62,127 @@ class StoreTaskRequest extends FormRequest
         ];
     }
 
+    public function checkTimeRequired($validator)
+    {
+
+        $alertOptions = getAlertOptions();
+
+        // Filtra as opções onde as chaves estão marcadas como 'true'
+        $trueOptions = array_filter($alertOptions, function ($label, $key) {
+            // Verifica se o valor da chave na requisição é 'true'
+            return $this->input($key) === 'true';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        if ((!$this->filled('time')) && empty($trueOptions)) {
+
+            $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
+        }
+    }
+
+
+    public function checkAlertTimesSufficiency($validator)
+    {
+        if (!filled($this->input('start'))) {
+            return;
+        }
+
+        $start = Carbon::createFromFormat('H:i', $this->input('start'));
+
+        $specificDate = $this->filled('specific_date')
+            ? getCarbonDate($this->input('specific_date'))
+            : null;
+
+        $alertOptions = [
+            'half_an_hour_before' => 30,
+            'one_hour_before' => 60,
+            'two_hours_before' => 120,
+        ];
+
+        foreach ($alertOptions as $alertIndex => $minutes) {
+
+            if (isset($specificDate) && $this->input($alertIndex) === 'true') {
+
+                $timeDifference = $start->diffInMinutes(now()->addMinutes($minutes), false);
+
+
+                $hours = floor($minutes / 60);
+                $minutesRemaining = $minutes % 60;
+
+                // Create message with hours and minutes
+                $timeText = $hours > 0 ? $hours . ' hora' . ($hours > 1 ? 's' : '') : '';
+                $timeText .= $minutesRemaining > 0 ? ($timeText ? ' e ' : '') . $minutesRemaining . ' minuto' . ($minutesRemaining > 1 ? 's' : '') : '';
+
+
+                if ($timeDifference < $minutes) {
+                    $validator->errors()->add($alertIndex, 'O horário de notificação selecionado (' . $timeText . ' antes), pois não há tempo suficiente antes do início da tarefa.');
+                }
+            }
+        }
+
+        $isOneDayBeforeSelected = isset($specificDate) && $this->input('one_day_earlier') === 'true';
+
+        if ($isOneDayBeforeSelected) {
+
+            $timeDifferenceInDays = $specificDate->diffInDays(now(), false);
+
+
+            if ($timeDifferenceInDays) {
+                $validator->errors()->add('one_day_earlier', 'A notificação de um dia antes não é válida, pois não há tempo suficiente entre a data da notificação e início da tarefa.');
+            }
+        }
+    }
+
+    public function checkStartTimeNotInPast($validator)
+    {
+        if (!filled($this->input('start'))) {
+            return;
+        }
+
+        $specificDate = $this->filled('specific_date')
+            ? getCarbonDate($this->input('specific_date'))
+            : null;
+
+        if (isset($specificDate) && checkIsToday($specificDate)) {
+
+            $start = Carbon::createFromFormat('H:i', $this->input('start'));
+
+            if ($start->isPast()) {
+                $validator->errors()->add('start', $this->pastMessage);
+            }
+        }
+    }
+
+    public function checkNotificationTimeNotInPast($validator)
+    {
+        if (!filled($this->input('time'))) {
+            return;
+        }
+
+        $specificDate = $this->filled('specific_date')
+            ? getCarbonDate($this->input('specific_date'))
+            : null;
+
+        if (isset($specificDate) && checkIsToday($specificDate)) {
+
+            $time = Carbon::createFromFormat('H:i', $this->input('time'));
+
+            if ($time->isPast()) {
+                $validator->errors()->add('time', 'Ops! Esse horário já passou.');
+            }
+        }
+    }
+
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
 
-            $start = Carbon::createFromFormat('H:i', $this->input('start'));
+            $this->checkAlertTimesSufficiency($validator);
 
-            $specificDate = $this->filled('specific_date')
-                ? getCarbonDate($this->input('specific_date'))
-                : null;
+            $this->checkStartTimeNotInPast($validator);
 
-            $alertOptions = [
-                'half_an_hour_before' => 30,
-                'one_hour_before' => 60,
-                'two_hours_before' => 120,
-            ];
+            $this->checkNotificationTimeNotInPast($validator);
 
-            foreach ($alertOptions as $alertIndex => $minutes) {
-
-                if ($this->input($alertIndex) === 'true') {
-
-                    $timeDifference = $start->diffInMinutes(now()->addMinutes($minutes), false);
-
-
-                    $hours = floor($minutes / 60);
-                    $minutesRemaining = $minutes % 60;
-
-                    // Create message with hours and minutes
-                    $timeText = $hours > 0 ? $hours . ' hora' . ($hours > 1 ? 's' : '') : '';
-                    $timeText .= $minutesRemaining > 0 ? ($timeText ? ' e ' : '') . $minutesRemaining . ' minuto' . ($minutesRemaining > 1 ? 's' : '') : '';
-
-                    // dd($timeDifference);
-
-                    if ($timeDifference < $minutes) {
-                        $validator->errors()->add($alertIndex, 'O horário de notificação selecionado (' . $timeText . ' antes), pois não há tempo suficiente antes do início da tarefa.');
-                    }
-                }
-            }
-
-            $isOneDayBeforeSelected = isset($specificDate) && $this->input('one_day_earlier') === 'true';
-
-            if ($isOneDayBeforeSelected) {
-
-                $timeDifferenceInDays = $specificDate->diffInDays(now(), false);
-
-                // dd($timeDifferenceInDays);
-
-                if ($timeDifferenceInDays) {
-                    $validator->errors()->add('one_day_earlier', 'A notificação de um dia antes não é válida, pois não há tempo suficiente entre a data da notificação e início da tarefa.');
-                }
-            }
+            $this->checkTimeRequired($validator);
         });
     }
 }

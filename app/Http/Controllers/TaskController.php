@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\QueryHelpers;
-
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\SetPendingTask;
 use App\Jobs\SendInvitationEmail;
-// use App\Models\NotificationTime;
 use App\Models\Attachment;
 use App\Models\Duration;
 use App\Models\Feedback;
@@ -17,7 +14,6 @@ use App\Models\User;
 use App\Models\Participant;
 use App\Models\Recurring;
 use App\Models\Reminder;
-use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
@@ -50,17 +46,11 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        // rodrigo
-        // dd($request->all());
+
         $currentUserID = auth()->id();
         $recurrencePatterns = getRecurrencePatterns($request->all());
 
-        //rodrigo
-        // dd($recurrencePatterns);
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
-
-        //rodrigo
-        // dd($isSpecificDayPattern);
 
         if ($isSpecificDayPattern) {
 
@@ -144,7 +134,7 @@ class TaskController extends Controller
 
         ]);
 
-        $recurringData = getRecurringData($request, $isSpecificDayPattern, $reminder);
+        $recurringData = getRecurringData($request, $reminder);
 
         Recurring::create($recurringData);
 
@@ -161,7 +151,7 @@ class TaskController extends Controller
             }
         }
 
-        Duration::create([
+        $duration = Duration::create([
 
             'start' => $request->start,
             'end' => $request->end,
@@ -170,17 +160,20 @@ class TaskController extends Controller
 
         ]);
 
+        if (getcarbonNow()->gte($duration->start) && getcarbonNow()->lte($duration->end)) {
+
+            $duration->status = 'in_progress';
+        } else {
+            $duration->status = 'finished';
+        }
+
+        $duration->save();
+
         $participantsEmails = getParticipantsEmail($request);
-        //Rodrigo
-        // dd($participantsEmail);
 
         $hasAnyParticipant = !empty($participantsEmails);
-        //rodrigo
-        // dd($hasAnyParticipant);
 
         if ($hasAnyParticipant) {
-            //Rodrigo
-            // dd($hasAnyParticipant);
 
             $creator = User::where('id', $task->created_by)->first();
 
@@ -207,8 +200,6 @@ class TaskController extends Controller
         $possibleParticipants = User::whereDoesntHave('participatingTasks', function ($query) use ($taskID) {
             $query->where('task_id', $taskID);
         })->where('id', '!=', auth()->id())->get();
-
-        // dd($possibleParticipants);
 
         if (isset($task)) {
 
@@ -255,40 +246,7 @@ class TaskController extends Controller
 
             $today = getToday();
 
-            if (isset($recurring->specific_date)) {
-
-                $specificDate = getCarbonDate($recurring->specific_date);
-
-                $isPast = $specificDate->isBefore($today);
-
-                $isTodaySpecificDate = checkIsToday($specificDate);
-
-                if ($isPast) {
-
-                    $task['tatus'] = 'finished';
-                } elseif ($isTodaySpecificDate) {
-
-                    $task['status'] = getTaskStatus($duration);
-                } else {
-
-                    $task['status'] = 'starting';
-                }
-            } else {
-
-                $todayWeekday = getDayOfWeek($today);
-
-                $repeatingDays = getRepeatingDays($recurring);
-
-                foreach ($repeatingDays as $day) {
-
-                    if ($day ===  $todayWeekday) {
-
-                        $task['status'] = getTaskStatus($duration);
-                    } else {
-                        $task['status'] = 'finished';
-                    }
-                }
-            }
+            $task['status'] = $duration->status;
 
             return $view === 'pending'
                 ?  view('tasks/showPending', compact('task', 'alertOptions'))
@@ -298,13 +256,6 @@ class TaskController extends Controller
             return redirect('home');
         }
     }
-
-    // public function showPending(string $id)
-    // {
-    //     $task = Task::find($id);
-
-    //     return view('tasks/showPending', compact('task'));
-    // }
 
     /**
      * Show the form for editing the specified resource.
@@ -332,37 +283,106 @@ class TaskController extends Controller
      */
     public function update(StoreTaskRequest $request, int $id)
     {
+        $recurrencePatterns = getRecurrencePatterns($request->all());
+        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
+
+        if ($isSpecificDayPattern) {
+
+            $conflict = getConflictingTask($request->all(), 'specific_date');
+
+            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                return $conflict;
+            }
+        } else {
+
+            foreach (array_keys($recurrencePatterns) as $pattern) {
+
+                $conflict = getConflictingTask($request,  $pattern);
+
+                if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                    return $conflict;
+                }
+            }
+        }
+        $task =  Task::with(
+
+            'reminder',
+
+            'reminder.recurring',
+
+            'durations',
+
+            'feedbacks',
+
+            'participants'
+
+        )->findOrFail($id);
+
+        $recurring = $task->reminder->recurring;
+
+        $duration = $task->durations()->where('user_id', auth()->id())->where('task_id', $task->id)->first();
+
+        $notificationTime  = $task->reminder->notificationTimes()->where('user_id', auth()->id())->first();
+
+        $taskAttributes  = $request->only('title', 'local', 'concluded');
+
+        $recurringAttributes = getRecurringData($request, $task->reminder);
+
+        $durationAttributes = $request->only('start', 'end');
+
+        $notificationTimeAttributes = [
+
+            'custom_time' => $request->time,
+
+            'half_an_hour_before' => $request->half_an_hour_before ?? 'false',
+
+            'one_hour_before' => $request->one_hour_before ?? 'false',
+
+            'two_hours_before' => $request->two_hours_before ?? 'false',
+
+            'one_day_earlier' => $request->one_day_earlier ?? 'false',
+
+        ];
+
+        $task->update($taskAttributes);
+
+        $recurring->update($recurringAttributes);
+
+        $duration->update($durationAttributes);
+
+        if (getCarbonTime($duration->start)->gt(now())) {
+
+            $duration->status = 'starting';
+            $duration->save();
+        }
 
 
-        return redirect('home');
+        $notificationTime->update($notificationTimeAttributes);
+
+        return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa atualizada com sucesso!');
     }
 
     public function acceptPendingTask(SetPendingTask $request, string $id)
     {
-        //rodrigo
-        // dd($request->all());
+
 
         $currentUserID = auth()->id();
 
         $currentTask = Task::find($id);
 
         $currentTaskRecurring = $currentTask->reminder->recurring->getAttributes();
-        //rodrigo
-        // dd($currentTaskRecurring);
+
 
         $recurrencePatterns = getRecurrencePatterns($currentTaskRecurring);
-        //rodrigo
-        // dd($recurrencePatterns);
+
 
         $isSpecificDayPattern = isset($recurrencePatterns['specific_date']);
-        //rodrigo
-        // dd($isSpecificDayPattern);
+
 
         if ($isSpecificDayPattern) {
 
             $inputData = $request->all() + $recurrencePatterns;
-            //rodrigo
-            // dd($inputData);
+
 
             $conflict = getConflictingTask($inputData, 'specific_date', $id);
 

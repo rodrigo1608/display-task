@@ -89,7 +89,7 @@ class HandleDurationsStatus implements ShouldQueue
 
                     if ($isSpecificDateToday) {
 
-                        Log::info('Job HandleDurationsStatus: A tarefa foi programada para ocorrer especificamente hoje -' . $now->format('d/m/Y'));
+                        Log::info('Job HandleDurationsStatus: A tarefa foi programada para ocorrer especificamente hoje - ' . $now->format('d/m/Y'));
 
                         handleDurationStatus($task, $now);
                     } else {

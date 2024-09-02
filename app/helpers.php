@@ -638,15 +638,19 @@ if (!function_exists('getNotificationQuery')) {
 
 if (!function_exists('getRecurringData')) {
 
-    function getRecurringData($request, $isSpecificDayPattern, $reminder)
+
+    function getRecurringData($request, $reminder)
     {
-        $specificDate = getCarbonDate($request->specific_date);
+
+        $hasSpecificDay = filled($request->specific_date);
+
+        $specificDate = $hasSpecificDay ? getCarbonDate($request->specific_date) : null;
 
         return [
 
-            'specific_date' => $request->specific_date ?? null,
+            'specific_date' => $request->specific_date,
 
-            'specific_date_weekday' => $isSpecificDayPattern ? getDayOfWeek($specificDate) : null,
+            'specific_date_weekday' => $hasSpecificDay ? getDayOfWeek($specificDate) : null,
 
             'sunday' => $request->sunday ?? 'false',
 

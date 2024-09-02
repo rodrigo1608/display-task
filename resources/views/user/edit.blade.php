@@ -5,55 +5,25 @@
 
         <div class="row vh-100">
 
-            <div class="col-md-2 border-end">
-
-                <ul class="list-group poppins">
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu Perfil</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu dia</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Minha semana</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu mês</li>
-                    </a>
-
-                    <a href="#" class="side-link">
-                        <li class="list-group-item active" aria-current="true">Painel geral</li>
-                    </a>
-
-                </ul>
-
-            </div>
-
-            <div class="col-md-6 offset-1">
+            <div class="col-md-6 container mt-4">
 
                 <div class="card py-5">
 
                     <div class="card-body">
 
-                        <form method="POST" action="{{ route('user.update', auth()->id()) }}"
-                            enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('user.update', auth()->id()) }}" enctype="multipart/form-data">
                             @csrf
                             @method('put')
 
                             {{-- Input name --}}
                             <div class="row mb-4">
 
-                                <label for="name"
-                                    class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
+                                <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
 
                                 <div class="col-md-6">
                                     <input id="name" type="text"
                                         class="input-form-text form-control @error('name') is-invalid @enderror"
-                                        name="name" value="{{ $user->name }}" autocomplete="name" autofocus>
+                                        name="name" value="{{ old('name', $user->name) }}" autocomplete="name" autofocus>
 
                                     @error('name')
                                         <span class="invalid-feedback" role="alert">
@@ -71,7 +41,7 @@
 
                                     <input id="lastname" type="text"
                                         class="form-control @error('lastname') is-invalid @enderror" name="lastname"
-                                        value="{{ $user->lastname }}" autocomplete="lastname" autofocus>
+                                        value="{{ old('lastname', $user->lastname) }}" autocomplete="lastname" autofocus>
 
                                     @error('lastname')
                                         <span class="invalid-feedback" role="alert">
@@ -90,7 +60,7 @@
 
                                     <input id="role" type="text"
                                         class="form-control @error('role') is-invalid @enderror" name="role"
-                                        value="{{ $user->role }}" autocomplete="role" autofocus>
+                                        value="{{ old('role', $user->role) }}" autocomplete="role" autofocus>
 
                                     @error('role')
                                         <span class="invalid-feedback" role="alert">
@@ -106,9 +76,8 @@
                                     class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
 
                                 <div class="col-md-6">
-                                    <input id="email" type="email"
-                                        class="form-control @error('email') is-invalid @enderror" name="email"
-                                        value="{{ $user->email }}" autocomplete="email">
+                                    <input id="email" class="form-control @error('email') is-invalid @enderror"
+                                        name="email" value="{{ old('email', $user->email) }}" autocomplete="email">
 
                                     @error('email')
                                         <span class="invalid-feedback" role="alert">
@@ -125,7 +94,7 @@
                                 <div class="col-md-6">
                                     <input id="telephone" type="text"
                                         class="form-control @error('telephone') is-invalid @enderror" name="telephone"
-                                        value="{{ $user->telephone }}" required autocomplete="telephone">
+                                        value="{{ old('telephone', $user->telephone) }}" required autocomplete="telephone">
 
                                     @error('telephone')
                                         <span class="invalid-feedback" role="alert">
@@ -143,6 +112,9 @@
 
                                 <div class="col-md-6">
                                     <!-- Button trigger modal -->
+
+                                    <input id="input-color" name="color" type="hidden" value="{{ $user->color }}">
+
                                     <button id="btn-chosen-color" type="button" class="btn btn-primary btn-outline-dark"
                                         data-bs-toggle="modal" data-bs-target="#colorModal"
                                         style="background-color:{{ $user->color }}; color:white">
@@ -162,9 +134,6 @@
                                                     <h1 class="modal-title fs-5 poppins-regular" id="myModalLabel">
                                                         Escolha a cor
                                                     </h1>
-
-                                                    <input id="input-color" name="color" type="hidden"
-                                                        value="">
 
                                                     <button type="button"
                                                         class="btn-close btn-outline-dark focus-ring-dark"
@@ -196,15 +165,13 @@
                                     </div>
 
                                     <script>
+                                        const btnChosenColor = document.getElementById('btn-chosen-color')
+
                                         const myModal = document.getElementById('colorModal')
 
                                         const btnSave = document.getElementById('btn-save')
 
-                                        const btnChosenColor = document.getElementById('btn-chosen-color')
-
                                         const inputColor = document.getElementById('input-color')
-
-                                        // const myInput = document.getElementById('myInput')
 
                                         myModal.addEventListener('shown.bs.modal', () => {
 

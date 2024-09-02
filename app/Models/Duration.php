@@ -34,7 +34,7 @@ class Duration extends Model
     }
 
     /**
-     * Get the user that owns the duration.
+     * Get the user that owns the duration.m
      */
     public function user()
     {

@@ -528,7 +528,6 @@
 
             const formattedDate = currentDate.toISOString().slice(0, 10);
 
-
             const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
                 const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
@@ -598,15 +597,16 @@
 
                 const todayObject = new Date();
 
-                const inputDateObject = new Date(someDate.value)
+                const inputDateObject = new Date(someDate.value + "T00:00:00")
 
                 const formatedToday = todayObject.getFullYear() +
                     '-' + (todayObject.getMonth() + 1) +
                     '-' + todayObject.getDate();
 
+
                 const formatedInputDateValue = inputDateObject.getFullYear() +
                     '-' + (inputDateObject.getMonth() + 1) +
-                    '-' + inputDateObject.getDate();
+                    '-' + (inputDateObject.getDate());
 
                 return formatedToday == formatedInputDateValue
 
@@ -614,7 +614,9 @@
 
             const setTaskLabelFromInputDate = () => {
 
-                const selectedDate = new Date(inputDate.value);
+                const selectedDate = new Date(inputDate.value + "T00:00:00");
+
+                console.log(selectedDate);
 
                 if (isNaN(selectedDate.getTime())) {
 
@@ -641,6 +643,7 @@
 
             //Abaixo: Manipula o label de aviso do lembrete em relação ao input de uma data específica.
 
+            //Primeiramente um reset dos checkboxes, caso o input de data específica haver uma alteração
             inputDate.addEventListener('change', () => {
 
                 weekDaysCheckBoxesInputs.forEach(checkBox => {
@@ -654,6 +657,7 @@
 
             });
 
+            //Caso algum checkbox seja clicado, uma string será construído
             weekDaysCheckBoxesInputs.forEach((checkBox, index) => {
 
                 checkBox.addEventListener('change', () => {

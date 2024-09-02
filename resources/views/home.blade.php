@@ -98,13 +98,6 @@
                                                     {{ $task->feedbacks[0]->feedback }}
                                                 </p>
 
-                                                @if ($task->isNotificationTimeMissing)
-                                                    <p class="text-danger roboto fs-6">Crie um lembrete para ser
-                                                        avisado antecipadamente, <a href="#"
-                                                            class="roboto-bold text-danger">clique
-                                                            aqui.</a></p>
-                                                @endif
-
                                                 <p class="roboto"><span class="poppins-medium">Local:</span>
                                                     {{ $task->local }}
                                                 </p>
@@ -120,7 +113,6 @@
                                                 <p class="roboto">
                                                     {!! $task->recurringMessage !!}
                                                 </p>
-
                                                 @if ($task->status === 'starting')
                                                     <p class="text-success roboto fs-6">
                                                         Irá começar

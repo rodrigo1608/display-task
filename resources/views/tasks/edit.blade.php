@@ -22,6 +22,7 @@
                         <form method="POST" action="{{ route('task.update', ['task' => $task->id]) }}"
                             enctype="multipart/form-data">
                             @csrf
+                            @method('put')
 
                             <div class="row mt-2">
 
@@ -35,23 +36,37 @@
                                 <div class="col-3 d-flex justify-content-end">
 
                                     @php
-                                        $specificDate = $task->reminder->recurring->specific_date;
+
+                                        $specificDate = getCarbonDate(
+                                            $task->reminder->recurring->specific_date,
+                                        )->format('Y-m-d');
+
+                                        $now = getCarbonNow()->format('Y-m-d');
+
                                     @endphp
 
                                     <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                        value="{{ old('specific_date', $specificDate ? Carbon\Carbon::parse($specificDate)->format('Y-m-d') : Carbon\Carbon::now()->format('Y-m-d')) }}"
-                                        min="{{ Carbon\Carbon::now()->format('Y-m-d') }}">
+                                        value="{{ old('specific_date', $specificDate ? $specificDate : $now) }}"
+                                        min="{{ $now }}">
                                 </div>
 
                             </div>
 
                             {{-- Check boxes dos dias da semana  --}}
+
+                            @php
+                                $recurring = $task->reminder->recurring;
+                            @endphp
+
                             <div class="weekdays-selects d-flex justify-content-between mt-3 flex-wrap">
 
                                 <div class="">
 
+
+
                                     <input type="checkbox" name="sunday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-sunday" {{ old('sunday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-sunday"
+                                        {{ old('sunday', $recurring->sunday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex me-3 mt-4 border-2"
@@ -63,7 +78,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="monday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-monday" {{ old('monday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-monday"
+                                        {{ old('monday', $recurring->monday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -74,7 +90,8 @@
 
                                 <div class="">
                                     <input type="checkbox" name="tuesday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-tuesday" {{ old('tuesday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-tuesday"
+                                        {{ old('tuesday', $recurring->tuesday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -85,7 +102,8 @@
 
                                 <div class="">
                                     <input type="checkbox" name="wednesday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-wednesday" {{ old('wednesday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-wednesday"
+                                        {{ old('wednesday', $recurring->wednesday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -97,7 +115,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="thursday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-thursday" {{ old('thursday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-thursday"
+                                        {{ old('thursday', $recurring->thursday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -109,7 +128,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="friday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-friday" {{ old('friday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-friday"
+                                        {{ old('friday', $recurring->friday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -121,7 +141,8 @@
                                 <div class="">
 
                                     <input type="checkbox" name="saturday" value="true" class="btn-check check-box-input"
-                                        id="btn-check-outlined-saturday" {{ old('saturday') == 'true' ? 'checked' : '' }}>
+                                        id="btn-check-outlined-saturday"
+                                        {{ old('saturday', $recurring->saturday) == 'true' ? 'checked' : '' }}>
 
                                     <label
                                         class="week-day btn btn-outline-dark poppins-medium rounded-pill d-flex justify-content-center align-items-center mt-4 border-2"
@@ -134,13 +155,28 @@
 
                             <div class="row d-flex jutify-content-between mt-5">
 
+                                @php
+
+                                    $userID = auth()->id();
+
+                                    $duration = $task
+                                        ->durations()
+                                        ->where('user_id', $userID)
+                                        ->where('task_id', $task->id)
+                                        ->first();
+
+                                    $start = getCarbonTime($duration->start)->format('H:i');
+                                    $end = getCarbonTime($duration->end)->format('H:i');
+
+                                @endphp
+
                                 <div class="col-md-3">
 
                                     <label for="start" class="poppins-regular fs-6 me-3">iniciar em:</label>
 
                                     <input id="start" type="time" name="start"
                                         class="form-control fs-6 @error('start') is-invalid @enderror text-center"
-                                        name="start" value={{ old('start') }}>
+                                        name="start" value={{ old('start', $start) }}>
 
                                     @error('start')
                                         <div class="invalid-feedback">
@@ -155,7 +191,7 @@
 
                                     <input id="end" type="time" name="end"
                                         class="form-control fs-6 @error('end') is-invalid @enderror text-center"
-                                        name="end" value={{ old('end') }}>
+                                        name="end" value={{ old('end', $end) }}>
 
                                     @error('end')
                                         <div class="invalid-feedback">
@@ -171,7 +207,7 @@
                                         (Opcional)</label>
 
                                     <input id="local" type="text" name="local" class="form-control fs-6"
-                                        name="local" value="{{ old('local') }}">
+                                        name="local" value="{{ old('local', $task->local) }}">
 
                                 </div>
                             </div>
@@ -180,6 +216,7 @@
 
                             @php
                                 $conflictingTask = session()->get('conflictingTask');
+
                             @endphp
 
                             @if ($errors->has('conflictingDuration'))
@@ -251,15 +288,26 @@
                             @endif
 
                             <div class="row d-flex align-items-start mt-5">
+                                @php
+                                    $notificationTime = $task->reminder
+                                        ->notificationTimes()
+                                        ->where('user_id', $userID)
+                                        ->first();
 
+                                    $customTime = filled($notificationTime->custom_time)
+                                        ? getCarbonTime($notificationTime->custom_time)
+                                        : null;
+
+                                @endphp
                                 <div class="col-md-5">
+
 
                                     <label for="time" class="poppins-regular fs-6 m-0">Horário da
                                         notificação</label>
 
                                     <input id="custom-alert-time" type="time" name="time"
                                         class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
-                                        value="{{ old('time') }}">
+                                        value="{{ old('time', $customTime->format('H:i')) }}">
 
                                     @error('time')
                                         <div class="invalid-feedback">
@@ -298,7 +346,7 @@
                                                             <input class="form-check-input alertOption" type="checkbox"
                                                                 value="true" name="{{ $alertIndex }}"
                                                                 id="alert{{ $alertIndex }}CheckDefault"
-                                                                {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
+                                                                {{ old($alertIndex, $notificationTime->$alertIndex) === 'true' ? 'checked' : '' }}>
 
                                                             <label class="form-check-label"
                                                                 for="alert{{ $alertIndex }}CheckDefault">
@@ -326,7 +374,7 @@
 
                                     <input id="title" type="text"
                                         class="form-control fs-6 @error('title') is-invalid @enderror" name="title"
-                                        value="{{ old('title') }}">
+                                        value="{{ old('title', $task->title) }}">
 
                                     @error('title')
                                         <div class="invalid-feedback">
@@ -338,12 +386,20 @@
                             </div>
 
                             {{-- Descrição da tarefa --}}
+
+                            @php
+                                $description = $task->feedbacks()->first()->feedback;
+                            @endphp
+
                             <div class="row mt-3">
 
                                 <div class="">
                                     <label for="description" class="fs-6">Descrição</label>
+
+
                                     <textarea name="description" id="description" cols="30" rows="5"
-                                        class="form-control roboto @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+                                        class="form-control roboto @error('description') is-invalid @enderror">{{ old('description', $description) }}</textarea>
+
                                     @error('description')
                                         <div class="invalid-feedback">
                                             <strong>{{ $message }}</strong>
@@ -386,96 +442,7 @@
 
                                 <div class="d-flex justify-content-between">
 
-                                    <div>
-                                        @if ($participants->isNotEmpty())
-                                            <button id="participants-button" type="button" class="btn btn-primary me-3"
-                                                data-bs-toggle="modal" data-bs-target="#participantsModal">
-                                                Adicionar participantes
-                                                <span id="participantCounterDisplay"></span>
-                                            </button>
-                                        @endif
 
-                                        <!-- Modal -->
-                                        <div class="modal fade" id="participantsModal" tabindex="-1"
-                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
-
-                                            <div class="modal-dialog">
-
-                                                <div class="modal-content">
-
-                                                    <div class="modal-header">
-
-                                                        <h1 class="modal-title fs-5 poppins-semibold"
-                                                            id="exampleModalLabel">Participantes
-                                                        </h1>
-
-                                                    </div>
-
-                                                    <div class="modal-body">
-
-                                                        @foreach ($participants as $index => $participant)
-                                                            <div class="list-group">
-
-                                                                <div class="form-check">
-
-                                                                    <input class="form-check-input participant-checkbox"
-                                                                        type="checkbox"
-                                                                        value=" {{ $participant->email }}"
-                                                                        name="participant{{ $index }}"
-                                                                        id="participant{{ $index }}CheckDefault"
-                                                                        {{ old('participant' . $index) == $participant->email ? 'checked' : '' }}>
-
-                                                                    <label class="form-check-label"
-                                                                        for="participant{{ $index }}CheckDefault">
-                                                                        {{ $participant->email }}
-                                                                    </label>
-                                                                </div>
-
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-
-                                                    <div class="modal-footer">
-
-                                                        <button type="button" data-bs-dismiss="modal"
-                                                            class="btn btn-primary">Adicionar</button>
-                                                    </div>
-
-                                                </div>
-
-                                                <script>
-                                                    const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-                                                    const participantCounterDisplay = document.getElementById('participantCounterDisplay');
-
-                                                    function updateParticipantCounter() {
-
-                                                        const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
-                                                        const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
-
-                                                        const checkedCounter = checkedParticipants.length;
-
-                                                        const hasAnyParticipant = checkedCounter > 0;
-
-                                                        if (hasAnyParticipant) {
-                                                            participantCounterDisplay.innerText = '(' + checkedCounter + ')';
-                                                        } else {
-                                                            participantCounterDisplay.innerText = '';
-                                                        }
-                                                    }
-
-                                                    // updateParticipantCounter();
-
-                                                    participantCheckboxes.forEach(participantCheckbox => participantCheckbox.addEventListener('change', () =>
-                                                        updateParticipantCounter()));
-
-                                                    updateParticipantCounter();
-                                                </script>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
 
                                     <button type="submit" class="btn btn-secondary">Salvar</button>
                                 </div>
@@ -575,7 +542,7 @@
 
                 const todayObject = new Date();
 
-                const inputDateObject = new Date(someDate.value)
+                const inputDateObject = new Date(someDate.value + "T00:00:00")
 
                 const formatedToday = todayObject.getFullYear() +
                     '-' + (todayObject.getMonth() + 1) +
@@ -591,7 +558,7 @@
 
             const setTaskLabelFromInputDate = () => {
 
-                const selectedDate = new Date(inputDate.value);
+                const selectedDate = new Date(inputDate.value + "T00:00:00");
 
                 if (isNaN(selectedDate.getTime())) {
 

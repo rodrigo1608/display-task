@@ -55,7 +55,7 @@ class ReminderController extends Controller
 
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
 
-        $recurringData = getRecurringData($request, $isSpecificDayPattern, $reminder);
+        $recurringData = getRecurringData($request,  $reminder);
         //rodrigo
         // dd($request->all(), $isSpecificDayPattern);
 

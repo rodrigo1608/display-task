@@ -274,7 +274,7 @@
             }
             const setReminderLabelFromInputDate = () => {
 
-                const selectedDate = new Date(inputDate.value);
+                const selectedDate = new Date(inputDate.value + "T00:00:00");
 
                 if (isNaN(selectedDate.getTime())) {
                     reminderLabel.innerText = "Insira uma data válida";
@@ -360,18 +360,15 @@
 
                 const today = new Date();
 
-                const inputDateObject = new Date(someDate.value)
+                const inputDateObject = new Date(someDate.value + "T00:00:00")
 
                 const date = today.getFullYear() +
                     '-' + (today.getMonth() + 1) +
                     '-' + today.getDate();
 
-                console.log(date);
                 const formatedInputDateValue = inputDateObject.getFullYear() +
                     '-' + (inputDateObject.getMonth() + 1) +
                     '-' + inputDateObject.getDate();
-
-                console.log(formatedInputDateValue);
 
                 return date == formatedInputDateValue
 
@@ -391,8 +388,6 @@
                 setReminderLabelFromInputDate();
 
             });
-
-
 
             setReminderLabelFromInputDate();
         </script>

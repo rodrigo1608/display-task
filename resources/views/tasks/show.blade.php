@@ -7,8 +7,6 @@
 
             <div class="w-100">
 
-
-
             </div>
             <div class="col-md-9 container p-0">
 
