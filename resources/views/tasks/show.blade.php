@@ -13,9 +13,8 @@
 
                 <div class="card mt-5">
 
-
-
                     <div class="card-body p-5">
+
                         <div class="d-flex justify-content-between align-items-end flex-row">
 
                             <div>
@@ -23,7 +22,10 @@
 
                                 <p class="roboto fs-5"> {{ $task->description }}</p>
                             </div>
-                            <a class="h-50 btn btn-primary" href="{{ route('task.edit', ['task' => $task->id]) }}">Editar</a>
+
+                            @if ($task->is_creator)
+                                <a class="h-50 btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
+                            @endif
                         </div>
 
                         <div class="accordion" id="accordionExample">
@@ -57,7 +59,7 @@
                                             {{ $task->local }}
                                         </p>
 
-                                        <p><span class="poppins-semibold">Criado por:</span> {{ $task->creator }}</p>
+                                        <p><span class="poppins-semibold">Criado por:</span> {{ $task->creator_name }}</p>
 
                                         <p><span class="poppins-semibold">Telefone do responsável:</span>
                                             {{ $task->creator_telephone }}</p>

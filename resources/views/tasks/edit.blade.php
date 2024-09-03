@@ -37,17 +37,16 @@
 
                                     @php
 
-                                        $specificDate = getCarbonDate(
-                                            $task->reminder->recurring->specific_date,
-                                        )->format('Y-m-d');
+                                        $specificDate = filled($task->reminder->recurring->specific_date)
+                                            ? getCarbonDate($task->reminder->recurring->specific_date)->format('Y-m-d')
+                                            : null;
 
                                         $now = getCarbonNow()->format('Y-m-d');
 
                                     @endphp
 
                                     <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
-                                        value="{{ old('specific_date', $specificDate ? $specificDate : $now) }}"
-                                        min="{{ $now }}">
+                                        value="{{ old('specific_date', $specificDate) }}" min="{{ $now }}">
                                 </div>
 
                             </div>

@@ -8,8 +8,6 @@ use Illuminate\Validation\Validator;
 
 use Carbon\Carbon;
 
-use function PHPUnit\Framework\isEmpty;
-
 class StoreTaskRequest extends FormRequest
 {
 
@@ -102,8 +100,9 @@ class StoreTaskRequest extends FormRequest
 
             if (isset($specificDate) && $this->input($alertIndex) === 'true') {
 
-                $timeDifference = $start->diffInMinutes(now()->addMinutes($minutes), false);
+                // $timeDifference = $start->diffInMinutes(now()->addMinutes($minutes), false);
 
+                $timeDifference = now()->diffInMinutes($start, false);
 
                 $hours = floor($minutes / 60);
                 $minutesRemaining = $minutes % 60;

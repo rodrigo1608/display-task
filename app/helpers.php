@@ -1445,27 +1445,11 @@ if (!function_exists('getRemindersByWeekday')) {
 }
 
 
-if (!function_exists('getTaskStatus')) {
+if (!function_exists('getDuration')) {
 
-    function getTaskStatus($duration)
+    function getDuration($task)
     {
-        $now = getCarbonNow();
-        $start = getCarbonTime($duration->start);
-        $end = getCarbonTime($duration->end);
 
-        $isStarting = $start->greaterThan($now);
-
-        $isFinished = isset($end) ? $end->lessThan($now) : null;
-
-        if ($isStarting) {
-
-            return 'starting';
-        } elseif ($isFinished) {
-
-            return 'finished';
-        } else {
-
-            return 'in_progress';
-        }
+        return $task->durations()->where('user_id', $task->created_by)->where('task_id', $task->id)->first();
     }
 }

@@ -5,435 +5,420 @@
 
         <div class="row vh-100">
 
-            <div class="col-md-2 border-end">
+            <div class="col-md-8 container p-5">
 
-                <ul class="list-group poppins">
 
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu Perfil</li>
-                    </a>
+                <div class="card">
 
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu dia</li>
-                    </a>
+                    <div class="card-body ps-5">
 
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Minha semana</li>
-                    </a>
+                        <div class="row">
+                            <h1 class="poppins-regular"> {{ $task->title }}</h1>
+                        </div>
 
-                    <a href="#" class="side-link">
-                        <li class="list-group-item">Meu mês</li>
-                    </a>
+                        <div class="row mt-4">
+                            <p class="poppins-semibold col-md-2">Responsável: </p>
+                            <p class="roboto col-md-4">{{ $task->creator_name }}</p>
+                            <p class="roboto col-md-2">{{ $task->creator_telephone }} </p>
+                            <p class="roboto col-md-3">{{ $task->creator_email }} </p>
+                        </div>
 
-                    <a href="#" class="side-link">
-                        <li class="list-group-item active" aria-current="true">Painel geral</li>
-                    </a>
+                        <div class="row mt-3">
+                            <p class="poppins-semibold col-md-2">Descrição: </p>
+                            <p class="roboto col-md-8">{{ $task->description }}</p>
+                        </div>
 
-                </ul>
+                        @php
+                            $hasAnyAttachment = isset($task->attachments) && !empty($task->attachments);
+                        @endphp
 
-            </div>
+                        @if ($hasAnyAttachment)
+                            <p class="poppins-semibold col-md-3">Anexos:</p>
+                            <div class="d-flex w-50 flex-row flex-wrap">
 
-            <div class="col-md-10 p-5">
+                                @foreach ($task->attachments as $index => $attachment)
+                                    {{-- @dd($attachment) --}}
 
-                <div class="row">
+                                    <!-- Button trigger modal -->
+                                    <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal"
+                                        data-bs-target="#attach{{ $index }}">
 
-                    <div class="col-md-10">
+                                        <img style="width:100px" src="{{ asset('storage/' . $attachment->path) }}"
+                                            alt="Attachment Image">
 
-                        <div class="card">
+                                    </button>
 
-                            <div class="card-body ps-5">
+                                    <!-- Modal -->
+                                    <div class="modal fade modal-xl" id="attach{{ $index }}" tabindex="-1"
+                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
 
-                                <div class="row">
-                                    <h1 class="poppins-regular"> {{ $task->title }}</h1>
-                                </div>
+                                        <div class="modal-dialog">
 
-                                <div class="row mt-4">
-                                    <p class="poppins-semibold col-md-2">Responsável: </p>
-                                    <p class="roboto col-md-4">{{ $task->creator }}</p>
-                                    <p class="roboto col-md-2">{{ $task->creator_telephone }} </p>
-                                    <p class="roboto col-md-3">{{ $task->creator_email }} </p>
-                                </div>
+                                            <div class="modal-content">
 
-                                <div class="row mt-3">
-                                    <p class="poppins-semibold col-md-2">Descrição: </p>
-                                    <p class="roboto col-md-8">{{ $task->description }}</p>
-                                </div>
+                                                <div class="modal-header">
 
-                                @php
-                                    $hasAnyAttachment = isset($task->attachments) && !empty($task->attachments);
-                                @endphp
+                                                    <h1 class="modal-title fs-5" id="exampleModalLabel">Anexo
+                                                        {{ $index + 1 }}</h1>
 
-                                @if ($hasAnyAttachment)
-                                    <p class="poppins-semibold col-md-3">Anexos:</p>
-                                    <div class="d-flex w-50 flex-row flex-wrap">
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
 
-                                        @foreach ($task->attachments as $index => $attachment)
-                                            {{-- @dd($attachment) --}}
-
-                                            <!-- Button trigger modal -->
-                                            <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal"
-                                                data-bs-target="#attach{{ $index }}">
-
-                                                <img style="width:100px" src="{{ asset('storage/' . $attachment->path) }}"
-                                                    alt="Attachment Image">
-
-                                            </button>
-
-                                            <!-- Modal -->
-                                            <div class="modal fade modal-xl" id="attach{{ $index }}" tabindex="-1"
-                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-
-                                                <div class="modal-dialog">
-
-                                                    <div class="modal-content">
-
-                                                        <div class="modal-header">
-
-                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Anexo
-                                                                {{ $index + 1 }}</h1>
-
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
-                                                        </div>
-
-                                                        <div class="modal-body">
-                                                            <img src="{{ asset('storage/' . $attachment->path) }}"
-                                                                alt="Attachment Image">
-                                                        </div>
-
-                                                    </div>
-
+                                                <div class="modal-body">
+                                                    <img src="{{ asset('storage/' . $attachment->path) }}"
+                                                        alt="Attachment Image">
                                                 </div>
 
                                             </div>
-                                        @endforeach
 
+                                        </div>
+
+                                    </div>
+                                @endforeach
+
+                            </div>
+                        @endif
+
+                        <div class="row mt-3">
+                            <p class="poppins-semibold col-md-2">Recorrencia: </p>
+                            <p class="roboto col-md-8">{!! $task->recurringMessage !!}</p>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="row d-flex align-items-center mb-5">
+
+                                <p class="poppins-semibold col-md-2 mt-4">Duração: </p>
+
+                                <div class="col-md-2 position-relative">
+
+                                    <label class="poppins fs-6">Começar em: </label>
+
+                                    <input id="start" type="time"
+                                        class="form-control fs-6 @error('start') is-invalid @enderror border-0 text-center"
+                                        value="{{ $task->start }}" readonly>
+
+                                    @error('start')
+                                        <div class="invalid-feedback position-absolute">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="col-md-2 offset-1 position-relative">
+
+                                    <label class="poppins fs-6">Terminar em: </label>
+
+                                    <input id="end" type="time"
+                                        class="form-control fs-6 @error('end') is-invalid @enderror border-0 text-center"
+                                        value="{{ $task->end }}" readonly>
+
+                                    @error('end')
+                                        <div class="invalid-feedback position-absolute">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+
+                                </div>
+
+                                <!-- Exibir mensagem de erro -->
+                                @php
+                                    $conflictingTask = session()->get('conflictingTask');
+                                @endphp
+
+                                @if ($errors->has('conflictingDuration'))
+                                    <div class="alert border-danger my-4 border border-2 bg-white">
+
+                                        <p class="text-danger">As durações propostas estão se sobrepondo com uma
+                                            tarefa já
+                                            criada.</p>
+
+                                        <h1></h1>
+
+                                        <div class="accordion accordion-flush" id="accordionFlushExample">
+
+                                            <div class="accordion-item">
+
+                                                <h2 class="accordion-header">
+                                                    <button class="accordion-button text-danger collapsed btn-danger"
+                                                        type="button" data-bs-toggle="collapse"
+                                                        data-bs-target="#flush-collapseOne" aria-expanded="false"
+                                                        aria-controls="flush-collapseOne">
+                                                        <p class="poppins-semibold">Clique para ver os detalhes
+                                                        </p>
+                                                    </button>
+                                                </h2>
+
+                                                <div id="flush-collapseOne" class="accordion-collapse collapse"
+                                                    data-bs-parent="#accordionFlushExample">
+                                                    <div class="accordion-body">
+                                                        <p class=""><span class="poppins-semibold">Tarefa
+                                                                conflitante:</span>
+
+                                                            {{ $conflictingTask['title'] }}
+                                                        </p>
+                                                        <p>
+                                                            <span class="poppins-semibold">
+                                                                Local:
+                                                            </span>
+                                                            {{ $conflictingTask['local'] }}
+                                                        </p>
+
+                                                        <p> <span class="poppins-semibold">
+                                                                Criado por:
+                                                            </span> {{ $conflictingTask['owner'] }} </p>
+
+                                                        <p>
+                                                            <span class="poppins-semibold">
+                                                                Contato:
+                                                            </span> {{ $conflictingTask['owner_telehpone'] }}
+                                                        </p>
+                                                        <p>
+                                                            <span class="poppins-semibold">
+                                                                email:
+                                                            </span>{{ $conflictingTask['owner_email'] }}
+                                                        </p>
+
+                                                        <p><span class="poppins-semibold">
+
+                                                            </span> {!! $conflictingTask['recurringMessage'] !!}</p>
+
+                                                        <p> <span class="poppins-semibold">
+                                                                das {{ $conflictingTask['start'] }} às
+                                                                {{ $conflictingTask['end'] }}
+                                                            </span></p>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 @endif
 
-                                <div class="row mt-3">
-                                    <p class="poppins-semibold col-md-2">Recorrencia: </p>
-                                    <p class="roboto col-md-8">{!! $task->recurringMessage !!}</p>
-                                </div>
+                            </div>
+                        </div>
 
-                                <div class="row mt-3">
-                                    <div class="row d-flex align-items-center mb-5">
+                    </div>
 
-                                        <p class="poppins-semibold col-md-2 mt-4">Duração: </p>
+                    <div class="card-footer ps-5">
 
-                                        <div class="col-md-2 position-relative">
+                        <div class="mb-5">
 
-                                            <label class="poppins fs-6">Começar em: </label>
+                            <form action="{{ route('task.acceptPendingTask', $task->id) }}" method="post">
+                                @csrf
+                                @method('PUT')
 
-                                            <input id="start" type="time"
-                                                class="form-control fs-6 @error('start') is-invalid @enderror border-0 text-center"
-                                                value="{{ $task->start }}" readonly>
+                                <input type="hidden" id="formStart" name="start">
+                                <input type="hidden" id="formEnd" name="end">
 
-                                            @error('start')
-                                                <div class="invalid-feedback position-absolute">
-                                                    <strong>{{ $message }}</strong>
-                                                </div>
-                                            @enderror
-                                        </div>
+                                <div class="row d-flex align-items-start mt-5">
 
-                                        <div class="col-md-2 offset-1 position-relative">
+                                    <div class="col-md-2">
 
-                                            <label class="poppins fs-6">Terminar em: </label>
+                                        <label for="time" class="poppins-regular fs-6 m-0">Horário da
+                                            notificação</label>
 
-                                            <input id="end" type="time"
-                                                class="form-control fs-6 @error('end') is-invalid @enderror border-0 text-center"
-                                                value="{{ $task->end }}" readonly>
+                                        <input id="custom-alert-time" type="time" name="time"
+                                            class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
+                                            value="{{ old('time') }}">
 
-                                            @error('end')
-                                                <div class="invalid-feedback position-absolute">
-                                                    <strong>{{ $message }}</strong>
-                                                </div>
-                                            @enderror
-
-                                        </div>
-
-                                        <!-- Exibir mensagem de erro -->
-                                        @php
-                                            $conflictingTask = session()->get('conflictingTask');
-                                        @endphp
-
-                                        @if ($errors->has('conflictingDuration'))
-                                            <div class="alert border-danger my-4 border border-2 bg-white">
-
-                                                <p class="text-danger">As durações propostas estão se sobrepondo com uma
-                                                    tarefa já
-                                                    criada.</p>
-
-                                                <h1></h1>
-
-                                                <div class="accordion accordion-flush" id="accordionFlushExample">
-
-                                                    <div class="accordion-item">
-
-                                                        <h2 class="accordion-header">
-                                                            <button
-                                                                class="accordion-button text-danger collapsed btn-danger"
-                                                                type="button" data-bs-toggle="collapse"
-                                                                data-bs-target="#flush-collapseOne" aria-expanded="false"
-                                                                aria-controls="flush-collapseOne">
-                                                                <p class="poppins-semibold">Clique para ver os detalhes
-                                                                </p>
-                                                            </button>
-                                                        </h2>
-
-                                                        <div id="flush-collapseOne" class="accordion-collapse collapse"
-                                                            data-bs-parent="#accordionFlushExample">
-                                                            <div class="accordion-body">
-                                                                <p class=""><span class="poppins-semibold">Tarefa
-                                                                        conflitante:</span>
-
-                                                                    {{ $conflictingTask['title'] }}
-                                                                </p>
-                                                                <p>
-                                                                    <span class="poppins-semibold">
-                                                                        Local:
-                                                                    </span>
-                                                                    {{ $conflictingTask['local'] }}
-                                                                </p>
-
-                                                                <p> <span class="poppins-semibold">
-                                                                        Criado por:
-                                                                    </span> {{ $conflictingTask['owner'] }} </p>
-
-                                                                <p>
-                                                                    <span class="poppins-semibold">
-                                                                        Contato:
-                                                                    </span> {{ $conflictingTask['owner_telehpone'] }}
-                                                                </p>
-                                                                <p>
-                                                                    <span class="poppins-semibold">
-                                                                        email:
-                                                                    </span>{{ $conflictingTask['owner_email'] }}
-                                                                </p>
-
-                                                                <p><span class="poppins-semibold">
-
-                                                                    </span> {!! $conflictingTask['recurringMessage'] !!}</p>
-
-                                                                <p> <span class="poppins-semibold">
-                                                                        das {{ $conflictingTask['start'] }} às
-                                                                        {{ $conflictingTask['end'] }}
-                                                                    </span></p>
-
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                        @error('time')
+                                            <div class="invalid-feedback">
+                                                <strong>{{ $message }}</strong>
                                             </div>
+                                        @enderror
+
+                                    </div>
+
+                                    <span class="col-md-1 mt-4 text-center">
+                                        ou
+                                    </span>
+
+                                    <div class="col-md-3 mt-3">
+
+                                        <div class="accordion" id="accordionPanelsStayOpenExample">
+
+                                            <div class="accordion-item">
+
+                                                <h2 class="accordion-header">
+
+                                                    <button class="accordion-button poppins-regular" type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="false"
+                                                        aria-controls="panelsStayOpen-collapseOne">
+                                                        Horário pré-definido <span
+                                                            class="alertOptionsCounter fs-6 ms-2"></span>
+                                                    </button>
+                                                </h2>
+
+                                                <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse">
+
+                                                    <div class="accordion-body">
+
+                                                        @foreach ($alertOptions as $alertIndex => $alertValue)
+                                                            <div class="form-check">
+
+                                                                <input class="form-check-input alertOption"
+                                                                    type="checkbox" value="true"
+                                                                    name="{{ $alertIndex }}"
+                                                                    id="alert{{ $alertIndex }}CheckDefault"
+                                                                    {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
+
+                                                                <label class="form-check-label"
+                                                                    for="alert{{ $alertIndex }}CheckDefault">
+                                                                    {{ $alertValue }}
+                                                                </label>
+                                                            </div>
+                                                        @endforeach
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                        <div class="mt-2">
+                                            @php
+                                                $firstError = null;
+
+                                                $alertOptions = [
+                                                    'half_an_hour_before',
+                                                    'one_hour_before',
+                                                    'two_hours_before',
+                                                    'one_day_earlier',
+                                                ];
+                                            @endphp
+
+                                            @foreach ($alertOptions as $alertIndex)
+                                                @if ($errors->has($alertIndex))
+                                                    @php
+                                                        $firstError = $errors->first($alertIndex);
+                                                    @endphp
+                                                @break
+                                            @endif
+                                        @endforeach
+                                        @if ($firstError)
+                                            <div class="invalid-feedback d-block">{{ $firstError }}</div>
                                         @endif
 
                                     </div>
+
+                                </div>
+
+                                <div class="d-flex col-md-3 offset-1 justify-content-end mt-4 p-0">
+
+                                    <button type="button"
+                                        class="btn btn-outline-danger poppins-regular me-4 border-2"
+                                        data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
+                                        Descartar
+                                    </button>
+
+                                    <button class="btn btn-secondary fs-5">Aceitar</button>
                                 </div>
 
                             </div>
 
-                            <div class="card-footer ps-5">
+                        </form>
 
-                                <div class="mb-5">
+                        <script>
+                            const start = document.getElementById('start').value;
+                            const end = document.getElementById('end').value;
 
-                                    <form action="{{ route('task.acceptPendingTask', ['task' => $task->id]) }}"
-                                        method="post">
-                                        @csrf
-                                        @method('PUT')
+                            const formStart = document.getElementById('formStart');
+                            const formEnd = document.getElementById('formEnd');
 
-                                        <input type="hidden" id="formStart" name="start">
-                                        <input type="hidden" id="formEnd" name="end">
+                            formStart.value = start
+                            formEnd.value = end
 
-                                        <div class="row d-flex align-items-start mt-5">
+                            //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
 
-                                            <div class="col-md-2">
+                            const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
-                                                <label for="time" class="poppins-regular fs-6 m-0">Horário da
-                                                    notificação</label>
+                                const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
 
-                                                <input id="custom-alert-time" type="time" name="time"
-                                                    class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
-                                                    value="{{ old('time') }}">
+                                const affectedInputIsEmpty = affectedInput.value.trim() == '';
 
-                                                @error('time')
-                                                    <div class="invalid-feedback">
-                                                        <strong>{{ $message }}</strong>
-                                                    </div>
-                                                @enderror
+                                const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
 
-                                            </div>
+                                affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
 
-                                            <span class="col-md-1 mt-4 text-center">
-                                                ou
-                                            </span>
+                            }
 
-                                            <div class="col-md-3 mt-3">
-                                                <div class="accordion" id="accordionPanelsStayOpenExample">
+                            const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
 
-                                                    <div class="accordion-item">
+                            const customAlertTime = document.querySelector('#custom-alert-time');
 
-                                                        <h2 class="accordion-header">
+                            const alertOptionsCollection = document.querySelectorAll('.alertOption');
 
-                                                            <button class="accordion-button poppins-regular"
-                                                                type="button" data-bs-toggle="collapse"
-                                                                data-bs-target="#panelsStayOpen-collapseOne"
-                                                                aria-expanded="false"
-                                                                aria-controls="panelsStayOpen-collapseOne">
-                                                                Horário pré-definido <span
-                                                                    class="alertOptionsCounter fs-6 ms-2"></span>
-                                                            </button>
-                                                        </h2>
+                            const alertOptions = Array.from(alertOptionsCollection);
 
-                                                        <div id="panelsStayOpen-collapseOne"
-                                                            class="accordion-collapse collapse">
+                            const displaySelectedAlertCounter = () => {
 
-                                                            <div class="accordion-body">
+                                const checkedOptions = alertOptions.filter(option => option.checked);
+                                const checkedRegister = checkedOptions.length;
 
-                                                                @foreach ($alertOptions as $alertIndex => $alertValue)
-                                                                    <div class="form-check">
+                                checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                                        checkedRegister + ')') :
+                                    alertOptionsCounterLabel.innerText = "";
+                            }
 
-                                                                        <input class="form-check-input alertOption"
-                                                                            type="checkbox" value="true"
-                                                                            name="{{ $alertIndex }}"
-                                                                            id="alert{{ $alertIndex }}CheckDefault"
-                                                                            {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
+                            displaySelectedAlertCounter();
 
-                                                                        <label class="form-check-label"
-                                                                            for="alert{{ $alertIndex }}CheckDefault">
-                                                                            {{ $alertValue }}
-                                                                        </label>
-                                                                    </div>
-                                                                @endforeach
+                            alertOptions.forEach(optionAlert => {
 
-                                                            </div>
+                                optionAlert.addEventListener('click', () => {
 
-                                                        </div>
+                                    displaySelectedAlertCounter();
 
-                                                    </div>
+                                    handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
 
-                                                </div>
+                                })
 
-                                            </div>
+                                customAlertTime.addEventListener('change', () => {
+                                    alertOptions.forEach(checkBox => {
 
-                                            <div class="d-flex col-md-3 offset-1 justify-content-end mt-4 p-0">
-                                                <button type="button"
-                                                    class="btn btn-outline-danger poppins-regular me-4 border-2"
-                                                    data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
-                                                    Descartar
-                                                </button>
+                                        checkBox.checked = false;
+                                        alertOptionsCounterLabel.innerText = '';
+                                    });
+                                })
 
-                                                <button class="btn btn-secondary fs-5">Aceitar</button>
-                                            </div>
+                            })
+                        </script>
 
-                                        </div>
+                    </div>
 
-                                    </form>
+                    <div class="modal fade" id="deleteParticipantModal" tabindex="-1"
+                        aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
 
-                                    <script>
-                                        const start = document.getElementById('start').value;
-                                        const end = document.getElementById('end').value;
+                        <div class="modal-dialog">
 
-                                        const formStart = document.getElementById('formStart');
-                                        const formEnd = document.getElementById('formEnd');
+                            <div class="modal-content">
 
-                                        formStart.value = start
-                                        formEnd.value = end
+                                <div class="modal-header">
 
-                                        //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
+                                    <h1 class="modal-title fs-5 poppins-semibold" id="deleteParticipantModalLabel">
+                                        Rejeitar convite
+                                    </h1>
 
-                                        const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
-
-                                            const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
-
-                                            const affectedInputIsEmpty = affectedInput.value.trim() == '';
-
-                                            const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
-
-                                            affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
-
-                                        }
-
-                                        const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
-
-                                        const customAlertTime = document.querySelector('#custom-alert-time');
-
-                                        const alertOptionsCollection = document.querySelectorAll('.alertOption');
-
-                                        const alertOptions = Array.from(alertOptionsCollection);
-
-                                        const displaySelectedAlertCounter = () => {
-
-                                            const checkedOptions = alertOptions.filter(option => option.checked);
-                                            const checkedRegister = checkedOptions.length;
-
-                                            checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
-                                                    checkedRegister + ')') :
-                                                alertOptionsCounterLabel.innerText = "";
-                                        }
-
-                                        displaySelectedAlertCounter();
-
-                                        alertOptions.forEach(optionAlert => {
-
-                                            optionAlert.addEventListener('click', () => {
-
-                                                displaySelectedAlertCounter();
-
-                                                handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
-
-                                            })
-
-                                            customAlertTime.addEventListener('change', () => {
-                                                alertOptions.forEach(checkBox => {
-
-                                                    checkBox.checked = false;
-                                                    alertOptionsCounterLabel.innerText = '';
-                                                });
-                                            })
-
-                                        })
-                                    </script>
-
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
 
-                                <div class="modal fade" id="deleteParticipantModal" tabindex="-1"
-                                    aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
-
-                                    <div class="modal-dialog">
-
-                                        <div class="modal-content">
-
-                                            <div class="modal-header">
-
-                                                <h1 class="modal-title fs-5 poppins-semibold"
-                                                    id="deleteParticipantModalLabel">
-                                                    Rejeitar convite
-                                                </h1>
-
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-
-                                            <div class="modal-body">
-                                                Deseja realmente não participar da tarefa?
-                                            </div>
+                                <div class="modal-body">
+                                    Deseja realmente não participar da tarefa?
+                                </div>
 
 
-                                            <div class="modal-footer">
-                                                <form action="{{ route('participant.destroy') }}" method="post">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <input type="hidden" name="task_id" value={{ $task->id }}>
-                                                    <input type="hidden" name="user_id" value={{ auth()->id() }}>
+                                <div class="modal-footer">
+                                    <form action="{{ route('participant.destroy') }}" method="post">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="hidden" name="task_id" value={{ $task->id }}>
+                                        <input type="hidden" name="user_id" value={{ auth()->id() }}>
 
-                                                    <button class="btn btn-danger" type="submit">Descartar</button>
-                                                </form>
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
+                                        <button class="btn btn-danger" type="submit">Descartar</button>
+                                    </form>
                                 </div>
 
                             </div>
@@ -444,8 +429,12 @@
 
                 </div>
 
+
+
             </div>
 
         </div>
 
-    @endsection
+    </div>
+
+@endsection

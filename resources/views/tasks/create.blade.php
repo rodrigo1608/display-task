@@ -176,6 +176,7 @@
                                             name="local" value="{{ old('local') }}">
 
                                     </div>
+
                                 </div>
 
                                 <!-- Exibir mensagem de erro de conflito de duração da tarefa -->
@@ -276,6 +277,7 @@
                                     </span>
 
                                     <div class="col-md-6 mt-3">
+
                                         <div class="accordion" id="accordionPanelsStayOpenExample">
 
                                             <div class="accordion-item">
@@ -316,12 +318,20 @@
                                                 </div>
 
                                             </div>
+
                                             <div class="mt-2">
                                                 @php
                                                     $firstError = null;
+
+                                                    $alertOptions = [
+                                                        'half_an_hour_before',
+                                                        'one_hour_before',
+                                                        'two_hours_before',
+                                                        'one_day_earlier',
+                                                    ];
                                                 @endphp
 
-                                                @foreach (['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'] as $alertIndex)
+                                                @foreach ($alertOptions as $alertIndex)
                                                     @if ($errors->has($alertIndex))
                                                         @php
                                                             $firstError = $errors->first($alertIndex);
@@ -329,9 +339,12 @@
                                                     @break
                                                 @endif
                                             @endforeach
+
                                             @if ($firstError)
                                                 <div class="invalid-feedback d-block">{{ $firstError }}</div>
                                             @endif
+
+
                                         </div>
 
                                     </div>
@@ -502,6 +515,7 @@
 
                                     <button type="submit" class="btn btn-secondary">Salvar</button>
                                 </div>
+
                             </div>
 
                         </form>

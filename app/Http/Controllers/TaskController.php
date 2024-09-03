@@ -160,12 +160,16 @@ class TaskController extends Controller
 
         ]);
 
-        if (getcarbonNow()->gte($duration->start) && getcarbonNow()->lte($duration->end)) {
+        $duration->status = match (true) {
 
-            $duration->status = 'in_progress';
-        } else {
-            $duration->status = 'finished';
-        }
+            getCarbonTime($duration->start)->isFuture() => 'starting',
+
+            getCarbonTime($duration->start)->isPast() && getCarbonTime($duration->end)->isFuture() => 'in_progress',
+
+            getCarbonTime($duration->end)->isPast() => 'finished',
+
+            default => $duration->status,
+        };
 
         $duration->save();
 
@@ -195,54 +199,47 @@ class TaskController extends Controller
 
         $task = Task::find($id);
 
+        $userID = auth()->id();
+
         $taskID = $task->id;
 
         $possibleParticipants = User::whereDoesntHave('participatingTasks', function ($query) use ($taskID) {
             $query->where('task_id', $taskID);
-        })->where('id', '!=', auth()->id())->get();
+        })->where('id', '!=', $userID)->get();
 
         if (isset($task)) {
 
             $view = request()->query('view', 'default');
 
-            $createdBy =  $task->creator ?? null;
+            $createdBy =  $task->creator;
 
-            $task['creator'] = $createdBy->name . ' ' . $createdBy->lastname;
+            $task->creator_name = $createdBy->name . ' ' . $createdBy->lastname;
 
-            $task['creator_telephone'] = getFormatedTelephone($createdBy);
+            $task->is_creator = $createdBy->id === $userID;
 
-            $task['creator_email'] = $createdBy->email;
+            $task->creator_telephone = getFormatedTelephone($createdBy);
 
-            $task['description'] = $task->feedbacks->first()->feedback;
+            $task->creator_email = $createdBy->email;
 
-            $task['attachments'] = $task->feedbacks->first()->attachments->all();
+            $task->description = $task->feedbacks->first()->feedback;
 
-            $duration = $task->durations->first();
+            $task->attachments = $task->feedbacks->first()->attachments->all();
 
-            $task['start'] = $duration->start ? date('H:i', strtotime($duration->start)) : null;
+            $duration = getDuration($task);
 
-            $task['end'] = $duration->end ? date('H:i', strtotime($duration->end)) : null;
+            $task->start = $duration->start ? date('H:i', strtotime($duration->start)) : null;
+
+            $task->end = $duration->end ? date('H:i', strtotime($duration->end)) : null;
 
             $recurring = $task->reminder->recurring;
 
-            $task['recurringMessage'] = getRecurringMessage($recurring);
+            $task->recurringMessage = getRecurringMessage($recurring);
 
             $alertOptions = getAlertOptions();
 
-            if ($task->participants->isEmpty()) {
-
-                $task->emailsParticipants = "Nenhum participante";
-            } else {
-
-                $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
-            }
-            if ($task->participants->isEmpty()) {
-
-                $task->emailsParticipants = "Nenhum participante";
-            } else {
-
-                $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
-            }
+            $task->emailsParticipants = $task->participants->isEmpty()
+                ? "Nenhum participante"
+                : $task->participants->pluck('email')->implode(', ');
 
             $today = getToday();
 
@@ -260,9 +257,9 @@ class TaskController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(int $id)
     {
-        $user  = auth()->id();
+        $userID  = auth()->id();
 
         $task = Task::find($id);
 
@@ -283,27 +280,6 @@ class TaskController extends Controller
      */
     public function update(StoreTaskRequest $request, int $id)
     {
-        $recurrencePatterns = getRecurrencePatterns($request->all());
-        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
-
-        if ($isSpecificDayPattern) {
-
-            $conflict = getConflictingTask($request->all(), 'specific_date');
-
-            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
-                return $conflict;
-            }
-        } else {
-
-            foreach (array_keys($recurrencePatterns) as $pattern) {
-
-                $conflict = getConflictingTask($request,  $pattern);
-
-                if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
-                    return $conflict;
-                }
-            }
-        }
         $task =  Task::with(
 
             'reminder',
@@ -318,9 +294,31 @@ class TaskController extends Controller
 
         )->findOrFail($id);
 
+        $recurrencePatterns = getRecurrencePatterns($request->all());
+        $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
+
+        if ($isSpecificDayPattern) {
+
+            $conflict = getConflictingTask($request->all(), 'specific_date', $task->id);
+
+            if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                return $conflict;
+            }
+        } else {
+
+            foreach (array_keys($recurrencePatterns) as $pattern) {
+
+                $conflict = getConflictingTask($request,  $pattern, $task->id);
+
+                if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+                    return $conflict;
+                }
+            }
+        }
+
         $recurring = $task->reminder->recurring;
 
-        $duration = $task->durations()->where('user_id', auth()->id())->where('task_id', $task->id)->first();
+        $duration = getDuration($task);
 
         $notificationTime  = $task->reminder->notificationTimes()->where('user_id', auth()->id())->first();
 
@@ -350,21 +348,26 @@ class TaskController extends Controller
 
         $duration->update($durationAttributes);
 
-        if (getCarbonTime($duration->start)->gt(now())) {
+        $duration->status = match (true) {
 
-            $duration->status = 'starting';
-            $duration->save();
-        }
+            getCarbonTime($duration->start)->isFuture() => 'starting',
 
+            getCarbonTime($duration->start)->isPast() && getCarbonTime($duration->end)->isFuture() => 'in_progress',
+
+            getCarbonTime($duration->end)->isPast() => 'finished',
+
+            default => $duration->status,
+        };
+
+        $duration->save();
 
         $notificationTime->update($notificationTimeAttributes);
 
-        return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('task.show', $task->id)->with('success', 'Tarefa atualizada com sucesso!');
     }
 
-    public function acceptPendingTask(SetPendingTask $request, string $id)
+    public function acceptPendingTask(SetPendingTask $request, int $id)
     {
-
 
         $currentUserID = auth()->id();
 
