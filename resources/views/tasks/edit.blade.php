@@ -306,7 +306,7 @@
 
                                     <input id="custom-alert-time" type="time" name="time"
                                         class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
-                                        value="{{ old('time', $customTime->format('H:i')) }}">
+                                        value="{{ old('time', $customTime ? $customTime->format('H:i') : '') }}">
 
                                     @error('time')
                                         <div class="invalid-feedback">

@@ -164,7 +164,7 @@
         @if (!$feedbacks->isEmpty())
             <div class="row mt-5">
 
-                <div class="col-md-9 container">
+                <div class="col-md-9 container px-5">
 
                     <h2 class="fs-4">
                         Comentários/Observações
@@ -174,7 +174,7 @@
 
             <div class="row">
 
-                <div class="col-md-9 container">
+                <div class="col-md-9 container p-5">
 
                     <div class="accordion" id="accordionPanelsStayOpenExample">
 
@@ -270,8 +270,6 @@
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">Close</button>
-                                                                <button type="button" class="btn btn-primary">Save
-                                                                    changes</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -404,7 +402,10 @@
                 updateParticipantCounter();
             </script>
 
-            <a href="#" class="btn btn-secondary me-4">Marcar como concluída</a>
+            <form class="d-inline-flex" action="{{ route('tasks.markAsConcluded', $task->id) }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-secondary me-4">Marcar como concluída</button>
+            </form>
         @endif
 
     </div>

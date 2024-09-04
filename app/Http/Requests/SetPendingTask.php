@@ -69,8 +69,10 @@ class SetPendingTask extends FormRequest
 
         $task = Task::find($taskID);
 
-        $specificDate = filled($task->reminder->recurring->specific_date)
-            ? getCarbonDate($task->reminder->recurring->specific_date)
+        $specificDateString = $task->reminder->recurring?->specific_date;
+
+        $specificDate = filled($specificDateString)
+            ? getCarbonDate($specificDateString)
             : null;
 
         $alertOptions = [
@@ -103,10 +105,13 @@ class SetPendingTask extends FormRequest
 
         if ($isOneDayBeforeSelected) {
 
-            $timeDifferenceInDays = $specificDate->diffInDays(now(), false);
+            $dateTimeString  = $specificDate->format('m/d/Y') . ' ' . $start->format('H:i');
 
+            $dateTime = getCarbonDate($dateTimeString);
 
-            if ($timeDifferenceInDays) {
+            $timeDifferenceInDays = now()->diffInDays($dateTime);
+
+            if ($timeDifferenceInDays < 1) {
                 $validator->errors()->add('one_day_earlier', 'A notificação de um dia antes não é válida, pois não há tempo suficiente entre a data da notificação e início da tarefa.');
             }
         }

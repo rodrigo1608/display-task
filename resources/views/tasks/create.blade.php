@@ -209,6 +209,7 @@
 
                                                 <div id="flush-collapseOne" class="accordion-collapse collapse"
                                                     data-bs-parent="#accordionFlushExample">
+
                                                     <div class="accordion-body">
                                                         <p class=""><span class="poppins-semibold">Tarefa
                                                                 conflitante:</span>
@@ -244,7 +245,8 @@
                                                         <p> <span class="poppins-semibold">
                                                                 das {{ $conflictingTask['start'] }} às
                                                                 {{ $conflictingTask['end'] }}
-                                                            </span></p>
+                                                            </span>
+                                                        </p>
 
                                                     </div>
                                                 </div>
@@ -341,9 +343,10 @@
                                             @endforeach
 
                                             @if ($firstError)
-                                                <div class="invalid-feedback d-block">{{ $firstError }}</div>
+                                                <div class="invalid-feedback d-block">
+                                                    <strong>{{ $firstError }}</strong>
+                                                </div>
                                             @endif
-
 
                                         </div>
 

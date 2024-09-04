@@ -24,6 +24,8 @@ Route::resource('reminder', ReminderController::class);
 
 Route::resource('task', TaskController::class);
 Route::put('task/{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('task.acceptPendingTask');
+Route::post('tasks/{id}/markAsConcluded', [TaskController::class, 'markAsConcluded'])->name('tasks.markAsConcluded');
+
 
 Route::get('user/{id}', [UserController::class, 'edit'])->name('user.edit');
 Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');

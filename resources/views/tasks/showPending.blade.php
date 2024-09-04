@@ -299,128 +299,127 @@
                                             @endif
                                         @endforeach
                                         @if ($firstError)
-                                            <div class="invalid-feedback d-block">{{ $firstError }}</div>
-                                        @endif
-
+                                            <div class="invalid-feedback d-block"><strong>{{ $firstError }}</strong>
+                                            </div>
                                     </div>
+                                    @endif
 
-                                </div>
-
-                                <div class="d-flex col-md-3 offset-1 justify-content-end mt-4 p-0">
-
-                                    <button type="button"
-                                        class="btn btn-outline-danger poppins-regular me-4 border-2"
-                                        data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
-                                        Descartar
-                                    </button>
-
-                                    <button class="btn btn-secondary fs-5">Aceitar</button>
                                 </div>
 
                             </div>
 
-                        </form>
+                            <div class="d-flex col-md-3 offset-1 justify-content-end mt-4 p-0">
 
-                        <script>
-                            const start = document.getElementById('start').value;
-                            const end = document.getElementById('end').value;
+                                <button type="button" class="btn btn-outline-danger poppins-regular me-4 border-2"
+                                    data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
+                                    Descartar
+                                </button>
 
-                            const formStart = document.getElementById('formStart');
-                            const formEnd = document.getElementById('formEnd');
-
-                            formStart.value = start
-                            formEnd.value = end
-
-                            //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
-
-                            const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
-
-                                const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
-
-                                const affectedInputIsEmpty = affectedInput.value.trim() == '';
-
-                                const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
-
-                                affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
-
-                            }
-
-                            const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
-
-                            const customAlertTime = document.querySelector('#custom-alert-time');
-
-                            const alertOptionsCollection = document.querySelectorAll('.alertOption');
-
-                            const alertOptions = Array.from(alertOptionsCollection);
-
-                            const displaySelectedAlertCounter = () => {
-
-                                const checkedOptions = alertOptions.filter(option => option.checked);
-                                const checkedRegister = checkedOptions.length;
-
-                                checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
-                                        checkedRegister + ')') :
-                                    alertOptionsCounterLabel.innerText = "";
-                            }
-
-                            displaySelectedAlertCounter();
-
-                            alertOptions.forEach(optionAlert => {
-
-                                optionAlert.addEventListener('click', () => {
-
-                                    displaySelectedAlertCounter();
-
-                                    handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
-
-                                })
-
-                                customAlertTime.addEventListener('change', () => {
-                                    alertOptions.forEach(checkBox => {
-
-                                        checkBox.checked = false;
-                                        alertOptionsCounterLabel.innerText = '';
-                                    });
-                                })
-
-                            })
-                        </script>
+                                <button class="btn btn-secondary fs-5">Aceitar</button>
+                            </div>
 
                     </div>
 
-                    <div class="modal fade" id="deleteParticipantModal" tabindex="-1"
-                        aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
+                    </form>
 
-                        <div class="modal-dialog">
+                    <script>
+                        const start = document.getElementById('start').value;
+                        const end = document.getElementById('end').value;
 
-                            <div class="modal-content">
+                        const formStart = document.getElementById('formStart');
+                        const formEnd = document.getElementById('formEnd');
 
-                                <div class="modal-header">
+                        formStart.value = start
+                        formEnd.value = end
 
-                                    <h1 class="modal-title fs-5 poppins-semibold" id="deleteParticipantModalLabel">
-                                        Rejeitar convite
-                                    </h1>
+                        //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
 
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
+                        const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
-                                <div class="modal-body">
-                                    Deseja realmente não participar da tarefa?
-                                </div>
+                            const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
+
+                            const affectedInputIsEmpty = affectedInput.value.trim() == '';
+
+                            const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
+
+                            affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
+
+                        }
+
+                        const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
+
+                        const customAlertTime = document.querySelector('#custom-alert-time');
+
+                        const alertOptionsCollection = document.querySelectorAll('.alertOption');
+
+                        const alertOptions = Array.from(alertOptionsCollection);
+
+                        const displaySelectedAlertCounter = () => {
+
+                            const checkedOptions = alertOptions.filter(option => option.checked);
+                            const checkedRegister = checkedOptions.length;
+
+                            checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                                    checkedRegister + ')') :
+                                alertOptionsCounterLabel.innerText = "";
+                        }
+
+                        displaySelectedAlertCounter();
+
+                        alertOptions.forEach(optionAlert => {
+
+                            optionAlert.addEventListener('click', () => {
+
+                                displaySelectedAlertCounter();
+
+                                handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
+
+                            })
+
+                            customAlertTime.addEventListener('change', () => {
+                                alertOptions.forEach(checkBox => {
+
+                                    checkBox.checked = false;
+                                    alertOptionsCounterLabel.innerText = '';
+                                });
+                            })
+
+                        })
+                    </script>
+
+                </div>
+
+                <div class="modal fade" id="deleteParticipantModal" tabindex="-1"
+                    aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
+
+                    <div class="modal-dialog">
+
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+
+                                <h1 class="modal-title fs-5 poppins-semibold" id="deleteParticipantModalLabel">
+                                    Rejeitar convite
+                                </h1>
+
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                Deseja realmente não participar da tarefa?
+                            </div>
 
 
-                                <div class="modal-footer">
-                                    <form action="{{ route('participant.destroy') }}" method="post">
-                                        @csrf
-                                        @method('DELETE')
-                                        <input type="hidden" name="task_id" value={{ $task->id }}>
-                                        <input type="hidden" name="user_id" value={{ auth()->id() }}>
+                            <div class="modal-footer">
+                                <form action="{{ route('participant.destroy') }}" method="post">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="task_id" value={{ $task->id }}>
+                                    <input type="hidden" name="user_id" value={{ auth()->id() }}>
 
-                                        <button class="btn btn-danger" type="submit">Descartar</button>
-                                    </form>
-                                </div>
-
+                                    <button class="btn btn-danger" type="submit">Descartar</button>
+                                </form>
                             </div>
 
                         </div>
@@ -429,12 +428,14 @@
 
                 </div>
 
-
-
             </div>
+
+
 
         </div>
 
     </div>
+
+</div>
 
 @endsection

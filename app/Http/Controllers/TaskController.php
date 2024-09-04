@@ -451,4 +451,10 @@ class TaskController extends Controller
     {
         //
     }
+
+    public function markAsConcluded(int $id)
+    {
+        $task =  Task::find($id);
+        dd($task);
+    }
 }
