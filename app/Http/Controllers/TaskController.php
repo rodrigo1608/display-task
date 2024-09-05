@@ -237,6 +237,13 @@ class TaskController extends Controller
 
             $alertOptions = getAlertOptions();
 
+            $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+            $expiredTask = getDuration($task)->status === 'finished';
+
+            $task->shoudDisplayButton = !($hasSpecificDate && $expiredTask);
+
+            $task->isConcluded = $task->concluded === 'true';
+
             $task->emailsParticipants = $task->participants->isEmpty()
                 ? "Nenhum participante"
                 : $task->participants->pluck('email')->implode(', ');
@@ -455,6 +462,9 @@ class TaskController extends Controller
     public function markAsConcluded(int $id)
     {
         $task =  Task::find($id);
-        dd($task);
+
+        $task->update(['concluded' => true]);
+
+        return  redirect()->route('task.show', compact('task'))->with('success', 'Tarefa concluída!');
     }
 }

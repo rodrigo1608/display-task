@@ -23,31 +23,46 @@
                                 <p class="roboto fs-5"> {{ $task->description }}</p>
                             </div>
 
-                            @if ($task->is_creator)
+
+                            @if ($task->is_creator && !$task->isConcluded)
                                 <a class="h-50 btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
                             @endif
+
                         </div>
 
                         <div class="accordion" id="accordionExample">
+
                             <div class="accordion-item my-4">
+
                                 <h2 class="accordion-header">
+
                                     <button class="accordion-button" type="button" data-bs-toggle="collapse"
                                         data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Detalhes
 
-                                        <div class="ms-2">
-                                            <svg stroke="currentColor" @class([
-                                                'text-success' => $task->status === 'starting',
-                                                'text-warning' => $task->status === 'in_progress',
-                                                'text-danger' => $task->status === 'finished',
-                                            ]) stroke-width="2"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                stroke-width="1.5" class="size-6" style="width: 1em; height: 1em;">
+                                        <p class="m-0 p-0"> Detalhes
 
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                        </div>
+                                            @if ($task->isConcluded)
+                                                <span class="text-primary ms-3">
+                                                    A tarefa foi registrada como concluída
+                                                </span>
+                                            @else
+                                                <div class="d-flex align-items-center m-0 ms-2 p-0">
+
+                                                    <svg stroke="currentColor" @class([
+                                                        'text-success' => $task->status === 'starting',
+                                                        'text-warning' => $task->status === 'in_progress',
+                                                        'text-danger' => $task->status === 'finished',
+                                                    ]) stroke-width="2"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" class="size-6"
+                                                        style="width: 1em; height: 2em; ">
+
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+                                            @endif
+                                        </p>
+
                                     </button>
                                 </h2>
 
@@ -123,24 +138,28 @@
 
                                             </div>
                                         @endif
-                                        <p>{!! $task->recurringMessage !!}</p>
+                                        @if (!$task->isConcluded)
+                                            <p class="mt-4">{!! $task->recurringMessage !!}</p>
 
-                                        <span class="fs-5">{{ $task->start }}</span> <span class="mx-2">-</span>
-                                        <span class="fs-5">{{ $task->end }}</span>
+                                            <span class="fs-5">{{ $task->start }}</span> <span class="mx-2">-</span>
+                                            <span class="fs-5">{{ $task->end }}</span>
 
-                                        @if ($task->status === 'starting')
-                                            <span class="text-success roboto fs-6 ms-4">
-                                                Irá começar
-                                            </span>
-                                        @elseIf($task->status === 'in_progress')
-                                            <span class="text-warning roboto fs-6 ms-4">
-                                                Sendo realizada
-                                            </span>
-                                        @else
-                                            <span class="text-danger roboto fs-6 ms-4">
-                                                Tempo expirado
-                                            </span>
+                                            @if ($task->status === 'starting')
+                                                <span class="text-success roboto fs-6 ms-4">
+                                                    Irá começar
+                                                </span>
+                                            @elseIf($task->status === 'in_progress')
+                                                <span class="text-warning roboto fs-6 ms-4">
+                                                    Sendo realizada
+                                                </span>
+                                            @else
+                                                <span class="text-danger roboto fs-6 ms-4">
+                                                    Tempo expirado
+                                                </span>
+                                            @endif
                                         @endif
+
+
                                     </div>
 
                                 </div>
@@ -292,8 +311,6 @@
             <div class="h-100 m-5">
 
 
-
-
             </div>
         @endif
 
@@ -320,30 +337,41 @@
                     </div>
 
                     <div class="modal-body">
+                        @if ($possibleParticipants->isNotEmpty())
+                            @foreach ($possibleParticipants as $index => $possibleParticipant)
+                                <div class="list-group">
 
-                        @foreach ($possibleParticipants as $index => $possibleParticipant)
-                            <div class="list-group">
+                                    <div class="form-check">
 
-                                <div class="form-check">
+                                        <input class="form-check-input participant-checkbox" type="checkbox"
+                                            value=" {{ $possibleParticipant->email }}"
+                                            name="participant{{ $index }}"
+                                            id="participant{{ $index }}CheckDefault"
+                                            {{ old('participant' . $index) == $possibleParticipant->email ? 'checked' : '' }}>
 
-                                    <input class="form-check-input participant-checkbox" type="checkbox"
-                                        value=" {{ $possibleParticipant->email }}" name="participant{{ $index }}"
-                                        id="participant{{ $index }}CheckDefault"
-                                        {{ old('participant' . $index) == $possibleParticipant->email ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="participant{{ $index }}CheckDefault">
+                                            {{ $possibleParticipant->email }}
+                                        </label>
+                                    </div>
 
-                                    <label class="form-check-label" for="participant{{ $index }}CheckDefault">
-                                        {{ $possibleParticipant->email }}
-                                    </label>
                                 </div>
-
-                            </div>
-                        @endforeach
+                            @endforeach
+                        @else
+                            <p>Não há participantes disponíveis.</p>
+                        @endif
 
                     </div>
 
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Adicionar</button>
-                    </div>
+                    @if ($possibleParticipants->isNotEmpty())
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Adicionar</button>
+                        </div>
+                    @else
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    @endif
 
                 </div>
 
@@ -353,20 +381,25 @@
     </form>
 
     <div class="fixed-bottom w-100 bg-white p-4 text-end" style="right: 130px;">
+        @if ($task->is_creator && !$task->isConcluded)
+            @if ($task->shoudDisplayButton)
+                <button type="button" class="btn btn-primary me-5" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop">
+                    Criar Feedback
+                </button>
+            @endif
 
-        <button type="button" class="btn btn-primary me-5" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-            Criar Feedback
-        </button>
+            @php
+                $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+                $expiredTask = getDuration($task)->status === 'finished';
+            @endphp
 
-        @if (auth()->id() == $task->created_by)
-            @if ($possibleParticipants->isNotEmpty())
+
+            @if ($task->shoudDisplayButton)
                 <button id="participants-button" type="button" class="btn btn-primary me-4" data-bs-toggle="modal"
                     data-bs-target="#participantsModal">
-
                     Adicionar participantes
-
                     <span id="participantCounterDisplay"></span>
-
                 </button>
             @endif
 
@@ -374,8 +407,6 @@
                 const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
 
                 const participantCounterDisplay = document.getElementById('participantCounterDisplay');
-
-                console.log(participantCounterDisplay);
 
                 function updateParticipantCounter() {
 
@@ -402,12 +433,45 @@
                 updateParticipantCounter();
             </script>
 
-            <form class="d-inline-flex" action="{{ route('tasks.markAsConcluded', $task->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-secondary me-4">Marcar como concluída</button>
-            </form>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-secondary me-4" data-bs-toggle="modal"
+                data-bs-target="#completeTaskModal">
+                Marcar como concluída
+            </button>
         @endif
 
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="completeTaskModal" tabindex="-1" aria-labelledby="completeTaskModalLabel"
+        aria-hidden="true">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h1 class="modal-title fs-4" id="completeTaskModalLabel">Concluir tarefa</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p class="roboto fs-4 m-4">Ao concluir esta tarefa, ela será marcada como finalizada. Tem certeza de
+                        que
+                        deseja
+                        continuar?</p>
+                </div>
+                <div class="modal-footer">
+
+                    <form class="d-inline-flex" action="{{ route('tasks.markAsConcluded', $task->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-secondary me-4">Confirmar</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modal -->

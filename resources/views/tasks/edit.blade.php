@@ -350,7 +350,7 @@
                                                             <label class="form-check-label"
                                                                 for="alert{{ $alertIndex }}CheckDefault">
                                                                 {{ $alertValue }}
-                                                            </label>
+                                                            </label>''
                                                         </div>
                                                     @endforeach
 

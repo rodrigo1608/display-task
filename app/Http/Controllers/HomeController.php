@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\NotificationTime;
-use App\Models\Reminder;
+
 use App\Models\Task;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
-use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -48,7 +44,7 @@ class HomeController extends Controller
 
         $weekdayInPortuguese = getDayOfWeek(getCarbonDate($selectedDate), 'pt-br');
 
-        $currentUserID = Auth::id();
+        $currentUserID = auth()->id();
 
         $daysOfWeek = getDaysOfWeek();
 
@@ -65,7 +61,7 @@ class HomeController extends Controller
             'reminder.recurring',
             'durations'
 
-        ])->where(function ($query) use ($currentUserID) {
+        ])->where('concluded', 'false')->where(function ($query) use ($currentUserID) {
 
             $query->where('created_by', $currentUserID)->orWhereHas('participants', function ($query) use ($currentUserID) {
                 $query->where('user_id', $currentUserID)->where('status', 'accepted');
