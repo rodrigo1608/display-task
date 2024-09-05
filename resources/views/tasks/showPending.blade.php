@@ -228,10 +228,10 @@
 
                     <div class="card-footer ps-5">
 
-                        <div class="row mt-5">
+                        <div class="row d-flex align-items-center py-3">
 
-                            @if ($task->isConcluded)
-                                <div class="col-md-9">
+                            @if (!$task->isConcluded)
+                                <div class="col-md-10">
 
                                     <form class="" action="{{ route('task.acceptPendingTask', $task->id) }}"
                                         method="post">
@@ -243,9 +243,9 @@
 
                                         <div class="row d-flex align-items-center">
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-3 p-0">
 
-                                                <label for="time" class="poppins-regular fs-6 m-0">Horário da
+                                                <label for="time" class="poppins-regular fs-6 m-0 p-0">Horário da
                                                     notificação</label>
 
                                                 <input id="custom-alert-time" type="time" name="time"
@@ -266,7 +266,7 @@
                                                 </span>
                                             </div>
 
-                                            <div class="col-md-4 mt-3">
+                                            <div class="col-md-4 d-flex align-items-end">
 
                                                 <div class="accordion" id="accordionPanelsStayOpenExample">
 
@@ -345,7 +345,7 @@
 
                                             </div>
 
-                                            <div class="col-md-3 offset-1 mt-2 p-0 text-end">
+                                            <div class="col-md-3 offset-1 p-0 text-end">
                                                 <button class="btn btn-secondary fs-5">Aceitar</button>
                                             </div>
 
@@ -355,11 +355,11 @@
                                 </div>
                             @endif
 
-                            <div class="d-flex col-md-3 justify-content-end mt-4 p-0">
-
-                                <form action="{{ route }}">
-
-                                </form>
+                            <div class="col-md-2 h-100">
+                                <button type="button" class="btn btn-outline-danger poppins-regular ms-2 border-2"
+                                    data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
+                                    Descartar
+                                </button>
 
                             </div>
 
