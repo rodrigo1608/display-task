@@ -300,13 +300,12 @@
                                 @endphp
                                 <div class="col-md-5">
 
-
                                     <label for="time" class="poppins-regular fs-6 m-0">Horário da
                                         notificação</label>
 
                                     <input id="custom-alert-time" type="time" name="time"
                                         class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
-                                        value="{{ old('time', $customTime ? $customTime->format('H:i') : '') }}">
+                                        {{-- Caso haja a necessidade do old por algum motivo, o código comentado ao lado é a alternativa --> value="{{ old('time', $customTime ? $customTime->format('H:i') : '') }}"> --}} value="">
 
                                     @error('time')
                                         <div class="invalid-feedback">
@@ -345,7 +344,7 @@
                                                             <input class="form-check-input alertOption" type="checkbox"
                                                                 value="true" name="{{ $alertIndex }}"
                                                                 id="alert{{ $alertIndex }}CheckDefault"
-                                                                {{ old($alertIndex, $notificationTime->$alertIndex) === 'true' ? 'checked' : '' }}>
+                                                                {{-- Caso haja a necessidade do old por algum motivo, o código comentado ao lado é a alternativa -->  {{ old($alertIndex, $notificationTime->$alertIndex) === 'true' ? 'checked' : '' }}> --}}>
 
                                                             <label class="form-check-label"
                                                                 for="alert{{ $alertIndex }}CheckDefault">

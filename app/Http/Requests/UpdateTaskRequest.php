@@ -6,12 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 
 use Illuminate\Validation\Validator;
 
+use App\Models\Task;
+
 use Carbon\Carbon;
 
-class StoreTaskRequest extends FormRequest
+class UpdateTaskRequest extends FormRequest
 {
-
-    private $pastMessage = 'Ops! Esse horário já passou.';
+    private $pastStartMessage = 'Ops! Esse horário já passou.';
+    private $pasEndtMessage = 'Não é possível editar o tempo de expiração de uma tarefa que não será repetida para o passado, pois ela já está expirada.';
 
     /**
      * Determine if the user is authorized to make this request.
@@ -60,22 +62,22 @@ class StoreTaskRequest extends FormRequest
         ];
     }
 
-    public function checkTimeRequired($validator)
-    {
+    // public function checkTimeRequired($validator)
+    // {
 
-        $alertOptions = getAlertOptions();
+    //     $alertOptions = getAlertOptions();
 
-        // Filtra as opções onde as chaves estão marcadas como 'true'
-        $trueOptions = array_filter($alertOptions, function ($label, $key) {
-            // Verifica se o valor da chave na requisição é 'true'
-            return $this->input($key) === 'true';
-        }, ARRAY_FILTER_USE_BOTH);
+    //     // Filtra as opções onde as chaves estão marcadas como 'true'
+    //     $trueOptions = array_filter($alertOptions, function ($label, $key) {
+    //         // Verifica se o valor da chave na requisição é 'true'
+    //         return $this->input($key) === 'true';
+    //     }, ARRAY_FILTER_USE_BOTH);
 
-        if ((!$this->filled('time')) && empty($trueOptions)) {
+    //     if ((!$this->filled('time')) && empty($trueOptions)) {
 
-            $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
-        }
-    }
+    //         $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
+    //     }
+    // }
 
 
     public function checkAlertTimesSufficiency($validator)
@@ -111,7 +113,6 @@ class StoreTaskRequest extends FormRequest
                 $timeText = $hours > 0 ? $hours . ' hora' . ($hours > 1 ? 's' : '') : '';
                 $timeText .= $minutesRemaining > 0 ? ($timeText ? ' e ' : '') . $minutesRemaining . ' minuto' . ($minutesRemaining > 1 ? 's' : '') : '';
 
-
                 if ($timeDifference < $minutes) {
                     $validator->errors()->add($alertIndex, 'O horário de notificação selecionado (' . $timeText . ' antes), pois não há tempo suficiente antes do início da tarefa.');
                 }
@@ -136,6 +137,10 @@ class StoreTaskRequest extends FormRequest
 
     public function checkStartTimeNotInPast($validator)
     {
+
+        $task = Task::with('durations')->findOrFail($this->route('task'));
+        $hasStartTimeChanged = $this->input('start') !==  substr(getDuration($task)->start, 0, 5);
+
         if (!filled($this->input('start'))) {
             return;
         }
@@ -144,12 +149,48 @@ class StoreTaskRequest extends FormRequest
             ? getCarbonDate($this->input('specific_date'))
             : null;
 
-        if (isset($specificDate) && checkIsToday($specificDate)) {
+        $isSpecificDateAndToday = isset($specificDate) && checkIsToday($specificDate);
+
+        if ($isSpecificDateAndToday && $hasStartTimeChanged) {
 
             $start = Carbon::createFromFormat('H:i', $this->input('start'));
 
             if ($start->isPast()) {
-                $validator->errors()->add('start', $this->pastMessage);
+                $validator->errors()->add('start', $this->pastStartMessage);
+            }
+        }
+    }
+
+    public function checkEndTimeInPast($validator)
+    {
+        if (!filled($this->input('start'))) {
+            return;
+        }
+
+        $task = Task::with('durations')->findOrFail($this->route('task'));
+
+        getDuration($task)->status;
+
+        $specificDate = $this->filled('specific_date')
+            ? getCarbonDate($this->input('specific_date'))
+            : null;
+
+        $isSpecificDateAndToday = isset($specificDate) && checkIsToday($specificDate);
+
+        $isTaskTimeExpired = getDuration($task)->status === 'finished';
+
+
+        $hasEndTimeChanged = $this->input('end') !==  substr(getDuration($task)->end, 0, 5);
+
+
+        // $hadAnyChangeInEndValue = $this->input('end')
+
+        if (($isSpecificDateAndToday && $isTaskTimeExpired) && $hasEndTimeChanged) {
+
+            $end = Carbon::createFromFormat('H:i', $this->input('end'));
+
+            if ($end->isPast()) {
+                $validator->errors()->add('end', $this->pasEndtMessage);
             }
         }
     }
@@ -169,10 +210,11 @@ class StoreTaskRequest extends FormRequest
             $time = Carbon::createFromFormat('H:i', $this->input('time'));
 
             if ($time->isPast()) {
-                $validator->errors()->add('time', $this->pastMessage);
+                $validator->errors()->add('time', 'Ops! Esse horário já passou.');
             }
         }
     }
+
 
     public function withValidator(Validator $validator)
     {
@@ -180,11 +222,11 @@ class StoreTaskRequest extends FormRequest
 
             $this->checkAlertTimesSufficiency($validator);
 
-            $this->checkStartTimeNotInPast($validator);
+            $this->checkEndTimeInPast($validator);
 
             $this->checkNotificationTimeNotInPast($validator);
 
-            $this->checkTimeRequired($validator);
+            // $this->checkTimeRequired($validator);
         });
     }
 }

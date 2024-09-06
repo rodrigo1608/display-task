@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Requests\SetPendingTask;
 use App\Jobs\SendInvitationEmail;
 use App\Models\Attachment;
@@ -285,7 +286,7 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreTaskRequest $request, int $id)
+    public function update(UpdateTaskRequest $request, int $id)
     {
         $task =  Task::with(
 

@@ -70,6 +70,10 @@
                                     data-bs-parent="#accordionExample">
 
                                     <div class="accordion-body">
+
+                                        <p class= "roboto">
+
+                                        </p>
                                         <p class= "roboto"><span class="poppins-semibold">Local:</span>
                                             {{ $task->local }}
                                         </p>
@@ -138,25 +142,30 @@
 
                                             </div>
                                         @endif
+
                                         @if (!$task->isConcluded)
-                                            <p class="mt-4">{!! $task->recurringMessage !!}</p>
+                                            <div class="border-top mb-2 mt-5 border-2">
 
-                                            <span class="fs-5">{{ $task->start }}</span> <span class="mx-2">-</span>
-                                            <span class="fs-5">{{ $task->end }}</span>
+                                                <p class="mt-4">{!! $task->recurringMessage !!}</p>
 
-                                            @if ($task->status === 'starting')
-                                                <span class="text-success roboto fs-6 ms-4">
-                                                    Irá começar
+                                                <span class="fs-5">{{ $task->start }}</span> <span class="mx-2"> até
                                                 </span>
-                                            @elseIf($task->status === 'in_progress')
-                                                <span class="text-warning roboto fs-6 ms-4">
-                                                    Sendo realizada
-                                                </span>
-                                            @else
-                                                <span class="text-danger roboto fs-6 ms-4">
-                                                    Tempo expirado
-                                                </span>
-                                            @endif
+                                                <span class="fs-5">{{ $task->end }}</span>
+
+                                                @if ($task->status === 'starting')
+                                                    <span class="text-success roboto fs-5 ms-4">
+                                                        Irá começar
+                                                    </span>
+                                                @elseIf($task->status === 'in_progress')
+                                                    <span class="text-warning roboto fs-5 ms-4">
+                                                        Sendo realizada
+                                                    </span>
+                                                @else
+                                                    <span class="text-danger roboto fs-5 ms-4">
+                                                        Tempo expirado
+                                                    </span>
+                                                @endif
+                                            </div>
                                         @endif
 
 
