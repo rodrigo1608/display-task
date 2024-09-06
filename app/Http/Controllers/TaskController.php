@@ -208,7 +208,7 @@ class TaskController extends Controller
             $query->where('task_id', $taskID);
         })->where('id', '!=', $userID)->get();
 
-        if (isset($task)) {
+        if (isset($task) && !$task->concluded) {
 
             $view = request()->query('view', 'default');
 

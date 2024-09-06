@@ -8,9 +8,6 @@ use App\Models\NotificationTime;
 use App\Models\Reminder;
 use App\Models\Recurring;
 use App\Http\Requests\StoreReminderRequest;
-use App\Models\Task;
-
-use Carbon\Carbon;
 
 class ReminderController extends Controller
 {

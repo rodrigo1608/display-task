@@ -38,7 +38,7 @@ class HandleDurationsStatus implements ShouldQueue
 
         $now = Carbon::now('America/Sao_Paulo');
 
-        $tasks = Task::all();
+        $tasks = Task::where('concluded', 'false');
 
         $currentDayOfWeek = getDayOfWeek($now);
 

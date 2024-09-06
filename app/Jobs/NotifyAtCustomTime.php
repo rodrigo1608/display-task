@@ -64,7 +64,7 @@ class NotifyAtCustomTime implements ShouldQueue
 
                     $hasSpecificDate = !is_null($recurring->specific_date);
 
-                    $task = $notificationTime->reminder->task;
+                    $task = $notificationTime->reminder->task()->where('concluded', 'false')->first();
 
                     $userToNotify = $notificationTime->user;
 

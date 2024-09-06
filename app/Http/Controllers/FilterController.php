@@ -26,7 +26,7 @@ class FilterController extends Controller
     public function searchByTitle(Request $request)
     {
 
-        $tasksFilteredByTitle = Task::where('title', 'LIKE', "%$request->title_filter%")->get();
+        $tasksFilteredByTitle = Task::where('concluded', 'false')->where('title', 'LIKE', "%$request->title_filter%")->get();
 
         return view('tasks/filtered', compact('tasksFilteredByTitle'));
     }

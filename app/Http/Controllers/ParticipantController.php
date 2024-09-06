@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Participant;
-use App\Models\Task;
 use App\Models\User;
 
 class ParticipantController extends Controller
