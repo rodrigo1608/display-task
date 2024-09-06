@@ -350,6 +350,8 @@ class TaskController extends Controller
 
         ];
 
+        $task->feedbacks()->first()->update(['feedback' => $request->description]);
+
         $task->update($taskAttributes);
 
         $recurring->update($recurringAttributes);

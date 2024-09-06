@@ -17,16 +17,18 @@
 
                         <div class="d-flex justify-content-between align-items-end flex-row">
 
-                            <div>
+                            <div class = "">
                                 <h1 class="poppins-semibold fs-4">{{ $task->title }}</h1>
 
                                 <p class="roboto fs-5"> {{ $task->description }}</p>
                             </div>
 
-
                             @if ($task->is_creator && !$task->isConcluded)
-                                <a class="h-50 btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
+                                <div class="ms-1">
+                                    <a class="h-50 btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
+                                </div>
                             @endif
+
 
                         </div>
 
@@ -70,7 +72,7 @@
                                     data-bs-parent="#accordionExample">
 
                                     <div class="accordion-body">
-                                        
+
                                         <p class= "roboto"><span class="poppins-semibold">Local:</span>
                                             {{ $task->local }}
                                         </p>
@@ -544,7 +546,7 @@
                         });
                     </script>
 
-                    <button type="submit" form="feedbackForm" class="btn btn-secondary">Salvar lembrete</button>
+                    <button type="submit" form="feedbackForm" class="btn btn-secondary">Salvar</button>
 
                 </div>
 

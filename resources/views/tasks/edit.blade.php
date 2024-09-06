@@ -410,30 +410,10 @@
 
                                 <div>
 
-                                    <a class="btn btn-primary me-3" href="{{ route('home') }}">voltar</a>
+                                    <a class="btn btn-primary me-3"
+                                        href="{{ route('task.show', ['task' => $task->id]) }}">voltar</a>
 
-                                    <label for="task_attachments" class="btn-custom btn btn-primary">
-                                        Anexar imagens
-                                        <span id="imageCountDisplay"></span>
-                                    </label>
 
-                                    <input id="task_attachments" name="task_attachments[]" type="file"
-                                        accept="image/*" multiple class="d-none" />
-
-                                    <script>
-                                        const fileInput = document.querySelector('#task_attachments');
-                                        const fileLabel = document.querySelector('#imageCountDisplay');
-
-                                        task_attachments.addEventListener('change', () => {
-
-                                            const selectedFiles = fileInput.files;
-
-                                            const pluralOrSingularString = selectedFiles.length > 1 ? `(${selectedFiles.length}) arquivos` :
-                                                `(${selectedFiles.length}) arquivo`;
-
-                                            fileLabel.innerText = pluralOrSingularString;
-                                        });
-                                    </script>
 
                                 </div>
 
