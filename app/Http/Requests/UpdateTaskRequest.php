@@ -13,17 +13,8 @@ use Carbon\Carbon;
 class UpdateTaskRequest extends FormRequest
 {
 
-    private $task;
-    private $pastStartMessage;
-    private $pasEndtMessage;
-
-    public function __construct()
-    {
-        $this->task = Task::with('durations')->findOrFail($this->route('task'));
-        $this->pastStartMessage = 'Ops! Esse horário já passou';
-
-        $this->pasEndtMessage = 'Não é possível editar o tempo de expiração de uma tarefa que não será repetida para o passado, pois ela já está expirada.';
-    }
+    private $pastStartMessage = 'Ops! Esse horário já passou.';
+    private $pasEndtMessage = 'Não é possível editar o tempo de expiração de uma tarefa que não será repetida para o passado, pois ela já está expirada.';
 
     /**
      * Determine if the user is authorized to make this request.
@@ -147,7 +138,8 @@ class UpdateTaskRequest extends FormRequest
     public function checkStartTimeNotInPast($validator)
     {
 
-        $hasStartTimeChanged = $this->input('start') !==  substr(getDuration($this->task)->start, 0, 5);
+        $task = Task::with('durations')->findOrFail($this->route('task'));
+        $hasStartTimeChanged = $this->input('start') !==  substr(getDuration($task)->start, 0, 5);
 
         if (!filled($this->input('start'))) {
             return;
@@ -175,8 +167,9 @@ class UpdateTaskRequest extends FormRequest
             return;
         }
 
+        $task = Task::with('durations')->findOrFail($this->route('task'));
 
-        getDuration($this->task)->status;
+        getDuration($task)->status;
 
         $specificDate = $this->filled('specific_date')
             ? getCarbonDate($this->input('specific_date'))
@@ -184,10 +177,10 @@ class UpdateTaskRequest extends FormRequest
 
         $isSpecificDateAndToday = isset($specificDate) && checkIsToday($specificDate);
 
-        $isTaskTimeExpired = getDuration($this->task)->status === 'finished';
+        $isTaskTimeExpired = getDuration($task)->status === 'finished';
 
 
-        $hasEndTimeChanged = $this->input('end') !==  substr(getDuration($this->task)->end, 0, 5);
+        $hasEndTimeChanged = $this->input('end') !==  substr(getDuration($task)->end, 0, 5);
 
         if (($isSpecificDateAndToday && $isTaskTimeExpired) && $hasEndTimeChanged) {
 
