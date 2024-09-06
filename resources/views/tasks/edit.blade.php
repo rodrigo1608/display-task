@@ -411,13 +411,18 @@
                                 <div>
 
                                     <a class="btn btn-primary me-3"
-                                        href="{{ route('task.show', ['task' => $task->id]) }}">voltar</a>
+                                        href="{{ route('task.show', ['task' => $task->id]) }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+                                            class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                                        </svg>
 
-
-
-                                </div>
-
-                                <div class="d-flex justify-content-between">
+                                        <span class="ms-2">
+                                            voltar
+                                        </span>
+                                    </a>
 
                                     <a href="{{ route('task.edit', $task->id) }}" class="btn btn-primary me-2">
 
@@ -431,6 +436,11 @@
                                         <span class="ms-2">Redefinir valores</span>
 
                                     </a>
+
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+
 
                                     <button type="submit" class="btn btn-secondary">Salvar</button>
 

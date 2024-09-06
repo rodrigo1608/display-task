@@ -127,7 +127,6 @@
                                                         Tempo expirado
                                                     </p>
                                                 @endif
-
                                                 <div class="text-end">
                                                     <a href="{{ route('task.show', ['task' => $task->id]) }}"
                                                         class="btn btn-secondary">Ver tarefa</a>

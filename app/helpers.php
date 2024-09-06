@@ -2,7 +2,6 @@
 
 use App\Mail\TaskNotify;
 use App\Mail\ReminderNotify;
-use App\Models\NotificationTime;
 use App\Models\Task;
 use App\Models\Reminder;
 use Carbon\Carbon;
@@ -550,7 +549,7 @@ if (!function_exists('getConflictingTask')) {
         $userID = auth()->id();
 
         // Primeiramente, a consulta deve ignorar a tarefa que já foi criada para, no caso de algum usuário aceitá-la, não gerar conflito de sobreposição
-        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('id', '!=', $currentTaskID)
+        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('concluded', 'false')->where('id', '!=', $currentTaskID)
 
             // Consulta que verifica se a tarefa pertence ao usuário logado ou se o usuário está participando de alguma tarefa
             ->where(function ($query) use ($userID) {

@@ -15,20 +15,23 @@
 
                     <div class="card-body p-5">
 
-                        <div class="d-flex justify-content-between align-items-end flex-row">
+                        <div class="">
 
-                            <div class = "">
-                                <h1 class="poppins-semibold fs-4">{{ $task->title }}</h1>
+                            <div class="row">
 
-                                <p class="roboto fs-5"> {{ $task->description }}</p>
-                            </div>
+                                <div class="col-md-10">
+                                    <h1 class="poppins-semibold fs-4">{{ $task->title }}</h1>
 
-                            @if ($task->is_creator && !$task->isConcluded)
-                                <div class="ms-1">
-                                    <a class="h-50 btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
+                                    <p class="roboto fs-5"> {{ $task->description }}</p>
                                 </div>
-                            @endif
 
+                                @if ($task->is_creator && !$task->isConcluded)
+                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
+
+                                        <a class="btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
+                                    </div>
+                                @endif
+                            </div>
 
                         </div>
 
