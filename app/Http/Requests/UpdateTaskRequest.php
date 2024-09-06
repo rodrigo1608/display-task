@@ -12,8 +12,18 @@ use Carbon\Carbon;
 
 class UpdateTaskRequest extends FormRequest
 {
-    private $pastStartMessage = 'Ops! Esse horário já passou.';
-    private $pasEndtMessage = 'Não é possível editar o tempo de expiração de uma tarefa que não será repetida para o passado, pois ela já está expirada.';
+
+    private $task;
+    private $pastStartMessage;
+    private $pasEndtMessage;
+
+    public function __construct()
+    {
+        $this->task = Task::with('durations')->findOrFail($this->route('task'));
+        $this->pastStartMessage = 'Ops! Esse horário já passou';
+
+        $this->pasEndtMessage = 'Não é possível editar o tempo de expiração de uma tarefa que não será repetida para o passado, pois ela já está expirada.';
+    }
 
     /**
      * Determine if the user is authorized to make this request.
@@ -79,7 +89,6 @@ class UpdateTaskRequest extends FormRequest
     //     }
     // }
 
-
     public function checkAlertTimesSufficiency($validator)
     {
         if (!filled($this->input('start'))) {
@@ -138,8 +147,7 @@ class UpdateTaskRequest extends FormRequest
     public function checkStartTimeNotInPast($validator)
     {
 
-        $task = Task::with('durations')->findOrFail($this->route('task'));
-        $hasStartTimeChanged = $this->input('start') !==  substr(getDuration($task)->start, 0, 5);
+        $hasStartTimeChanged = $this->input('start') !==  substr(getDuration($this->task)->start, 0, 5);
 
         if (!filled($this->input('start'))) {
             return;
@@ -167,9 +175,8 @@ class UpdateTaskRequest extends FormRequest
             return;
         }
 
-        $task = Task::with('durations')->findOrFail($this->route('task'));
 
-        getDuration($task)->status;
+        getDuration($this->task)->status;
 
         $specificDate = $this->filled('specific_date')
             ? getCarbonDate($this->input('specific_date'))
@@ -177,13 +184,10 @@ class UpdateTaskRequest extends FormRequest
 
         $isSpecificDateAndToday = isset($specificDate) && checkIsToday($specificDate);
 
-        $isTaskTimeExpired = getDuration($task)->status === 'finished';
+        $isTaskTimeExpired = getDuration($this->task)->status === 'finished';
 
 
-        $hasEndTimeChanged = $this->input('end') !==  substr(getDuration($task)->end, 0, 5);
-
-
-        // $hadAnyChangeInEndValue = $this->input('end')
+        $hasEndTimeChanged = $this->input('end') !==  substr(getDuration($this->task)->end, 0, 5);
 
         if (($isSpecificDateAndToday && $isTaskTimeExpired) && $hasEndTimeChanged) {
 
@@ -215,12 +219,13 @@ class UpdateTaskRequest extends FormRequest
         }
     }
 
-
     public function withValidator(Validator $validator)
     {
         $validator->after(function ($validator) {
 
             $this->checkAlertTimesSufficiency($validator);
+
+            $this->checkStartTimeNotInPast($validator);
 
             $this->checkEndTimeInPast($validator);
 

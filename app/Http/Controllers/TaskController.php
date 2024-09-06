@@ -302,6 +302,8 @@ class TaskController extends Controller
 
         )->findOrFail($id);
 
+        dd($request->all());
+
         $recurrencePatterns = getRecurrencePatterns($request->all());
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
 

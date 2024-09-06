@@ -70,10 +70,7 @@
                                     data-bs-parent="#accordionExample">
 
                                     <div class="accordion-body">
-
-                                        <p class= "roboto">
-
-                                        </p>
+                                        
                                         <p class= "roboto"><span class="poppins-semibold">Local:</span>
                                             {{ $task->local }}
                                         </p>
