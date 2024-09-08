@@ -385,17 +385,13 @@ class TaskController extends Controller
 
         $currentTaskRecurring = $currentTask->reminder->recurring->getAttributes();
 
-
         $recurrencePatterns = getRecurrencePatterns($currentTaskRecurring);
 
-
         $isSpecificDayPattern = isset($recurrencePatterns['specific_date']);
-
 
         if ($isSpecificDayPattern) {
 
             $inputData = $request->all() + $recurrencePatterns;
-
 
             $conflict = getConflictingTask($inputData, 'specific_date', $id);
 
@@ -465,6 +461,11 @@ class TaskController extends Controller
     public function markAsConcluded(int $id)
     {
         $task =  Task::find($id);
+
+        $task =  Task::find($id);
+
+        $task->participants()->wherePivot('status', 'pending')->detach();
+
 
         $task->update(['concluded' => true]);
 

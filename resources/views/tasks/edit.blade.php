@@ -409,8 +409,8 @@
                             <div class="d-flex justify-content-between mt-4">
 
                                 <div>
-
-                                    <a class="btn btn-primary me-3"
+                                    {{-- Botão de voltar --}}
+                                    <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial"
                                         href="{{ route('task.show', ['task' => $task->id]) }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
@@ -419,9 +419,6 @@
                                                 d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
                                         </svg>
 
-                                        <span class="ms-2">
-                                            voltar
-                                        </span>
                                     </a>
 
                                     <a href="{{ route('task.edit', $task->id) }}" class="btn btn-primary me-2">

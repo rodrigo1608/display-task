@@ -378,9 +378,11 @@
                             <div class="row mt-3">
 
                                 <div class="">
+
                                     <label for="description" class="fs-6">Descrição</label>
                                     <textarea name="description" id="description" cols="30" rows="5"
                                         class="form-control roboto @error('description') is-invalid @enderror">{{ old('description') }}</textarea>
+
                                     @error('description')
                                         <div class="invalid-feedback">
                                             <strong>{{ $message }}</strong>
@@ -390,14 +392,30 @@
 
                             </div>
 
-                            <div class="d-flex justify-content-between mt-4">
+                            <div class="d-flex justify-content-between align-items-center mt-4">
 
                                 <div class>
 
-                                    <a class="btn btn-primary me-3" href="{{ route('home') }}">voltar</a>
+                                    {{-- botão de voltar --}}
+                                    <a class="btn btn-primary me-3 py-2" href="{{ route('home') }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" viewBox="0 0 24 24" stroke-width="1.8"
+                                            stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                                        </svg>
 
+                                    </a>
+
+                                    {{-- botão de anexar imagens --}}
                                     <label for="task_attachments" class="btn-custom btn btn-primary">
-                                        Anexar imagens
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                            fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                            stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
+                                        </svg>
                                         <span id="imageCountDisplay"></span>
                                     </label>
 

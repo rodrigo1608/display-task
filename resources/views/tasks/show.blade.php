@@ -5,11 +5,7 @@
 
         <div class="row">
 
-            <div class="w-100">
-
-            </div>
             <div class="col-md-9 container p-0">
-
 
                 <div class="card mt-5">
 
@@ -185,6 +181,105 @@
 
             </div>
 
+            @if (!$task->isConcluded)
+
+                <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
+
+                    {{-- botão de voltar --}}
+                    <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                        </svg>
+
+                    </a>
+
+
+                    <div class="btn-group dropup">
+
+                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="32" height="32"
+                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+                        </button>
+
+                        <ul class="dropdown-menu">
+
+                            @if ($task->shoudDisplayButton)
+                                <li>
+                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#staticBackdrop">
+                                        Criar Feedback
+                                    </button>
+                                </li>
+                            @endif
+
+                            @if ($task->is_creator)
+                                @php
+                                    $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+                                    $expiredTask = getDuration($task)->status === 'finished';
+                                @endphp
+
+                                @if ($task->shoudDisplayButton)
+                                    <li>
+                                        <button id="participants-button" type="button" class="dropdown-item"
+                                            data-bs-toggle="modal" data-bs-target="#participantsModal">
+                                            Adicionar participantes
+                                            <span id="participantCounterDisplay"></span>
+                                        </button>
+                                    </li>
+                                @endif
+
+                                <script>
+                                    const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+
+                                    const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+
+                                    function updateParticipantCounter() {
+
+                                        const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
+                                        const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+
+                                        const checkedCounter = checkedParticipants.length;
+
+                                        const hasAnyParticipant = checkedCounter > 0;
+
+                                        if (hasAnyParticipant) {
+                                            participantCounterDisplay.innerText = '(' + checkedCounter + ')';
+                                        } else {
+                                            participantCounterDisplay.innerText = '';
+                                        }
+                                    }
+
+                                    // updateParticipantCounter();
+
+                                    participantCheckboxes.forEach(
+                                        participantCheckbox => participantCheckbox.addEventListener('change', () =>
+                                            updateParticipantCounter()));
+
+                                    updateParticipantCounter();
+                                </script>
+
+                                <!-- Button trigger modal -->
+
+                                <li>
+                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                        data-bs-target="#completeTaskModal">
+                                        Marcar como concluída
+                                    </button>
+                                </li>
+                            @endif
+                        </ul>
+
+                    </div>
+                </div>
+            @endif
         </div>
 
         @php
@@ -391,8 +486,10 @@
         </div>
     </form>
 
-    <div class="fixed-bottom w-100 bg-white p-4 text-end" style="right: 130px;">
+    {{-- <div class="fixed-bottom w-100 bg-white p-4 text-end" style="right: 130px;">
+
         @if ($task->is_creator && !$task->isConcluded)
+
             @if ($task->shoudDisplayButton)
                 <button type="button" class="btn btn-primary me-5" data-bs-toggle="modal"
                     data-bs-target="#staticBackdrop">
@@ -451,7 +548,7 @@
             </button>
         @endif
 
-    </div>
+    </div> --}}
 
     <!-- Modal -->
     <div class="modal fade" id="completeTaskModal" tabindex="-1" aria-labelledby="completeTaskModalLabel"

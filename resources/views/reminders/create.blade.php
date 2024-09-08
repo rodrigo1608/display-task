@@ -178,8 +178,15 @@
                             </div>
 
                             <div class="d-flex justify-content-between mt-3">
+                                {{-- botão de voltar --}}
+                                <a class="btn btn-primary r me-3 py-2" href="{{ route('home') }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                        viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                                    </svg>
 
-                                <a class="btn btn-primary" href="{{ route('home') }}">voltar</a>
+                                </a>
 
                                 <button type="submit" class="btn btn-secondary">Salvar lembrete</button>
                             </div>

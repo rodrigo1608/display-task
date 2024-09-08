@@ -32,7 +32,8 @@ class AppServiceProvider extends ServiceProvider
                 $userID = $user->id;
 
                 $pendingTasks = Task::whereHas('participants', function ($query) use ($userID) {
-                    $query->where('user_id', $userID)
+                    $query->where('concluded', 'false')
+                        ->where('user_id', $userID)
                         ->where('status', 'pending');
                 })->get();
             } else {

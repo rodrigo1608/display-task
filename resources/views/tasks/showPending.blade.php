@@ -111,7 +111,7 @@
 
                                     </div>
 
-                                    <div class="col-md-2 offset-1 position-relative">
+                                    <div class="col-md-2 position-relative">
 
                                         <label class="poppins fs-6">Terminar em: </label>
 
@@ -228,7 +228,7 @@
 
                     <div class="card-footer ps-5">
 
-                        <div class="row d-flex align-items-center py-3">
+                        <div class="row d-flex align-items-end py-3">
 
                             @if (!$task->isConcluded)
                                 <div class="col-md-10">
@@ -241,7 +241,7 @@
                                         <input type="hidden" id="formStart" name="start">
                                         <input type="hidden" id="formEnd" name="end">
 
-                                        <div class="row d-flex align-items-center">
+                                        <div class="row d-flex align-items-end">
 
                                             <div class="col-md-3 p-0">
 
@@ -280,7 +280,7 @@
                                                                 aria-expanded="false"
                                                                 aria-controls="panelsStayOpen-collapseOne">
                                                                 Horário pré-definido <span
-                                                                    class="alertOptionsCounter fs-6 ms-2"></span>
+                                                                    class="alertOptionsCounter fs-6 m-2"></span>
                                                             </button>
 
                                                         </h2>
@@ -356,7 +356,8 @@
                             @endif
 
                             <div class="col-md-2 h-100">
-                                <button type="button" class="btn btn-outline-danger poppins-regular ms-2 border-2"
+                                <button type="button"
+                                    class="btn rounded-pill btn-outline-danger poppins-regular fs-5 ms-2 border-2"
                                     data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
                                     Descartar
                                 </button>
@@ -374,8 +375,6 @@
         </div>
 
     </div>
-
-
 
     <div class="modal fade" id="deleteParticipantModal" tabindex="-1" aria-labelledby="deleteParticipantModalLabel"
         aria-hidden="true">

@@ -117,6 +117,7 @@
                             </form>
 
                             @php
+
                                 $hasAnyPendingTask = count($pendingTasks) > 0;
 
                                 $pluralOrSingularInvitation =
