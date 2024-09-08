@@ -1452,3 +1452,51 @@ if (!function_exists('getDuration')) {
         return $task->durations()->where('user_id', $task->created_by)->where('task_id', $task->id)->first();
     }
 }
+
+if (!function_exists('getAlertAboutNotificationTime')) {
+
+    function getAlertAboutNotificationTime($task)
+    {
+
+        $now = getCarbonNow();
+
+        $duration = getDuration($task);
+
+        $start =  getCarbonTime($duration->start);
+
+        $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+
+        if ($hasSpecificDate) {
+
+            switch ($duration->status) {
+                case 'starting':
+                    if ($now->diffInMinutes($start) < 30) {
+                        return 'A tarefa irá começar em breve';
+                    }
+                case 'in_progress':
+                    return 'A tarefa já está em andamento';
+
+                case 'finished':
+                    return 'A tarefa está expirada';
+            }
+        } else {
+
+            switch ($duration->status) {
+
+                case 'starting':
+                    if ($now->diffInMinutes($start) < 30) {
+
+                        return 'A tarefa está prestes a começar. Se o alerta exceder 30 minutos, você será notificado novamente apenas na próxima recorrência';
+                    }
+
+                case 'in_progress':
+
+                    return 'A tarefa está atualmente em andamento. Você receberá uma nova notificação apenas na próxima recorrênciaa';
+
+                case 'finished':
+
+                    return 'A tarefa expirou hoje. A notificação será enviada apenas na próxima recorrência';
+            }
+        }
+    }
+}

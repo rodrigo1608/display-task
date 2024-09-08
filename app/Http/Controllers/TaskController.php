@@ -228,9 +228,9 @@ class TaskController extends Controller
 
             $duration = getDuration($task);
 
-            $task->start = $duration->start ? date('H:i', strtotime($duration->start)) : null;
+            $task->start = date('H:i', strtotime($duration->start));
 
-            $task->end = $duration->end ? date('H:i', strtotime($duration->end)) : null;
+            $task->end = date('H:i', strtotime($duration->end));
 
             $recurring = $task->reminder->recurring;
 
@@ -239,11 +239,12 @@ class TaskController extends Controller
             $alertOptions = getAlertOptions();
 
             $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+
             $expiredTask = getDuration($task)->status === 'finished';
 
             $task->shoudDisplayButton = !($hasSpecificDate && $expiredTask);
 
-            $task->isConcluded = $task->concluded === 'true';
+            // $task->isConcluded = $task->concluded === 'true';
 
             $task->emailsParticipants = $task->participants->isEmpty()
                 ? "Nenhum participante"
@@ -251,7 +252,9 @@ class TaskController extends Controller
 
             $today = getToday();
 
-            $task['status'] = $duration->status;
+            $task->status = $duration->status;
+
+            $task->notificationAlert = getAlertAboutNotificationTime($task);
 
             return $view === 'pending'
                 ?  view('tasks/showPending', compact('task', 'alertOptions'))
