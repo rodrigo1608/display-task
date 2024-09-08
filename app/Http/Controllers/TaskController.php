@@ -195,7 +195,7 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
 
         $task = Task::find($id);
@@ -462,10 +462,7 @@ class TaskController extends Controller
     {
         $task =  Task::find($id);
 
-        $task =  Task::find($id);
-
         $task->participants()->wherePivot('status', 'pending')->detach();
-
 
         $task->update(['concluded' => true]);
 
