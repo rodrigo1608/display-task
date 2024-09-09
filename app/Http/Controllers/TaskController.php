@@ -256,6 +256,8 @@ class TaskController extends Controller
 
             $task->notificationAlert = getAlertAboutNotificationTime($task);
 
+            $task->shouldHiddenTimeAlertsOptions = in_array($task->notificationAlert, getSpecificAlerts(), true);
+
             return $view === 'pending'
                 ?  view('tasks/showPending', compact('task', 'alertOptions'))
                 :  view('tasks/show', compact('possibleParticipants', 'task'));

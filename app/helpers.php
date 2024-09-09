@@ -1453,6 +1453,22 @@ if (!function_exists('getDuration')) {
     }
 }
 
+if (!function_exists('getSpecificAlerts')) {
+
+    function getSpecificAlerts()
+    {
+
+        return [
+
+            'starting' => 'A tarefa começará em breve (em menos de 30 minutos)',
+
+            'in_progress' => 'A tarefa já está em andamento',
+
+            'finished' => 'A tarefa está expirada',
+        ];
+    }
+}
+
 if (!function_exists('getAlertAboutNotificationTime')) {
 
     function getAlertAboutNotificationTime($task)
@@ -1466,18 +1482,28 @@ if (!function_exists('getAlertAboutNotificationTime')) {
 
         $hasSpecificDate = filled($task->reminder->recurring->specific_date);
 
+        $specificDateAlertMessages = getSpecificAlerts();
+
         if ($hasSpecificDate) {
 
+
             switch ($duration->status) {
+
                 case 'starting':
+
                     if ($now->diffInMinutes($start) < 30) {
-                        return 'A tarefa irá começar em breve';
+                        return $specificDateAlertMessages['starting'];
                     }
+
+                    break;
+
                 case 'in_progress':
-                    return 'A tarefa já está em andamento';
+
+                    return $specificDateAlertMessages['in_progress'];
 
                 case 'finished':
-                    return 'A tarefa está expirada';
+
+                    return $specificDateAlertMessages['finished'];
             }
         } else {
 

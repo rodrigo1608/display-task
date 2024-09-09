@@ -226,11 +226,12 @@
 
                     </div>
 
-                    <div class="card-footer ps-5">
+                    <div class="card-footer py-5">
 
-                        <div class="row d-flex align-items-end py-3">
+                        <div class="row d-flex align-items-end ms-4 py-3">
 
                             @if (!$task->isConcluded)
+
                                 <div class="col-md-10">
 
                                     <form class="" action="{{ route('task.acceptPendingTask', $task->id) }}"
@@ -243,68 +244,84 @@
 
                                         <div class="row d-flex align-items-end">
 
-                                            <div class="col-md-3 p-0">
+                                            @if ($task->shouldHiddenTimeAlertsOptions)
+                                                <div class="col-md-7 p-0">
+                                                    <p
+                                                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
+                                                        text-success
+                                                        @elseif (getDuration($task)->status === 'in_progress')
+                                                         border-warning-subtle text-warning
+                                                        @elseif (getDuration($task)->status === 'finished')
+                                                          border-danger-subtle  text-danger @endif m-0 rounded border border-2 py-2 text-center">
+                                                        {{ $task->notificationAlert }}
+                                                    </p>
 
-                                                <label for="time" class="poppins-regular fs-6 m-0 p-0">Horário da
-                                                    notificação</label>
+                                                </div>
+                                            @else
+                                                <div class="col-md-3 p-0">
 
-                                                <input id="custom-alert-time" type="time" name="time"
-                                                    class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
-                                                    value="{{ old('time') }}">
+                                                    <label for="time" class="poppins-regular fs-6 m-0 p-0">Horário da
+                                                        notificação</label>
 
-                                                @error('time')
-                                                    <div class="invalid-feedback">
-                                                        <strong>{{ $message }}</strong>
-                                                    </div>
-                                                @enderror
+                                                    <input id="custom-alert-time" type="time" name="time"
+                                                        class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
+                                                        value="{{ old('time') }}">
 
-                                            </div>
+                                                    @error('time')
+                                                        <div class="invalid-feedback">
+                                                            <strong>{{ $message }}</strong>
+                                                        </div>
+                                                    @enderror
 
-                                            <div class="col-md-1 mt-4 text-center">
-                                                <span>
-                                                    ou
-                                                </span>
-                                            </div>
+                                                </div>
 
-                                            <div class="col-md-4 d-flex align-items-end">
+                                                <div class="col-md-1 mt-4 text-center">
+                                                    <span>
+                                                        ou
+                                                    </span>
+                                                </div>
 
-                                                <div class="accordion" id="accordionPanelsStayOpenExample">
+                                                <div class="col-md-4 d-flex align-items-end">
 
-                                                    <div class="accordion-item">
+                                                    <div class="accordion" id="accordionPanelsStayOpenExample">
 
-                                                        <h2 class="accordion-header">
+                                                        <div class="accordion-item">
 
-                                                            <button class="accordion-button poppins-regular"
-                                                                type="button" data-bs-toggle="collapse"
-                                                                data-bs-target="#panelsStayOpen-collapseOne"
-                                                                aria-expanded="false"
-                                                                aria-controls="panelsStayOpen-collapseOne">
-                                                                Horário pré-definido <span
-                                                                    class="alertOptionsCounter fs-6 m-2"></span>
-                                                            </button>
+                                                            <h2 class="accordion-header">
 
-                                                        </h2>
+                                                                <button class="accordion-button poppins-regular"
+                                                                    type="button" data-bs-toggle="collapse"
+                                                                    data-bs-target="#panelsStayOpen-collapseOne"
+                                                                    aria-expanded="false"
+                                                                    aria-controls="panelsStayOpen-collapseOne">
+                                                                    Horário pré-definido <span
+                                                                        class="alertOptionsCounter fs-6 m-2"></span>
+                                                                </button>
 
-                                                        <div id="panelsStayOpen-collapseOne"
-                                                            class="accordion-collapse collapse">
+                                                            </h2>
 
-                                                            <div class="accordion-body">
+                                                            <div id="panelsStayOpen-collapseOne"
+                                                                class="accordion-collapse collapse">
 
-                                                                @foreach ($alertOptions as $alertIndex => $alertValue)
-                                                                    <div class="form-check">
+                                                                <div class="accordion-body">
 
-                                                                        <input class="form-check-input alertOption"
-                                                                            type="checkbox" value="true"
-                                                                            name="{{ $alertIndex }}"
-                                                                            id="alert{{ $alertIndex }}CheckDefault"
-                                                                            {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
+                                                                    @foreach ($alertOptions as $alertIndex => $alertValue)
+                                                                        <div class="form-check">
 
-                                                                        <label class="form-check-label"
-                                                                            for="alert{{ $alertIndex }}CheckDefault">
-                                                                            {{ $alertValue }}
-                                                                        </label>
-                                                                    </div>
-                                                                @endforeach
+                                                                            <input class="form-check-input alertOption"
+                                                                                type="checkbox" value="true"
+                                                                                name="{{ $alertIndex }}"
+                                                                                id="alert{{ $alertIndex }}CheckDefault"
+                                                                                {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
+
+                                                                            <label class="form-check-label"
+                                                                                for="alert{{ $alertIndex }}CheckDefault">
+                                                                                {{ $alertValue }}
+                                                                            </label>
+                                                                        </div>
+                                                                    @endforeach
+
+                                                                </div>
 
                                                             </div>
 
@@ -312,58 +329,84 @@
 
                                                     </div>
 
-                                                </div>
+                                                    <div class="mt-2">
 
-                                                <div class="mt-2">
+                                                        @php
+                                                            $firstError = null;
 
-                                                    @php
-                                                        $firstError = null;
+                                                            $alertOptions = [
+                                                                'half_an_hour_before',
+                                                                'one_hour_before',
+                                                                'two_hours_before',
+                                                                'one_day_earlier',
+                                                            ];
 
-                                                        $alertOptions = [
-                                                            'half_an_hour_before',
-                                                            'one_hour_before',
-                                                            'two_hours_before',
-                                                            'one_day_earlier',
-                                                        ];
-
-                                                        foreach ($alertOptions as $alertIndex) {
-                                                            if ($errors->has($alertIndex)) {
-                                                                $firstError = $errors->first($alertIndex);
-                                                                break;
+                                                            foreach ($alertOptions as $alertIndex) {
+                                                                if ($errors->has($alertIndex)) {
+                                                                    $firstError = $errors->first($alertIndex);
+                                                                    break;
+                                                                }
                                                             }
-                                                        }
 
-                                                    @endphp
+                                                        @endphp
 
-                                                    @if ($firstError)
-                                                        <div class="invalid-feedback d-block">
-                                                            <strong>{{ $firstError }}</strong>
-                                                        </div>
-                                                    @endif
+                                                        @if ($firstError)
+                                                            <div class="invalid-feedback d-block">
+                                                                <strong>{{ $firstError }}</strong>
+                                                            </div>
+                                                        @endif
+
+                                                    </div>
 
                                                 </div>
-
-                                            </div>
+                                            @endif
 
                                             <div class="col-md-3 offset-1 p-0 text-end">
-                                                <button class="btn btn-secondary fs-5">Aceitar</button>
+
+                                                @if ($task->shoudDisplayButton)
+                                                    <button class="btn btn-secondary fs-5">Aceitar</button>
+                                                @endif
+
                                             </div>
 
                                         </div>
 
                                     </form>
+
                                 </div>
+
                             @endif
 
                             <div class="col-md-2 h-100">
                                 <button type="button"
                                     class="btn rounded-pill btn-outline-danger poppins-regular fs-5 ms-2 border-2"
                                     data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
-                                    Descartar
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        width="24" height="24" stroke-width="1.5" stroke="currentColor"
+                                        class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                    </svg>
+
                                 </button>
 
                             </div>
 
+                        </div>
+
+                        <div class="row container mt-5">
+
+                            <div class="col-md-12 p-0">
+                                <p
+                                    class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
+                                    text-success
+                                    @elseif (getDuration($task)->status === 'in_progress')
+                                     border-warning-subtle text-warning
+                                    @elseif (getDuration($task)->status === 'finished')
+                                      border-danger-subtle  text-danger @endif m-0 rounded border border-2 py-2 text-center">
+                                    {{ $task->notificationAlert }}
+                                </p>
+                            </div>
                         </div>
 
                     </div>
@@ -374,109 +417,107 @@
 
         </div>
 
-    </div>
+        <div class="modal fade" id="deleteParticipantModal" tabindex="-1" aria-labelledby="deleteParticipantModalLabel"
+            aria-hidden="true">
 
-    <div class="modal fade" id="deleteParticipantModal" tabindex="-1" aria-labelledby="deleteParticipantModalLabel"
-        aria-hidden="true">
+            <div class="modal-dialog">
 
-        <div class="modal-dialog">
+                <div class="modal-content">
 
-            <div class="modal-content">
+                    <div class="modal-header">
 
-                <div class="modal-header">
+                        <h1 class="modal-title fs-5 poppins-semibold" id="deleteParticipantModalLabel">
+                            Rejeitar convite
+                        </h1>
 
-                    <h1 class="modal-title fs-5 poppins-semibold" id="deleteParticipantModalLabel">
-                        Rejeitar convite
-                    </h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
 
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    Deseja realmente não participar da tarefa?
-                </div>
+                    <div class="modal-body">
+                        Deseja realmente não participar da tarefa?
+                    </div>
 
 
-                <div class="modal-footer">
-                    <form action="{{ route('participant.destroy') }}" method="post">
-                        @csrf
-                        @method('DELETE')
-                        <input type="hidden" name="task_id" value={{ $task->id }}>
-                        <input type="hidden" name="user_id" value={{ auth()->id() }}>
+                    <div class="modal-footer">
+                        <form action="{{ route('participant.destroy') }}" method="post">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="task_id" value={{ $task->id }}>
+                            <input type="hidden" name="user_id" value={{ auth()->id() }}>
 
-                        <button class="btn btn-danger" type="submit">Descartar</button>
-                    </form>
+                            <button class="btn btn-danger" type="submit">Descartar</button>
+                        </form>
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
 
-    </div>
+        <script>
+            const start = document.getElementById('start').value;
+            const end = document.getElementById('end').value;
 
-    <script>
-        const start = document.getElementById('start').value;
-        const end = document.getElementById('end').value;
+            const formStart = document.getElementById('formStart');
+            const formEnd = document.getElementById('formEnd');
 
-        const formStart = document.getElementById('formStart');
-        const formEnd = document.getElementById('formEnd');
+            formStart.value = start
+            formEnd.value = end
 
-        formStart.value = start
-        formEnd.value = end
+            //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
 
-        //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
+            const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
-        const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
+                const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
 
-            const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
+                const affectedInputIsEmpty = affectedInput.value.trim() == '';
 
-            const affectedInputIsEmpty = affectedInput.value.trim() == '';
+                const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
 
-            const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
+                affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
 
-            affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
+            }
 
-        }
+            const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
 
-        const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
+            const customAlertTime = document.querySelector('#custom-alert-time');
 
-        const customAlertTime = document.querySelector('#custom-alert-time');
+            const alertOptionsCollection = document.querySelectorAll('.alertOption');
 
-        const alertOptionsCollection = document.querySelectorAll('.alertOption');
+            const alertOptions = Array.from(alertOptionsCollection);
 
-        const alertOptions = Array.from(alertOptionsCollection);
+            const displaySelectedAlertCounter = () => {
 
-        const displaySelectedAlertCounter = () => {
+                const checkedOptions = alertOptions.filter(option => option.checked);
+                const checkedRegister = checkedOptions.length;
 
-            const checkedOptions = alertOptions.filter(option => option.checked);
-            const checkedRegister = checkedOptions.length;
+                checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                        checkedRegister + ')') :
+                    alertOptionsCounterLabel.innerText = "";
+            }
 
-            checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
-                    checkedRegister + ')') :
-                alertOptionsCounterLabel.innerText = "";
-        }
+            displaySelectedAlertCounter();
 
-        displaySelectedAlertCounter();
+            alertOptions.forEach(optionAlert => {
 
-        alertOptions.forEach(optionAlert => {
+                optionAlert.addEventListener('click', () => {
 
-            optionAlert.addEventListener('click', () => {
+                    displaySelectedAlertCounter();
 
-                displaySelectedAlertCounter();
+                    handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
 
-                handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
+                })
+
+                customAlertTime.addEventListener('change', () => {
+                    alertOptions.forEach(checkBox => {
+
+                        checkBox.checked = false;
+                        alertOptionsCounterLabel.innerText = '';
+                    });
+                })
 
             })
+        </script>
 
-            customAlertTime.addEventListener('change', () => {
-                alertOptions.forEach(checkBox => {
-
-                    checkBox.checked = false;
-                    alertOptionsCounterLabel.innerText = '';
-                });
-            })
-
-        })
-    </script>
-
-@endsection
+    @endsection

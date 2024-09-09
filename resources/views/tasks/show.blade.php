@@ -16,7 +16,7 @@
 
                                 <div class="col-md-10">
 
-                                    <h1 class="poppins-semibold fs-4">{{ $task->title }}
+                                    <h1 class="roboto-semibold fs-5">{{ $task->title }}
                                         @if ($task->isConcluded)
                                             <span class="text-primary ms-3">
                                                 A tarefa foi registrada como concluída
