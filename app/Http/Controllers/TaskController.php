@@ -208,7 +208,7 @@ class TaskController extends Controller
             $query->where('task_id', $taskID);
         })->where('id', '!=', $userID)->get();
 
-        if (isset($task) && $task->concluded === 'false') {
+        if (isset($task)) {
 
             $view = request()->query('view', 'default');
 
@@ -244,7 +244,7 @@ class TaskController extends Controller
 
             $task->shoudDisplayButton = !($hasSpecificDate && $expiredTask);
 
-            // $task->isConcluded = $task->concluded === 'true';
+            $task->isConcluded = $task->concluded === 'true';
 
             $task->emailsParticipants = $task->participants->isEmpty()
                 ? "Nenhum participante"

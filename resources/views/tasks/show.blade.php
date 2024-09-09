@@ -16,29 +16,25 @@
                             <div class="row">
 
                                 <div class="col-md-10">
+
                                     <h1 class="poppins-semibold fs-4">{{ $task->title }}</h1>
 
                                     <p class="roboto fs-5"> {{ $task->description }}</p>
+
                                 </div>
 
-                                @if ($task->is_creator && !$task->isConcluded)
-                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
-
-                                        <a class="btn btn-primary" href="{{ route('task.edit', $task->id) }}">Editar</a>
-                                    </div>
-                                @endif
                             </div>
 
                         </div>
 
-                        <div class="accordion" id="accordionExample">
+                        <div class="accordion" id="accordionTaskDetails">
 
                             <div class="accordion-item my-4">
 
                                 <h2 class="accordion-header">
 
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    <button class="accordion-button" type="button" aria-expanded="true"
+                                        data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-controls="collapseOne">
 
                                         <p class="m-0 p-0"> Detalhes
 
@@ -63,12 +59,11 @@
                                                     </svg>
                                             @endif
                                         </p>
-
                                     </button>
                                 </h2>
 
-                                <div id="collapseOne" class="accordion-collapse show collapse"
-                                    data-bs-parent="#accordionExample">
+                                <div id="collapseOne" class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionTaskDetails">
 
                                     <div class="accordion-body">
 
@@ -181,21 +176,21 @@
 
             </div>
 
-            @if (!$task->isConcluded)
 
-                <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
+            <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
 
-                    {{-- botão de voltar --}}
-                    <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                        </svg>
+                {{-- botão de voltar --}}
+                <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                    </svg>
 
-                    </a>
+                </a>
 
-
+                @if (!$task->isConcluded)
+                    {{-- Dropdown de opções --}}
                     <div class="btn-group dropup">
 
                         <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
@@ -209,13 +204,22 @@
 
                         </button>
 
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu fs-5 mb-4">
+
+                            @if ($task->is_creator && !$task->isConcluded)
+                                <li>
+                                    <a class="dropdown-item poppins-regular"
+                                        href="{{ route('task.edit', $task->id) }}">Editar</a>
+                                </li>
+                            @endif
 
                             @if ($task->shoudDisplayButton)
                                 <li>
-                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                    <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
                                         data-bs-target="#staticBackdrop">
+
                                         Criar Feedback
+
                                     </button>
                                 </li>
                             @endif
@@ -228,8 +232,9 @@
 
                                 @if ($task->shoudDisplayButton)
                                     <li>
-                                        <button id="participants-button" type="button" class="dropdown-item"
-                                            data-bs-toggle="modal" data-bs-target="#participantsModal">
+                                        <button id="participants-button" type="button"
+                                            class="dropdown-item poppins-regular" data-bs-toggle="modal"
+                                            data-bs-target="#participantsModal">
                                             Adicionar participantes
                                             <span id="participantCounterDisplay"></span>
                                         </button>
@@ -269,7 +274,7 @@
                                 <!-- Button trigger modal -->
 
                                 <li>
-                                    <button type="button" class="dropdown-item" data-bs-toggle="modal"
+                                    <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
                                         data-bs-target="#completeTaskModal">
                                         Marcar como concluída
                                     </button>
@@ -278,8 +283,8 @@
                         </ul>
 
                     </div>
-                </div>
-            @endif
+                @endif
+            </div>
         </div>
 
         @php
@@ -301,16 +306,16 @@
 
                 <div class="col-md-9 container p-5">
 
-                    <div class="accordion" id="accordionPanelsStayOpenExample">
+                    <div class="accordion" id="accordionFeedbacks">
 
                         @foreach ($feedbacks as $key => $feedback)
-                            <div class="accordion-item">
+                            <div class="accordion-item border-bottom border-0 border-2">
 
                                 <h2 class="accordion-header">
 
-                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#panelsStayOpen-collapse{{ $key }}" aria-expanded="true"
-                                        aria-controls="panelsStayOpen-collapse{{ $key }}">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapse{{ $key }}"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapse{{ $key }}">
 
                                         <div class="d-flex justify-content-center align-items-center">
 
@@ -336,8 +341,7 @@
 
                                 </h2>
 
-                                <div id="panelsStayOpen-collapse{{ $key }}"
-                                    class="accordion-collapse show collapse">
+                                <div id="panelsStayOpen-collapse{{ $key }}" class="accordion-collapse collapse">
 
                                     <div class="accordion-body">
                                         <p class="roboto">{!! $feedback->feedback !!}</p>
