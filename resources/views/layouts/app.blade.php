@@ -301,73 +301,22 @@
                     </ul>
 
                     <div class="mt-3">
+                        <form action="" method="get">
+                            @csrf
+                            <select class="form-select" aria-label="Default select example">
 
-                        <div class="accordion" id="accordionPanelsStayOpenFilter">
+                                <option selected disabled> Filtrar tarefas</option>
 
-                            <div class="accordion-item">
+                                <option value="1"> Criadas por mim</option>
 
-                                <h2 class="accordion-header">
+                                <option value="2">Estou participando</option>
 
-                                    <button class="accordion-button poppins-regular" type="button"
-                                        data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseFilter"
-                                        aria-expanded="false" aria-controls="panelsStayOpen-collapseFilter">
-                                        Filtrar tarefas
-                                    </button>
-                                </h2>
+                                <option value="3"> Concluídas</option>
 
-                                <form action="" method="get">
-                                    @csrf
+                            </select>
+                            <button type="submit">Enviar </button>
+                        </form>
 
-                                    <div id="panelsStayOpen-collapseFilter" class="accordion-collapse collapse">
-
-                                        <div class="accordion-body">
-
-                                            <div class="form-check">
-
-                                                <input class="form-check-input" type="checkbox" value="true"
-                                                    name="created_by_me" id="created_by_me"
-                                                    {{ old('created_by_me') === 'true' ? 'checked' : '' }}>
-
-                                                <label class="form-check-label" for="created_by_me">
-                                                    Criadas por mim
-                                                </label>
-
-                                            </div>
-
-                                            <div class="form-check">
-
-                                                <input class="form-check-input" type="checkbox" value="true"
-                                                    name="task_participation" id="task_participation"
-                                                    {{ old('task_participation') === 'true' ? 'checked' : '' }}>
-
-                                                <label class="form-check-label" for="task_participation">
-                                                    Estou participando
-                                                </label>
-
-                                            </div>
-
-                                            <div class="form-check">
-
-                                                <input class="form-check-input" type="checkbox" value="true"
-                                                    name="task_participation" id="task_participation"
-                                                    {{ old('task_participation') === 'true' ? 'checked' : '' }}>
-
-                                                <label class="form-check-label" for="task_participation">
-                                                    Concluídas
-                                                </label>
-
-                                            </div>
-
-                                        </div>
-
-
-                                    </div>
-
-                                </form>
-
-                            </div>
-
-                        </div>
 
                     </div>
 

@@ -1476,7 +1476,7 @@ if (!function_exists('getRecurringAlerts')) {
 
         return [
 
-            'starting' => 'A tarefa está prestes a começar. Se o alerta exceder 30 minutos, você será notificado novamente apenas na próxima recorrência',
+            'starting' => 'A tarefa está prestes a começar. Se o horário de alerta exceder 30 minutos, você será notificado novamente apenas na próxima recorrência',
 
             'in_progress' => 'A tarefa está atualmente em andamento. Você receberá uma nova notificação apenas na próxima recorrênciaa',
 
