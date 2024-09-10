@@ -57,7 +57,8 @@
 
                 @if (Auth::check())
                     <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">+</button>
+                        data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
+                        title="Visualizar barra lateral">+</button>
                 @endif
 
                 <a class="navbar-brand poppins-regular ms-5 font-black" href="{{ url('/') }}">

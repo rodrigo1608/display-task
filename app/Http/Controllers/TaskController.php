@@ -256,7 +256,9 @@ class TaskController extends Controller
 
             $task->notificationAlert = getAlertAboutNotificationTime($task);
 
-            $task->shouldHiddenTimeAlertsOptions = in_array($task->notificationAlert, getSpecificAlerts(), true);
+            $task->shouldHiddenTimeAlertsOptions = in_array($task->notificationAlert, getSpecificDayAlerts(), true);
+
+            $task->shouldDisplayRecurringTimeAlert = in_array($task->notificationAlert, getRecurringAlerts(), true);
 
             return $view === 'pending'
                 ?  view('tasks/showPending', compact('task', 'alertOptions'))

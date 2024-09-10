@@ -42,16 +42,24 @@ class SetPendingTask extends FormRequest
 
     public function checkTimeRequired($validator)
     {
+        $taskID = $this->route('task');
 
+        $task = Task::find($taskID);
         $alertOptions = getAlertOptions();
+        $duration = getDuration($task);
+        $now = getCarbonNow();
+        $start = getCarbonTime($duration->start);
+
+        $willNotStartSoon = $now->diffInMinutes($start) > 30;
 
         // Filtra as opções onde as chaves estão marcadas como 'true'
         $trueOptions = array_filter($alertOptions, function ($label, $key) {
+
             // Verifica se o valor da chave na requisição é 'true'
             return $this->input($key) === 'true';
         }, ARRAY_FILTER_USE_BOTH);
 
-        if ((!$this->filled('time')) && empty($trueOptions)) {
+        if ((!$this->filled('time')) && empty($trueOptions) && $willNotStartSoon) {
 
             $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
         }

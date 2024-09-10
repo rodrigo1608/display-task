@@ -246,6 +246,7 @@
 
                                             @if ($task->shouldHiddenTimeAlertsOptions)
                                                 <div class="col-md-7 p-0">
+
                                                     <p
                                                         class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
                                                         text-success
@@ -393,21 +394,23 @@
                             </div>
 
                         </div>
+                        @if ($task->shouldDisplayRecurringTimeAlert)
+                            <div class="row container mt-5">
 
-                        <div class="row container mt-5">
-
-                            <div class="col-md-12 p-0">
-                                <p
-                                    class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
+                                <div class="col-md-12 p-0">
+                                    <p
+                                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
                                     text-success
                                     @elseif (getDuration($task)->status === 'in_progress')
                                      border-warning-subtle text-warning
                                     @elseif (getDuration($task)->status === 'finished')
                                       border-danger-subtle  text-danger @endif m-0 rounded border border-2 py-2 text-center">
-                                    {{ $task->notificationAlert }}
-                                </p>
+                                        {{ $task->notificationAlert }}
+                                    </p>
+                                </div>
+
                             </div>
-                        </div>
+                        @endif
 
                     </div>
 

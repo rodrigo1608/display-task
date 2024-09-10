@@ -168,21 +168,29 @@
     <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
 
         {{-- botão de voltar --}}
-        <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}">
+        <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
+            title="voltar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
                 stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
             </svg>
-
         </a>
 
-        @if (!$task->isConcluded)
+        @php
+
+            $shoudDisplayTaskOptions = $task->is_creator
+                ? !$task->isConcluded
+                : $task->shoudDisplayButton && !$task->isConcluded;
+
+        @endphp
+
+        @if ($shoudDisplayTaskOptions)
 
             {{-- Dropdown de opções --}}
             <div class="btn-group dropup">
 
                 <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                    aria-expanded="false" title="Visualizar opções da tarefa">
 
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="32" height="32"
                         viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -332,7 +340,7 @@
                             <div id="panelsStayOpen-collapse{{ $key }}" class="accordion-collapse collapse">
 
                                 <div class="accordion-body">
-                                    <p class="roboto">{!! $feedback->feedback !!}</p>
+                                    <p class="roboto fs-5">{!! $feedback->feedback !!}</p>
 
                                     {{-- @dd($feedback->attachments->isEmpty()) --}}
 

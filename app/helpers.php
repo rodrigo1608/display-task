@@ -1453,9 +1453,9 @@ if (!function_exists('getDuration')) {
     }
 }
 
-if (!function_exists('getSpecificAlerts')) {
+if (!function_exists('getSpecificDayAlerts')) {
 
-    function getSpecificAlerts()
+    function getSpecificDayAlerts()
     {
 
         return [
@@ -1465,6 +1465,22 @@ if (!function_exists('getSpecificAlerts')) {
             'in_progress' => 'A tarefa já está em andamento',
 
             'finished' => 'A tarefa está expirada',
+        ];
+    }
+}
+
+if (!function_exists('getRecurringAlerts')) {
+
+    function getRecurringAlerts()
+    {
+
+        return [
+
+            'starting' => 'A tarefa está prestes a começar. Se o alerta exceder 30 minutos, você será notificado novamente apenas na próxima recorrência',
+
+            'in_progress' => 'A tarefa está atualmente em andamento. Você receberá uma nova notificação apenas na próxima recorrênciaa',
+
+            'finished' => 'A tarefa expirou hoje. A notificação será enviada apenas na próxima recorrência',
         ];
     }
 }
@@ -1482,7 +1498,9 @@ if (!function_exists('getAlertAboutNotificationTime')) {
 
         $hasSpecificDate = filled($task->reminder->recurring->specific_date);
 
-        $specificDateAlertMessages = getSpecificAlerts();
+        $specificDayAlertMessages = getSpecificDayAlerts();
+
+        $recurringAlertMessages  = getRecurringAlerts();
 
         if ($hasSpecificDate) {
 
@@ -1492,18 +1510,18 @@ if (!function_exists('getAlertAboutNotificationTime')) {
                 case 'starting':
 
                     if ($now->diffInMinutes($start) < 30) {
-                        return $specificDateAlertMessages['starting'];
+                        return $specificDayAlertMessages['starting'];
                     }
 
                     break;
 
                 case 'in_progress':
 
-                    return $specificDateAlertMessages['in_progress'];
+                    return $specificDayAlertMessages['in_progress'];
 
                 case 'finished':
 
-                    return $specificDateAlertMessages['finished'];
+                    return $specificDayAlertMessages['finished'];
             }
         } else {
 
@@ -1512,16 +1530,17 @@ if (!function_exists('getAlertAboutNotificationTime')) {
                 case 'starting':
                     if ($now->diffInMinutes($start) < 30) {
 
-                        return 'A tarefa está prestes a começar. Se o alerta exceder 30 minutos, você será notificado novamente apenas na próxima recorrência';
+                        return $recurringAlertMessages['starting'];;
                     }
+                    break;
 
                 case 'in_progress':
 
-                    return 'A tarefa está atualmente em andamento. Você receberá uma nova notificação apenas na próxima recorrênciaa';
+                    return $recurringAlertMessages['in_progress'];;
 
                 case 'finished':
 
-                    return 'A tarefa expirou hoje. A notificação será enviada apenas na próxima recorrência';
+                    return $recurringAlertMessages['in_progress'];;
             }
         }
     }
