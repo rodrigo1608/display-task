@@ -397,7 +397,7 @@
                                 <div class>
 
                                     {{-- botão de voltar --}}
-                                    <a class="btn btn-primary me-3 py-2" href="{{ route('home') }}">
+                                    <a class="btn btn-primary me-3 py-2" href="{{ route('home') }}"  aria-label="Voltar para a pagina inicial">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                                             stroke="currentColor" class="size-6">

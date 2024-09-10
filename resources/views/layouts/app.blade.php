@@ -61,18 +61,23 @@
                         title="Visualizar barra lateral">+</button>
                 @endif
 
-                <a class="navbar-brand poppins-regular ms-5 font-black" href="{{ url('/') }}">
+                <a class="navbar-brand poppins-regular ms-5 font-black" href="{{ url('/') }}"
+                    title="Clique parar ir para página inicial">
                     {{ config('app.name', 'Tela tarefa') }}
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                     data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+
                     <span class="navbar-toggler-icon"></span>
+
                 </button>
 
                 <div class="navbar-collapse collapse" id="navbarSupportedContent">
+
                     <!-- Left Side Of Navbar -->
+
                     <ul class="navbar-nav me-auto">
 
                         @auth
@@ -113,8 +118,23 @@
                                 class="d-flex me-5 flex-row">
                                 @csrf
                                 <input type="text" name="title_filter" id="title_filter"
-                                    placeholder="Procurar por nome da tarefa"class="form-control fs-6 me-1">
-                                <button class="btn btn-primary">Enviar</button>
+                                    placeholder="Procurar por nome da tarefa"
+                                    class="form-control rounded-0 rounded-start border-end-1 fs-6">
+
+                                <button class="btn btn-secondary rounded-end rounded-0 border-start-0"
+                                    title="Enviar pesquisa">
+
+
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        width="19" height="19" stroke-width="1.5" stroke="currentColor"
+                                        class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                    </svg>
+
+
+
+                                </button>
                             </form>
 
                             @php
@@ -187,7 +207,8 @@
                                         {{ __('Logout') }}
                                     </a>
 
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                        class="d-none">
                                         @csrf
                                     </form>
 
@@ -236,8 +257,8 @@
         </script>
 
         @if (Auth::check())
-            <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
-                aria-labelledby="offcanvasWithBothOptionsLabel">
+            <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
+                id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
 
                 <div class="w-100 text-end">
                     <button type="button" class="btn-close me-4 mt-4" data-bs-dismiss="offcanvas"
@@ -301,9 +322,12 @@
                     </ul>
 
                     <div class="mt-3">
-                        <form action="" method="get">
+
+
+                        <form action="" method="get" class="d-flex me-5 flex-row">
                             @csrf
-                            <select class="form-select" aria-label="Default select example">
+                            <select class="form-select rounded-0 rounded-start border-end-1 fs-6"
+                                aria-label="Default select example">
 
                                 <option selected disabled> Filtrar tarefas</option>
 
@@ -314,9 +338,19 @@
                                 <option value="3"> Concluídas</option>
 
                             </select>
-                            <button type="submit">Enviar </button>
-                        </form>
 
+                            {{-- botão de enviar --}}
+                            <button class="btn btn-secondary rounded-end rounded-0 border-start-0" type="submit"
+                                aria-label="Enviar filtro">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="size-6" width="19"
+                                    height="19">
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                </svg>
+                            </button>
+                        </form>
 
                     </div>
 

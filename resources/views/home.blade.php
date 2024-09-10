@@ -16,14 +16,21 @@
 
                             <form action="{{ route('home') }}" method="get">
                                 @csrf
-
                                 <div class="d-flex">
 
-                                    <input type="date" id="input-date" name="specific_date" class="form-control fs-6"
+                                    <input type="date" id="input-date" name="specific_date"
+                                        class="form-control rounded-0 rounded-start border-end-1 fs-6"
                                         value="{{ old('specific_date', request()->input('specific_date', Carbon\Carbon::now()->format('Y-m-d'))) }}">
 
-                                    <button type="submit" class="btn btn-secondary ms-1 py-0">
-                                        Enviar
+                                    <button type="submit"
+                                        class="btn btn-secondary rounded-end rounded-0 border-start-0 py-0"
+                                        title="Enviar data">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            width="19" height="19" stroke-width="1.5" stroke="currentColor"
+                                            class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                        </svg>
                                     </button>
 
                                 </div>
