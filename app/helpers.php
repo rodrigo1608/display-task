@@ -612,14 +612,14 @@ if (!function_exists('getRecurringTasks')) {
 
 if (!function_exists('getNotificationQuery')) {
 
-    function getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID)
+    function getNotificationQuery($creatorOrParticipant, $query, $userID, $taskID)
     {
         if ($creatorOrParticipant === 'creator') {
-            return $query->where('created_by', $currentUserID);
+            return $query->where('created_by', $userID);
         } else {
-            return $query->where('id', $taskID)->whereHas('participants', function ($query) use ($currentUserID,  $taskID) {
+            return $query->where('id', $taskID)->whereHas('participants', function ($query) use ($userID,  $taskID) {
 
-                $query->where('user_id', $currentUserID)->where('task_id', $taskID)->where('status', 'accepted');
+                $query->where('user_id', $userID)->where('task_id', $taskID)->where('status', 'accepted');
             });
         };
     }
@@ -627,10 +627,10 @@ if (!function_exists('getNotificationQuery')) {
 
 // if (!function_exists('getCurrentUserTasks')) {
 
-//     function getCurrentUserTasks($creatorOrParticipant, $currentUserID, $taskID)
+//     function getCurrentUserTasks($creatorOrParticipant, $userID, $taskID)
 //     {
-//         return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $currentUserID, $taskID) {
-//             getNotificationQuery($creatorOrParticipant, $query, $currentUserID, $taskID);
+//         return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $userID, $taskID) {
+//             getNotificationQuery($creatorOrParticipant, $query, $userID, $taskID);
 //         })->first()->get();
 //     }
 // } q viagem é essa?
@@ -1443,7 +1443,6 @@ if (!function_exists('getRemindersByWeekday')) {
     }
 }
 
-
 if (!function_exists('getDuration')) {
 
     function getDuration($task)
@@ -1543,5 +1542,45 @@ if (!function_exists('getAlertAboutNotificationTime')) {
                     return $recurringAlertMessages['in_progress'];;
             }
         }
+    }
+}
+
+if (!function_exists('getFilteredBySelectTasks')) {
+
+    function getFilteredBySelectTasks($request)
+    {
+        $userID = auth()->id();
+
+        $selectedUserTasksBuilder = Task::with([
+
+            'participants',
+            'reminder',
+            'reminder.recurring',
+            'durations'
+
+        ]);
+
+        if ($request->has('select_filter') && $request->input('select_filter') === 'concluded') {
+
+            $selectedUserTasksBuilder = $selectedUserTasksBuilder->where('concluded', 'true')->where(function ($query) use ($userID) {
+
+                $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+                    $query->where('user_id', $userID)->where('status', 'accepted');
+                });
+            })
+                ->orderBy('updated_at', 'desc')
+                ->get();
+        } elseif ($request->has('select_filter') && $request->input('select_filter') === 'created_by_me') {
+
+            $selectedUserTasksBuilder =  $selectedUserTasksBuilder->where('concluded', 'false')->where(function ($query) use ($userID) {
+                $query->where('created_by', $userID);
+            })->get();
+        } elseif ($request->has('select_filter') && $request->input('select_filter') === 'participating') {
+            $selectedUserTasksBuilder  = $selectedUserTasksBuilder->where('concluded', 'false')->whereHas('participants', function ($query) use ($userID) {
+                $query->where('user_id', $userID)->where('status', 'accepted');
+            })->get();
+        }
+
+        return $selectedUserTasksBuilder;
     }
 }

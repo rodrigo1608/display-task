@@ -44,20 +44,29 @@ class SetPendingTask extends FormRequest
     {
         $taskID = $this->route('task');
 
-        $task = Task::find($taskID);
+        $task = Task::with('reminder', 'reminder.recurring')->find($taskID);
+
         $alertOptions = getAlertOptions();
+
         $duration = getDuration($task);
+
         $now = getCarbonNow();
+
         $start = getCarbonTime($duration->start);
 
-        $willNotStartSoon = $now->diffInMinutes($start) > 30;
+        $willNotStartSoon = $now->diffInMinutes($start) > 30 && !filled($task->reminder->recurring->specific_date);
+
 
         // Filtra as opções onde as chaves estão marcadas como 'true'
         $trueOptions = array_filter($alertOptions, function ($label, $key) {
 
+
             // Verifica se o valor da chave na requisição é 'true'
             return $this->input($key) === 'true';
         }, ARRAY_FILTER_USE_BOTH);
+
+
+        // dd(!$this->filled('time') && empty($trueOptions) && $willNotStartSoon);
 
         if ((!$this->filled('time')) && empty($trueOptions) && $willNotStartSoon) {
 
@@ -70,6 +79,7 @@ class SetPendingTask extends FormRequest
         if (!filled($this->input('start'))) {
             return;
         }
+
 
         $start = getCarbonTime($this->input('start'));
 
@@ -104,7 +114,7 @@ class SetPendingTask extends FormRequest
 
                 if ($timeDifference < $minutes) {
 
-                    $validator->errors()->add($alertIndex, 'O horário de notificação selecionado (' . $timeText . ' antes), pois não há tempo suficiente antes do início da tarefa.');
+                    $validator->errors()->add($alertIndex, 'Não há tempo suficiente entre o horário de notificação selecionado e o início da tarefa   (' . $timeText . ' antes)');
                 }
             }
         }

@@ -30,4 +30,13 @@ class FilterController extends Controller
 
         return view('tasks/filtered', compact('tasksFilteredByTitle'));
     }
+
+
+    public function getTasksCreatedByMe(Request $request)
+    {
+        $userID = auth()->id();
+
+
+        $tasksFilteredByTitle = Task::where('concluded', 'false')->where('title', 'LIKE', "%$request->title_filter%")->get();
+    }
 }

@@ -121,9 +121,7 @@
                                     placeholder="Procurar por nome da tarefa"
                                     class="form-control rounded-0 rounded-start border-end-1 fs-6">
 
-                                <button class="btn btn-secondary rounded-end rounded-0 border-start-0"
-                                    title="Enviar pesquisa">
-
+                                <button class="btn btn-secondary rounded-end rounded-0 border-start-0" title="Pesquisar">
 
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         width="19" height="19" stroke-width="1.5" stroke="currentColor"
@@ -132,9 +130,8 @@
                                             d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                                     </svg>
 
-
-
                                 </button>
+
                             </form>
 
                             @php
@@ -323,19 +320,18 @@
 
                     <div class="mt-3">
 
-
-                        <form action="" method="get" class="d-flex me-5 flex-row">
+                        <form action="{{ route('home') }}" method="get" class="d-flex me-5 flex-row">
                             @csrf
-                            <select class="form-select rounded-0 rounded-start border-end-1 fs-6"
+                            <select name="select_filter" class="form-select rounded-0 rounded-start border-end-1 fs-6"
                                 aria-label="Default select example">
 
                                 <option selected disabled> Filtrar tarefas</option>
 
-                                <option value="1"> Criadas por mim</option>
+                                <option value="created_by_me"> Criadas por mim</option>
 
-                                <option value="2">Estou participando</option>
+                                <option value="participating">Estou participando</option>
 
-                                <option value="3"> Concluídas</option>
+                                <option value="concluded"> Concluídas</option>
 
                             </select>
 

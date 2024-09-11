@@ -16,12 +16,8 @@
 
                                 <div class="col-md-10">
 
-                                    <h1 class="roboto-semibold fs-5">{{ $task->title }}
-                                        @if ($task->isConcluded)
-                                            <span class="text-primary ms-3">
-                                                A tarefa foi registrada como concluída
-                                            </span>
-                                        @else
+                                    <h1 class="roboto-semibold fs-4">{{ $task->title }}
+                                        @if (!$task->isConcluded)
                                             <svg stroke="currentColor" @class([
                                                 'text-success' => $task->status === 'starting',
                                                 'text-warning' => $task->status === 'in_progress',
@@ -35,6 +31,12 @@
                                             </svg>
                                         @endif
                                     </h1>
+
+                                    @if ($task->isConcluded)
+                                        <p class="text-primary fs-5">
+                                            A tarefa está registrada como concluída
+                                        </p>
+                                    @endif
 
                                     <p class="roboto fs-5"> {{ $task->description }}</p>
 
@@ -184,8 +186,8 @@
 
         @endphp
 
-        @if ($shoudDisplayTaskOptions)
 
+        @if ($shoudDisplayTaskOptions)
             {{-- Dropdown de opções --}}
             <div class="btn-group dropup">
 
@@ -202,10 +204,13 @@
 
                 <ul class="dropdown-menu fs-5 mb-4">
 
-                    @if ($task->is_creator && !$task->isConcluded)
+                    @if ($task->shoudDisplayButton && $task->created_by === auth()->id())
                         <li>
-                            <a class="dropdown-item poppins-regular"
-                                href="{{ route('task.edit', $task->id) }}">Editar</a>
+                            <button id="participants-button" type="button" class="dropdown-item poppins-regular"
+                                data-bs-toggle="modal" data-bs-target="#participantsModal">
+                                Adicionar participantes
+                                <span id="participantCounterDisplay"></span>
+                            </button>
                         </li>
                     @endif
 
@@ -220,21 +225,18 @@
                         </li>
                     @endif
 
+                    @if ($task->is_creator && !$task->isConcluded)
+                        <li>
+                            <a class="dropdown-item poppins-regular"
+                                href="{{ route('task.edit', $task->id) }}">Editar</a>
+                        </li>
+                    @endif
+
                     @if ($task->is_creator)
                         @php
                             $hasSpecificDate = filled($task->reminder->recurring->specific_date);
                             $expiredTask = getDuration($task)->status === 'finished';
                         @endphp
-
-                        @if ($task->shoudDisplayButton)
-                            <li>
-                                <button id="participants-button" type="button" class="dropdown-item poppins-regular"
-                                    data-bs-toggle="modal" data-bs-target="#participantsModal">
-                                    Adicionar participantes
-                                    <span id="participantCounterDisplay"></span>
-                                </button>
-                            </li>
-                        @endif
 
                         <script>
                             const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
@@ -278,7 +280,6 @@
                 </ul>
 
             </div>
-
         @endif
 
     </div>
@@ -392,10 +393,6 @@
 
                                                         </div>
 
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">Close</button>
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -424,14 +421,37 @@
 
     <!-- Modal -->
 
-    <form method="post" action="{{ route('participant.add', ['taskID' => $task->id]) }}">
 
+
+    <div class="modal" tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title">Modal title</h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" action="{{ route('participant.add', ['taskID' => $task->id]) }}">
         @csrf
         <div class="modal fade" id="participantsModal" tabindex="-1" aria-labelledby="participantsModalLabel"
             aria-hidden="true">
 
             <div class="modal-dialog">
-
                 <div class="modal-content">
 
                     <div class="modal-header">
@@ -439,6 +459,8 @@
                         <h1 class="modal-title fs-5 poppins-semibold" id="participantsModalLabel">
                             Participantes
                         </h1>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
                     </div>
 
@@ -463,14 +485,13 @@
                                 </div>
                             @endforeach
                         @else
-                            <p>Não há participantes disponíveis.</p>
+                            <p>Não há participantes disponíveis</p>
                         @endif
 
                     </div>
 
                     @if ($possibleParticipants->isNotEmpty())
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Adicionar</button>
                         </div>
                     @else
@@ -565,7 +586,7 @@
                 </div>
 
                 <div class="modal-body">
-                    <p class="roboto fs-4 m-4">Ao concluir esta tarefa, ela será marcada como finalizada. Tem certeza de
+                    <p class="roboto fs-5 m-4">Ao concluir esta tarefa, ela será marcada como finalizada. Tem certeza de
                         que
                         deseja
                         continuar?</p>

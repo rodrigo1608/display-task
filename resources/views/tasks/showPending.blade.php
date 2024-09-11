@@ -330,34 +330,7 @@
 
                                                     </div>
 
-                                                    <div class="mt-2">
 
-                                                        @php
-                                                            $firstError = null;
-
-                                                            $alertOptions = [
-                                                                'half_an_hour_before',
-                                                                'one_hour_before',
-                                                                'two_hours_before',
-                                                                'one_day_earlier',
-                                                            ];
-
-                                                            foreach ($alertOptions as $alertIndex) {
-                                                                if ($errors->has($alertIndex)) {
-                                                                    $firstError = $errors->first($alertIndex);
-                                                                    break;
-                                                                }
-                                                            }
-
-                                                        @endphp
-
-                                                        @if ($firstError)
-                                                            <div class="invalid-feedback d-block">
-                                                                <strong>{{ $firstError }}</strong>
-                                                            </div>
-                                                        @endif
-
-                                                    </div>
 
                                                 </div>
                                             @endif
@@ -394,6 +367,36 @@
                             </div>
 
                         </div>
+
+
+
+                        @php
+                            $firstError = null;
+
+                            $alertOptions = [
+                                'half_an_hour_before',
+                                'one_hour_before',
+                                'two_hours_before',
+                                'one_day_earlier',
+                            ];
+
+                            foreach ($alertOptions as $alertIndex) {
+                                if ($errors->has($alertIndex)) {
+                                    $firstError = $errors->first($alertIndex);
+                                    break;
+                                }
+                            }
+
+                        @endphp
+
+                        @if ($firstError)
+                            <div class="row">
+                                <div class="col-md-6 offset-3 invalid-feedback d-block">
+                                    <strong>{{ $firstError }}</strong>
+                                </div>
+                            </div>
+                        @endif
+
                         @if ($task->shouldDisplayRecurringTimeAlert)
                             <div class="row container mt-5">
 
