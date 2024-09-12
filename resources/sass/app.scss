@@ -247,6 +247,17 @@ body,
     box-shadow: none;
 }
 
+//Container do display
+.almost-full-height {
+    height: 93vh;
+}
+
+.container-day {
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
 //Poppins's classes
 
 .poppins-extralight {

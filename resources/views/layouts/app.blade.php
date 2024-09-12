@@ -20,9 +20,6 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 
-    {{-- Material icons --}}
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
     {{-- styles --}}
 
     @if (Auth::check())
@@ -300,7 +297,7 @@
                             $today = Carbon\Carbon::today()->format('Y-m-d');
                         @endphp
 
-                        <a href="{{ route('home', ['displayOption' => 'specific_day']) }}" class="side-link">
+                        <a href="{{ route('display_day.displayDay') }}" class="side-link">
                             <li class="list-group-item">Meu dia</li>
                         </a>
 
@@ -352,6 +349,7 @@
 
                 </div>
             </div>
+
         @endif
 
         <main class="">

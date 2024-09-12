@@ -4,7 +4,7 @@ use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\FilterController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ParticipantController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
@@ -36,3 +36,5 @@ Route::delete('participant', [ParticipantController::class, 'destroy'])->name('p
 Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
 Route::get('search_tasks', [FilterController::class, 'searchByTitle'])->name('search_tasks.searchByTitle');
+
+Route::get('display_day', [DisplayController::class, 'displayDay'])->name('display_day.displayDay');
