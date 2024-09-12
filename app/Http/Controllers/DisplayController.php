@@ -15,36 +15,43 @@ class DisplayController extends Controller
 
         $currentDayOfWeek = getDayOfWeek($today);
 
+        // $tasksTodayBuilder = Task::with([
 
-        $tasksTodayBuilder = Task::with([
+        //     'participants',
+        //     'reminder',
+        //     'reminder.recurring',
+        //     'durations'
 
-            'participants',
-            'reminder',
-            'reminder.recurring',
-            'durations'
+        // ])->where('concluded', 'false')->where(function ($query) use ($userID) {
 
-        ])->where('concluded', 'false')->where(function ($query) use ($userID) {
+        //     $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+        //         $query->where('user_id', $userID)->where('status', 'accepted');
+        //     });
+        // })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
 
-            $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-                $query->where('user_id', $userID)->where('status', 'accepted');
-            });
-        })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
+        //     $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
 
-            $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
+        //         $query->where(function ($query) use ($today, $currentDayOfWeek) {
 
-                $query->where(function ($query) use ($today, $currentDayOfWeek) {
+        //             $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
+        //         })->orWhere($currentDayOfWeek, 'true');
+        //     });
+        // });
 
-                    $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
-                })->orWhere($currentDayOfWeek, 'true');
-            });
-        });
+        // $tasksToday = $tasksTodayBuilder->get();
 
-        $tasksToday = $tasksTodayBuilder->get();
+        $now = getCarbonNow();
+        $startOfDay = $now->copy()->startOfDay();
 
-        $tasksToday = $tasksToday->sortBy(function ($task) use ($userID) {
-            return $task->durations->where('user_id', $userID)->first()->start ?? '23:59:59';
-        });
+        // Calcula o número de minutos desde o início do dia
+        $minutesSinceStartOfDay = $startOfDay->diffInMinutes($now);
 
-        return view('day', compact('tasksToday'));
+        $position = 50 - ($minutesSinceStartOfDay *  0.185);
+
+        // $tasksToday = $tasksToday->sortBy(function ($task) use ($userID) {
+        //     return $task->durations->where('user_id', $userID)->first()->start ?? '23:59:59';
+        // });
+
+        return view('day', compact('position'));
     }
 }
