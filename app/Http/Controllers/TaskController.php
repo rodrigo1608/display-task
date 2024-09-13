@@ -226,7 +226,9 @@ class TaskController extends Controller
 
             $task->attachments = $task->feedbacks->first()->attachments->all();
 
-            $duration = getDuration($task);
+            $duration = getDuration($task, $task->created_by);
+
+
 
             $task->start = date('H:i', strtotime($duration->start));
 

@@ -1447,8 +1447,7 @@ if (!function_exists('getDuration')) {
 
     function getDuration($task)
     {
-
-        return $task->durations()->where('user_id', auth()->id())->where('task_id', $task->id)->first();
+        return $task->durations()->where('user_id',  $task->created_by)->where('task_id', $task->id)->first();
     }
 }
 
@@ -1592,7 +1591,7 @@ if (!function_exists('getTaskAtThatTime')) {
         $time = getCarbonTime($time);
 
 
-        $timePlusOneHour = $time->copy()->addHour();
+        $timePlusOneHour = $time->copy()->addHour()->subSecond();
 
         $userID = auth()->id();
 
