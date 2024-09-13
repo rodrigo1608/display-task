@@ -267,7 +267,7 @@ class TaskController extends Controller
                 :  view('tasks/show', compact('possibleParticipants', 'task'));
         } else {
 
-            return redirect('home');
+            return redirect('display_day.displayDay');
         }
     }
 
@@ -422,12 +422,18 @@ class TaskController extends Controller
         $startTime = $request->start ? date('H:i', strtotime($request->start)) : null;
         $endTime = $request->end ? date('H:i', strtotime($request->end)) : null;
 
-        Duration::create([
+        $duration = getDuration($currentTask);
+
+
+
+
+        $duration = Duration::create([
 
             'start' => $startTime,
             'end' => $endTime,
             'task_id' => $id,
-            'user_id' => $currentUserID
+            'user_id' => $currentUserID,
+            'status' => $duration->status
 
         ]);
 
@@ -456,7 +462,7 @@ class TaskController extends Controller
 
         $participant->save();
 
-        return redirect('home');
+        return redirect('display_day.displayDay');
     }
 
     /**

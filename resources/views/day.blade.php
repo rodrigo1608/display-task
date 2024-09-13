@@ -30,7 +30,6 @@
 
                 @endphp --}}
 
-
                 <div id="hour-block" class="bg-alert d-flex flex-column align-items-center justify-content-center m-0"
                     style="position:absolute; top: {{ $position }}%; left: 0; width:100% ">
 
@@ -47,7 +46,6 @@
 
                             @php
                                 $tasks = getTaskAtThatTime($blockTime);
-
                             @endphp
 
                             @if (!$tasks->isEmpty())
@@ -71,11 +69,11 @@
                                     @endphp
 
                                     <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 w-100 task-container border-3 text-decoration-none rounded border border-black"
+                                        class="col-md-10 w-100 task-container text-decoration-none rounded border border-2 border-black"
                                         style="height:{{ $taskContainerHeigh }}px; position:absolute; left:0; z-index: 1; background:{{ $task->creator->color }};
                                         top:{{ $taskPositionTop }}%">
 
-                                        <p class="mt-2 text-white">{{ $task->title }} - {{ $start->format('H:i') }} até
+                                        <p class="text-white">{{ $task->title }} - {{ $start->format('H:i') }} até
                                             {{ $end->format('H:i') }}</p>
                                     </a>
                                 @endforeach

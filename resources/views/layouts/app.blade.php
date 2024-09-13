@@ -48,7 +48,7 @@
 
     <div id="app">
 
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm" style="z-index:4">
 
             <div class="container-fluid">
 
@@ -309,8 +309,8 @@
                             <li class="list-group-item">Meu mês</li>
                         </a>
 
-                        <a href="#" class="side-link">
-                            <li class="list-group-item active" aria-current="true">Painel geral</li>
+                        <a href="{{ route('home') }}" class="side-link">
+                            <li class="list-group-item" aria-current="true">Painel geral</li>
                         </a>
 
                     </ul>
@@ -349,7 +349,6 @@
 
                 </div>
             </div>
-
         @endif
 
         <main class="">

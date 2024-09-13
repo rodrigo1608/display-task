@@ -7,6 +7,10 @@ use App\Models\Task;
 
 class DisplayController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'verified']);
+    }
     public function displayDay()
     {
         $userID = auth()->id();
