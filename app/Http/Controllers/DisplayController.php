@@ -63,7 +63,19 @@ class DisplayController extends Controller
 
     public function displayWeek()
     {
+        $currentDate = Carbon::now();
 
+        // Criar um array para armazenar os dias da semana
+        $weekDays = [];
+
+        // Preencher o array com os próximos 7 dias, começando do atual
+        for ($i = 0; $i < 7; $i++) {
+            // Adicionar cada dia ao array
+            $weekDays[] = $currentDate->copy()->addDays($i);
+        }
+
+        // Passar os dias da semana para a view
+        return view('week_view', compact('weekDays'));
 
         return view('timelines/week');
     }
