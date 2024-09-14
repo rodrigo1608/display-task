@@ -481,6 +481,6 @@ class TaskController extends Controller
 
         $task->update(['concluded' => true]);
 
-        return  redirect()->route('task.show', compact('task'))->with('success', 'Tarefa concluída!');
+        return  redirect()->route('display.displayDay')->with('success', 'Tarefa concluída!');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Task;
+use Carbon\Carbon;
 
 class DisplayController extends Controller
 {
@@ -65,18 +66,14 @@ class DisplayController extends Controller
     {
         $currentDate = Carbon::now();
 
-        // Criar um array para armazenar os dias da semana
+        $startOfWeek = $currentDate->startOfWeek(Carbon::SUNDAY);
+
         $weekDays = [];
 
-        // Preencher o array com os próximos 7 dias, começando do atual
         for ($i = 0; $i < 7; $i++) {
-            // Adicionar cada dia ao array
-            $weekDays[] = $currentDate->copy()->addDays($i);
+            $weekDays[] = $startOfWeek->copy()->addDays($i);
         }
 
-        // Passar os dias da semana para a view
-        return view('week_view', compact('weekDays'));
-
-        return view('timelines/week');
+        return view('timelines/week', compact('weekDays'));
     }
 }
