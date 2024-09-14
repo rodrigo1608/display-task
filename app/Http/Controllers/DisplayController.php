@@ -11,6 +11,8 @@ class DisplayController extends Controller
     {
         $this->middleware(['auth', 'verified']);
     }
+
+
     public function displayDay()
     {
         $userID = auth()->id();
@@ -56,6 +58,13 @@ class DisplayController extends Controller
         //     return $task->durations->where('user_id', $userID)->first()->start ?? '23:59:59';
         // });
 
-        return view('day', compact('position'));
+        return view('timelines/day', compact('position'));
+    }
+
+    public function displayWeek()
+    {
+
+
+        return view('timelines/week');
     }
 }

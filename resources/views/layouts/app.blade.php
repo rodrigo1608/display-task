@@ -297,7 +297,7 @@
                             $today = Carbon\Carbon::today()->format('Y-m-d');
                         @endphp
 
-                        <a href="{{ route('display_day.displayDay') }}" class="side-link">
+                        <a href="{{ route('display.displayDay') }}" class="side-link">
                             <li class="list-group-item">Meu dia</li>
                         </a>
 
