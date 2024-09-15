@@ -248,15 +248,21 @@ body,
 }
 
 //Container do display
-.almost-full-height {
+.full-height-93vh {
     height: 93vh;
+    overflow: auto;
+}
+
+.full-height-78vh {
+    height: 78vh;
+    overflow: auto;
+    overflow-x: hidden;
 }
 
 .container-day {
     height: 100%;
     position: relative;
 }
-
 
 .task-container {
     position: relative;

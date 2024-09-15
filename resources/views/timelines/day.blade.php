@@ -4,7 +4,7 @@
 
     <div class="container">
 
-        <div class="row almost-full-height">
+        <div class="row full-height-93vh">
 
             <div class="container-day col-9 container p-0">
 
@@ -22,8 +22,8 @@
 
                         <div class="row border-top border-black" style="position:relative; height:100px; width:98%;">
 
-                            <div class="col-md-2 fs-6" style="position:absolute; top:-12px; left:-16%;">
-                                <p class="poppins-light text-end">{{ $blockTime }}</p>
+                            <div class="col-md-2 fs-6" style="position:absolute; top:-13px; left:-17%;">
+                                <p class="poppins-light text-secondary text-end">{{ $i }}h</p>
                             </div>
 
                             @php
