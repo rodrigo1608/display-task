@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="container">
 
         <div class="row almost-full-height">
@@ -10,25 +11,6 @@
                 <div id="current-time-line" class="bg-danger"
                     style="position:absolute; top:50%;  left: 0; height: 2px;  width:100%; z-index:2; ">
                 </div>
-
-                {{-- @php
-
-                    $blockTime = getCarbontime(str_pad(20, 2, '0', STR_PAD_LEFT) . ':00');
-
-                    $tasks = getTaskAtThatTime($blockTime);
-
-                    foreach ($tasks as $task) {
-
-                        $duration = getDuration($task);
-
-                        $start = getCarbonTime($duration->start);
-
-                        $blockStartTaskStartGap = getCarbonTime($blockTime)->diffInMinutes($start);
-
-                        dd($blockStartTaskStartGap);
-                    }
-
-                @endphp --}}
 
                 <div id="hour-block" class="bg-alert d-flex flex-column align-items-center justify-content-center m-0"
                     style="position:absolute; top: {{ $position }}%; left: 0; width:100% ">
@@ -79,12 +61,11 @@
                                 @endforeach
                             @endif
 
-
-
                         </div>
                     @endfor
 
                 </div>
+
             </div>
 
         </div>

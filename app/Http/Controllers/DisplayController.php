@@ -64,9 +64,13 @@ class DisplayController extends Controller
 
     public function displayWeek()
     {
-        $currentDate = Carbon::now();
+        $now = Carbon::now();
 
-        $startOfWeek = $currentDate->startOfWeek(Carbon::SUNDAY);
+        $startOfWeek = $now->startOfWeek(Carbon::SUNDAY);
+        $startOfDay = $now->copy()->startOfDay();
+        $minutesSinceStartOfDay = $startOfDay->diffInMinutes($now);
+
+
 
         $weekDays = [];
 
