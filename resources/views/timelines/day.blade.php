@@ -40,13 +40,12 @@
                                         $end = getCarbonTime($duration->end);
 
                                         $blockStartTaskStartGap = getCarbonTime($blockTime)->diffInMinutes($start);
+
                                         $taskPositionTop = ($blockStartTaskStartGap * 100) / 60;
 
                                         $durationInMinutes = $start->diffInMinutes($end);
 
                                         $taskContainerHeigh = ($durationInMinutes * 100) / 60;
-
-                                        $createTaskLinkHeight;
 
                                     @endphp
 

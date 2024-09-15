@@ -1590,7 +1590,6 @@ if (!function_exists('getTaskAtThatTime')) {
     {
         $time = getCarbonTime($time);
 
-
         $timePlusOneHour = $time->copy()->addHour()->subSecond();
 
         $userID = auth()->id();
@@ -1598,32 +1597,6 @@ if (!function_exists('getTaskAtThatTime')) {
         $today = getToday();
 
         $currentDayOfWeek = getDayOfWeek($today);
-
-        // dd(Task::with([
-        //     'participants',
-        //     'reminder',
-        //     'reminder.recurring',
-        //     'durations'
-
-        // ])->where('concluded', 'false')->where(function ($query) use ($userID) {
-
-        //     $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-        //         $query->where('user_id', $userID)->where('status', 'accepted');
-        //     });
-        // })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
-
-        //     $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
-
-        //         $query->where(function ($query) use ($today, $currentDayOfWeek) {
-
-        //             $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
-        //         })->orWhere($currentDayOfWeek, 'true');
-        //     });
-        // })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
-
-        //     $query->where('user_id', $userID)->whereBetween('start', [$time->format('H:i:s'), $timePlusOneHour->format('H:i:s')]);
-        // })->get());
-
 
         return Task::with([
             'participants',
@@ -1649,20 +1622,5 @@ if (!function_exists('getTaskAtThatTime')) {
 
             $query->where('user_id', $userID)->whereBetween('start', [$time->format('H:i:s'), $timePlusOneHour->format('H:i:s')]);
         })->get();
-
-
-
-
-
-        // foreach ($tasksToday as $task) {
-
-        //     $start  = getDuration($task)->start;
-        //     $start = getCarbonTime($start);
-
-        //     if ($start->between($time, $timePlusOneHour)) {
-        //         return $task;
-        //     }
-        // }
-        // return null;
     }
 }
