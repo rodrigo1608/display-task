@@ -1,13 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="container px-5">
+
 
         <div class="row m-0 mt-5 p-0 px-5">
 
-            @foreach ($weekDays as $weekday)
+            @foreach ($carbonWeekDays as $carbonWeekDay)
                 @php
-                    $nameOfweekDay = getDayOfWeek($weekday, 'pt-br');
+                    $nameOfweekDay = getDayOfWeek($carbonWeekDay, 'pt-br');
 
                     $abbreviated = mb_substr($nameOfweekDay, 0, 3, 'UTF-8');
 
@@ -19,7 +21,7 @@
 
                     <p class="poppins fs-6 text-center">{{ $formatedWeekDay }}</p>
 
-                    <p class="poppins-regular fs-4 text-center">{{ $weekday->day }}</p>
+                    <p class="poppins-regular fs-4 text-center">{{ $carbonWeekDay->day }}</p>
 
                 </div>
             @endforeach
@@ -28,45 +30,92 @@
 
         <div class="full-height-78vh row m-0 mt-2 p-0 px-5">
 
-            @foreach ($weekDays as $weekday)
+            @foreach ($carbonWeekDays as $carbonWeekDay)
                 <div class="col m-0 mt-2 p-0" style="{{ $loop->last ? '' : 'border-right: 1px solid lightgrey;' }}">
 
-                    {{-- <div id="current-time-line" class="bg-danger"
-                            style="position:absolute; top:50%;  left: 0; height: 2px;  width:100%; z-index:2; ">
-                        </div> --}}
-
-                    {{-- {{ !$loop->last ? 'border-right: 1px solid lightgrey;' : '' }} --}}
-
                     @for ($i = 0; $i < 24; $i++)
-                        <div class="row" style="border-top: 1px solid black; height:100px; position:relative;">
+                        <div class="" style="border-top: 1px solid black; height:100px; position:relative;">
 
                             @php
+
+                                $isToday = checkIsToday($carbonWeekDay);
+
                                 $blockTime = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
 
-                                $tasks = getTaskAtThatTime($blockTime);
+                                $time = getCarbonTime($blockTime);
+
+                                $tasks = getTasksForDayAndTime($blockTime, $carbonWeekDay);
+
+                                $timePlusOneHour = $time->copy()->addHour()->subSecond();
+
+                                $shouldDisplayTimeMarker = $isToday && $now->between($time, $timePlusOneHour);
 
                             @endphp
 
                             @foreach ($tasks as $task)
                                 @php
-                                    $duration = getDuration($task);
 
-                                    $start = getCarbonTime($duration->start);
-                                    $end = getCarbonTime($duration->end);
+                                    $dayOfWeek = getDayOfWeek($carbonWeekDay);
 
-                                    $blockStartTaskStartGap = getCarbonTime($blockTime)->diffInMinutes($start);
+                                    $recurring = $task->reminder->recurring;
 
-                                    $taskPositionTop = ($blockStartTaskStartGap * 100) / 60;
+                                    $specificDateWeekday = $recurring->specific_date_weekday;
 
-                                    $durationInMinutes = $start->diffInMinutes($end);
+                                    $isSpecificDateMatchingWeekday = $specificDateWeekday === $dayOfWeek;
 
-                                    $taskContainerHeigh = ($durationInMinutes * 100) / 60;
+                                    $isRecurringOnDay = $recurring->{$dayOfWeek} === 'true';
+
+                                    $shouldDisplayTask = $isSpecificDateMatchingWeekday || $isRecurringOnDay;
+
                                 @endphp
 
-                                <div>
-                                    {{ $task->title }}
-                                </div>
+                                @if ($shouldDisplayTask)
+                                    @php
+
+                                        $duration = getDuration($task);
+
+                                        $start = getCarbonTime($duration->start);
+
+                                        $end = getCarbonTime($duration->end);
+
+                                        $durationInMinutes = $start->diffInMinutes($end);
+
+                                        $taskContainerHeigh = ($durationInMinutes * 100) / 60;
+
+                                        $blockStartTaskStartGap = getCarbonTime($blockTime)->diffInMinutes($start);
+
+                                        $taskPositionTop = ($blockStartTaskStartGap * 100) / 60;
+
+                                    @endphp
+
+                                    <a href="{{ route('task.show', $task->id) }}"
+                                        class="col-md-10 w-100 task-container text-decoration-none rounded border border-2 border-black"
+                                        style="height:{{ $taskContainerHeigh }}px; position:absolute; left:0; z-index: 1; background:{{ $task->creator->color }};
+                                    top:{{ $taskPositionTop }}%">
+
+                                        <p class="text-white">{{ $task->title }} - {{ $start->format('H:i') }} até
+                                            {{ $end->format('H:i') }}</p>
+                                    </a>
+                                @endif
                             @endforeach
+
+                            @if ($shouldDisplayTimeMarker)
+                                @php
+                                    $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
+                                    $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
+                                @endphp
+
+                                <div id="time-marker" class="bg-danger"
+                                    style="
+                                  position:absolute;
+                                    top:{{ $timeMarkerPosition }}px;
+                                    left: 0;
+                                    height: 2px;
+                                    width:100%;
+                                    z-index:2;">
+                                </div>
+                            @endif
+
 
                             @if ($loop->first)
                                 @php
@@ -89,9 +138,32 @@
 
                 </div>
             @endforeach
-
         </div>
 
-
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const timeMarker = document.querySelector('#time-marker');
+            const scrollContainer = document.querySelector('.full-height-78vh');
+
+
+            if (timeMarker && scrollContainer) {
+
+                let timeMarkerPosition = timeMarker.getBoundingClientRect().top;
+
+                scrollContainer.scrollTop = timeMarkerPosition - scrollContainer.clientHeight / 2;
+            }
+        })
+
+        function autoRefreshEveryMinute() {
+
+            location.reload();
+
+        }
+
+        setInterval(autoRefreshEveryMinute, 60000);
+    </script>
+
 @endsection

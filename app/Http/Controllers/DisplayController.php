@@ -48,6 +48,8 @@ class DisplayController extends Controller
         // $tasksToday = $tasksTodayBuilder->get();
 
         $now = getCarbonNow();
+
+
         $startOfDay = $now->copy()->startOfDay();
 
         // Calcula o número de minutos desde o início do dia
@@ -64,20 +66,15 @@ class DisplayController extends Controller
 
     public function displayWeek()
     {
-        $now = Carbon::now();
+        $now = getCarbonNow();
+        $startOfWeek = $now->copy()->startOfWeek(Carbon::SUNDAY);
 
-        $startOfWeek = $now->startOfWeek(Carbon::SUNDAY);
-        $startOfDay = $now->copy()->startOfDay();
-        $minutesSinceStartOfDay = $startOfDay->diffInMinutes($now);
-
-
-
-        $weekDays = [];
+        $carbonWeekDays = [];
 
         for ($i = 0; $i < 7; $i++) {
-            $weekDays[] = $startOfWeek->copy()->addDays($i);
+            $carbonWeekDays[] = $startOfWeek->copy()->addDays($i);
         }
 
-        return view('timelines/week', compact('weekDays'));
+        return view('timelines/week', compact('carbonWeekDays', 'now'));
     }
 }

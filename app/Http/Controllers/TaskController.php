@@ -424,9 +424,6 @@ class TaskController extends Controller
 
         $duration = getDuration($currentTask);
 
-
-
-
         $duration = Duration::create([
 
             'start' => $startTime,
@@ -462,7 +459,7 @@ class TaskController extends Controller
 
         $participant->save();
 
-        return redirect('display_day.displayDay');
+        return redirect()->route('display.displayDay');
     }
 
     /**

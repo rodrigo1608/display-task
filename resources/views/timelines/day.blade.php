@@ -8,11 +8,11 @@
 
             <div class="container-day col-9 container p-0">
 
-                <div id="current-time-line" class="bg-danger"
-                    style="position:absolute; top:50%;  left: 0; height: 2px;  width:100%; z-index:2; ">
+                <div id="current-time-marker" class="bg-danger"
+                    style="position:absolute; top:50%; left:0; height: 2px;  width:100%; z-index:2; ">
                 </div>
 
-                <div id="hour-block" class="bg-alert d-flex flex-column align-items-center justify-content-center m-0"
+                <div class="d-flex flex-column align-items-center justify-content-center m-0"
                     style="position:absolute; top: {{ $position }}%; left: 0; width:100% ">
 
                     @for ($i = 0; $i < 24; $i++)
@@ -27,7 +27,8 @@
                             </div>
 
                             @php
-                                $tasks = getTaskAtThatTime($blockTime);
+                                $today = getToday();
+                                $tasks = getTasksForDayAndTime($blockTime, $today);
                             @endphp
 
                             @if (!$tasks->isEmpty())
@@ -37,6 +38,7 @@
                                         $duration = getDuration($task);
 
                                         $start = getCarbonTime($duration->start);
+
                                         $end = getCarbonTime($duration->end);
 
                                         $blockStartTaskStartGap = getCarbonTime($blockTime)->diffInMinutes($start);
@@ -74,7 +76,7 @@
     <script>
         let counter = 0;
 
-        function moveTimeLine() {
+        function autoRefreshEveryMinute() {
 
             // let hourBlock = document.querySelector('#hour-block');
 
@@ -88,7 +90,7 @@
 
         }
 
-        setInterval(moveTimeLine, 60000);
+        setInterval(autoRefreshEveryMinute, 60000);
     </script>
 
 @endsection

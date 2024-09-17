@@ -368,8 +368,6 @@
 
                         </div>
 
-
-
                         @php
                             $firstError = null;
 

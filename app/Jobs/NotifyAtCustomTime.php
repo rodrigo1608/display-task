@@ -123,7 +123,7 @@ class NotifyAtCustomTime implements ShouldQueue
 
                                 if ($time === 'one_day_earlier') {
 
-                                    $isTodayADayBefore =  checkIsDayBefore($specificDate);
+                                    $isTodayADayBefore = checkIsDayBefore($specificDate);
 
                                     if (!$isTodayADayBefore) {
 
@@ -179,11 +179,11 @@ class NotifyAtCustomTime implements ShouldQueue
                     } else {
 
                         $isTask = !is_null($task);
+
                         Log::info('Job NotifyAtCustomTime:');
                         Log::info('Job NotifyAtCustomTime: ' . getNotificationContextSnippet($isTask) . ' para se repetir semanalmente em dias selecionados - Recurring ID: ' . $recurring->id);
 
                         $recurringDays = getRepeatingDays($recurring);
-
 
                         $today = getToday();
                         $todayWeekday = getDayOfWeek($today);

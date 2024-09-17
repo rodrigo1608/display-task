@@ -218,7 +218,6 @@ if (!function_exists('getRepeatingDays')) {
 
         $daysOfWeek = getDaysOfWeek();
 
-
         $repeatingDays = [];
 
         $isPtBr = $language  == 'pt-br';
@@ -1538,7 +1537,7 @@ if (!function_exists('getAlertAboutNotificationTime')) {
 
                 case 'finished':
 
-                    return $recurringAlertMessages['in_progress'];;
+                    return $recurringAlertMessages['finished'];;
             }
         }
     }
@@ -1584,9 +1583,9 @@ if (!function_exists('getFilteredBySelectTasks')) {
     }
 }
 
-if (!function_exists('getTaskAtThatTime')) {
+if (!function_exists('getTasksForDayAndTime')) {
 
-    function getTaskAtThatTime($time)
+    function getTasksForDayAndTime($time, $day)
     {
         $time = getCarbonTime($time);
 
@@ -1594,9 +1593,33 @@ if (!function_exists('getTaskAtThatTime')) {
 
         $userID = auth()->id();
 
-        $today = getToday();
+        $currentDayOfWeek = getDayOfWeek($day);
 
-        $currentDayOfWeek = getDayOfWeek($today);
+        // dd(Task::with([
+        //     'participants',
+        //     'reminder',
+        //     'reminder.recurring',
+        //     'durations'
+
+        // ])->where('concluded', 'false')->where(function ($query) use ($userID) {
+
+        //     $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+        //         $query->where('user_id', $userID)->where('status', 'accepted');
+        //     });
+        // })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
+
+        //     $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
+
+        //         $query->where(function ($query) use ($today, $currentDayOfWeek) {
+
+        //             $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
+        //         })->orWhere($currentDayOfWeek, 'true');
+        //     });
+        // })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
+
+        //     $query->where('user_id', $userID)->whereBetween('start', [$time->format('H:i:s'), $timePlusOneHour->format('H:i:s')]);
+        // })->get());
+
 
         return Task::with([
             'participants',
@@ -1609,13 +1632,13 @@ if (!function_exists('getTaskAtThatTime')) {
             $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
                 $query->where('user_id', $userID)->where('status', 'accepted');
             });
-        })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
+        })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
 
-            $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
+            $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
 
-                $query->where(function ($query) use ($today, $currentDayOfWeek) {
+                $query->where(function ($query) use ($day, $currentDayOfWeek) {
 
-                    $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
+                    $query->where('specific_date', $day)->where('specific_date_weekday', $currentDayOfWeek);
                 })->orWhere($currentDayOfWeek, 'true');
             });
         })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
