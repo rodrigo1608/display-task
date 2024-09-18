@@ -77,4 +77,70 @@ class DisplayController extends Controller
 
         return view('timelines/week', compact('carbonWeekDays', 'now'));
     }
+
+    public function displayMonth()
+    {
+        $now = getCarbonNow();
+
+        $currentMonth = $now->month;
+        $currentYear = $now->year;
+
+        $firstDayOfMonth = getCarbonDate($now->format('Y-m') . '-1');
+        $lastDayOfMonth = getCarbonDate($now->format('Y-m') . '-' . $now->daysInMonth);
+
+        $daysInMonth = $now->daysInMonth;
+
+        $daysArray = [];
+
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+
+            $daysArray[] = getCarbonDate($now->format('Y-m') . '-' . $day);
+        }
+
+        $startDayIndex = $firstDayOfMonth->dayOfWeek;
+
+        $emptyDaysBefore = array_fill(0, $startDayIndex, '');
+
+        $daysWithEmpty = array_merge($emptyDaysBefore, $daysArray);
+
+        $totalDaysToShow = 42;
+
+        $daysToFill = $totalDaysToShow - count($daysWithEmpty);
+
+        for ($i = 0; $i < $startDayIndex; $i++) {
+
+            $daysWithEmpty[$i] = $firstDayOfMonth->copy()->subDays($startDayIndex - $i);
+        }
+
+        for ($i = 0; $i < $daysToFill; $i++) {
+
+            $daysWithEmpty[] = $lastDayOfMonth->copy()->addDays($i);
+        }
+
+        $startOfWeek = $now->copy()->startOfWeek(Carbon::SUNDAY);
+
+        $carbonWeekDays = [];
+
+        for ($i = 0; $i < 7; $i++) {
+
+            $carbonWeekDays[] = $startOfWeek->copy()->addDays($i);
+        }
+
+        $monthsInPortuguese = [
+            'Jan' => 'Jan',
+            'Feb' => 'Fev',
+            'Mar' => 'Mar',
+            'Apr' => 'Abr',
+            'May' => 'Mai',
+            'Jun' => 'Jun',
+            'Jul' => 'Jul',
+            'Aug' => 'Ago',
+            'Sep' => 'Set',
+            'Oct' => 'Out',
+            'Nov' => 'Nov',
+            'Dec' => 'Dez',
+        ];
+
+        return view('timelines/month', compact('daysWithEmpty', 'carbonWeekDays', 'monthsInPortuguese'));
+    }
 }

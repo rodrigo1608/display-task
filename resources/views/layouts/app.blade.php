@@ -305,7 +305,7 @@
                             <li class="list-group-item">Minha semana</li>
                         </a>
 
-                        <a href="#" class="side-link">
+                        <a href="{{ route('display.displayMonth') }}" class="side-link">
                             <li class="list-group-item">Meu mês</li>
                         </a>
 

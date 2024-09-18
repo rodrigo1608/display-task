@@ -39,3 +39,4 @@ Route::get('search_tasks', [FilterController::class, 'searchByTitle'])->name('se
 
 Route::get('display/day', [DisplayController::class, 'displayDay'])->name('display.displayDay');
 Route::get('display/week', [DisplayController::class, 'displayWeek'])->name('display.displayWeek');
+Route::get('display/month', [DisplayController::class, 'displayMonth'])->name('display.displayMonth');
