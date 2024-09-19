@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Task;
 use Carbon\Carbon;
 
 class DisplayController extends Controller
@@ -14,8 +13,9 @@ class DisplayController extends Controller
     }
 
 
-    public function displayDay()
+    public function displayDay(Request $request)
     {
+        dd($request->all());
         $userID = auth()->id();
 
         $today = getToday();
@@ -49,7 +49,6 @@ class DisplayController extends Controller
 
         $now = getCarbonNow();
 
-
         $startOfDay = $now->copy()->startOfDay();
 
         // Calcula o número de minutos desde o início do dia
@@ -78,26 +77,38 @@ class DisplayController extends Controller
         return view('timelines/week', compact('carbonWeekDays', 'now'));
     }
 
-    public function displayMonth()
+    public function displayMonth(Request $request)
     {
         $now = getCarbonNow();
 
-        $currentMonth = $now->month;
-        $currentYear = $now->year;
+        $currentDate = '';
+        $selectedMonth =  $now->format('F');
+        $selectedYear = $now->format('Y');
 
-        $firstDayOfMonth = getCarbonDate($now->format('Y-m') . '-1');
-        $lastDayOfMonth = getCarbonDate($now->format('Y-m') . '-' . $now->daysInMonth);
+        if (!empty($request->all())) {
 
-        $daysInMonth = $now->daysInMonth;
+            $currentDate = $request->year . '-0' . getCarbonDate($request->month)->month;
+            $selectedMonth = $request->month;
+            $selectedYear  = $request->year;
+        }
+
+        $isCurrentDate = empty($request->all()) ||  $currentDate === $now->format('Y-m');
+
+        $date = $isCurrentDate ? $now : getCarbonDate($currentDate);
+
+        $firstDayOfMonth = $date->copy()->startOfMonth()->timezone('America/Sao_Paulo');
+        $lastDayOfMonth = $date->copy()->endOfMonth()->timezone('America/Sao_Paulo');
+
+        $daysInMonth = $date->daysInMonth;
 
         $daysArray = [];
 
         for ($day = 1; $day <= $daysInMonth; $day++) {
 
-            $daysArray[] = getCarbonDate($now->format('Y-m') . '-' . $day);
+            $daysArray[] = getCarbonDate($date->format('Y-m') . '-' . $day);
         }
 
-        $startDayIndex = $firstDayOfMonth->dayOfWeek;
+        $startDayIndex = $firstDayOfMonth->dayOfWeek ?: 7;
 
         $emptyDaysBefore = array_fill(0, $startDayIndex, '');
 
@@ -112,12 +123,12 @@ class DisplayController extends Controller
             $daysWithEmpty[$i] = $firstDayOfMonth->copy()->subDays($startDayIndex - $i);
         }
 
-        for ($i = 0; $i < $daysToFill; $i++) {
+        for ($i = 1; $i <= $daysToFill; $i++) {
 
             $daysWithEmpty[] = $lastDayOfMonth->copy()->addDays($i);
         }
 
-        $startOfWeek = $now->copy()->startOfWeek(Carbon::SUNDAY);
+        $startOfWeek = $date->copy()->startOfWeek(Carbon::SUNDAY);
 
         $carbonWeekDays = [];
 
@@ -126,21 +137,10 @@ class DisplayController extends Controller
             $carbonWeekDays[] = $startOfWeek->copy()->addDays($i);
         }
 
-        $monthsInPortuguese = [
-            'Jan' => 'Jan',
-            'Feb' => 'Fev',
-            'Mar' => 'Mar',
-            'Apr' => 'Abr',
-            'May' => 'Mai',
-            'Jun' => 'Jun',
-            'Jul' => 'Jul',
-            'Aug' => 'Ago',
-            'Sep' => 'Set',
-            'Oct' => 'Out',
-            'Nov' => 'Nov',
-            'Dec' => 'Dez',
-        ];
+        $months = getMonths();
+        $selectedMOnthInPortuguese = $months[$selectedMonth];
 
-        return view('timelines/month', compact('daysWithEmpty', 'carbonWeekDays', 'monthsInPortuguese'));
+        // dd($daysWithEmpty);
+        return view('timelines/month', compact('daysWithEmpty', 'carbonWeekDays', 'months', 'selectedMOnthInPortuguese', 'selectedYear'));
     }
 }

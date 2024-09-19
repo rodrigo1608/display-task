@@ -162,6 +162,32 @@ if (!function_exists('checkIsDayBefore')) {
     }
 }
 
+if (!function_exists('getMonths')) {
+
+    function getMonths($abbreviated = false)
+    {
+
+        return  [
+            'January' => 'Janeiro',
+            'February' => 'Fevereiro',
+            'March' => 'Março',
+            'April' => 'Abril',
+            'May' => 'Maio',
+            'June' => 'Junho',
+            'July' => 'Julho',
+            'August' => 'Agosto',
+            'September' => 'Setembro',
+            'October' => 'Outubro',
+            'November' => 'Novembro',
+            'December' => 'Dezembro',
+        ];
+    }
+}
+
+
+
+
+
 
 // if (!function_exists('checkValidDayAlert')) {
 
@@ -1644,6 +1670,39 @@ if (!function_exists('getTasksForDayAndTime')) {
         })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
 
             $query->where('user_id', $userID)->whereBetween('start', [$time->format('H:i:s'), $timePlusOneHour->format('H:i:s')]);
+        })->get();
+    }
+}
+
+
+if (!function_exists('getTasksForDay')) {
+
+    function getTasksForDay($day)
+    {
+        $userID = auth()->id();
+
+        $currentDayOfWeek = getDayOfWeek($day);
+
+        return Task::with([
+            'participants',
+            'reminder',
+            'reminder.recurring',
+            'durations'
+
+        ])->where('concluded', 'false')->where(function ($query) use ($userID) {
+
+            $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+                $query->where('user_id', $userID)->where('status', 'accepted');
+            });
+        })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
+
+            $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
+
+                $query->where(function ($query) use ($day, $currentDayOfWeek) {
+
+                    $query->where('specific_date', $day)->where('specific_date_weekday', $currentDayOfWeek);
+                })->orWhere($currentDayOfWeek, 'true');
+            });
         })->get();
     }
 }
