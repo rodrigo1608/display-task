@@ -101,10 +101,9 @@
                     @foreach ($daysWithEmpty as $day)
                         @if ($nameOfWeekDay === getDayOfWeek($day, 'pt-br'))
                             <form action="{{ route('display.displayDay') }}"method="get">
-
                                 @csrf
 
-                                <input type="hidden" name="date" value="{{ $day->format('m-d') }}">
+                                <input type="hidden" name="date" value="{{ $day->format('Y-m-d') }}">
 
                                 <button type="submit"
                                     class="day-block w-100 align-items-center d-flex flex-column border-top border-0 bg-white">

@@ -18,7 +18,6 @@ class DisplayController extends Controller
     {
 
         $userID = auth()->id();
-
         $date =  empty($request->all()) ? getToday() : getCarbonDate($request->date);
 
         $currentDayOfWeek = getDayOfWeek($date);
