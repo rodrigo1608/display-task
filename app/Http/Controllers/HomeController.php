@@ -66,34 +66,9 @@ class HomeController extends Controller
 
             $selectedUserTasks = getFilteredBySelectTasks($request);
         } else {
-            $selectedUserTasksBuilder = Task::with([
+            $selectedUserTasksBuilder = getSelectedUserTasksBuilder($selectedDate);
 
-                'participants',
-                'reminder',
-                'reminder.recurring',
-                'durations'
-
-            ])->where('concluded', 'false')->where(function ($query) use ($currentUserID) {
-
-                $query->where('created_by', $currentUserID)->orWhereHas('participants', function ($query) use ($currentUserID) {
-                    $query->where('user_id', $currentUserID)->where('status', 'accepted');
-                });
-            })->whereHas('reminder', function ($query) use ($selectedDate, $weekdayOfSelectDate) {
-
-                $query->whereHas('recurring', function ($query) use ($selectedDate, $weekdayOfSelectDate) {
-
-                    $query->where(function ($query) use ($selectedDate, $weekdayOfSelectDate) {
-
-                        $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekdayOfSelectDate);
-                    })->orWhere($weekdayOfSelectDate, 'true');
-                });
-            });
-
-            $selectedUserTasks = $selectedUserTasksBuilder->get();
-
-            $selectedUserTasks = $selectedUserTasks->sortBy(function ($task) use ($currentUserID) {
-                return $task->durations->where('user_id', $currentUserID)->first()->start ?? '23:59:59';
-            });
+            $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
         }
 
         $labelOverview = "";

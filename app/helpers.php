@@ -1682,37 +1682,37 @@ if (!function_exists('getTasksForDayAndTime')) {
 }
 
 
-if (!function_exists('getTasksForDay')) {
+// if (!function_exists('getTasksForDay')) {
 
-    function getTasksForDay($day)
-    {
-        $userID = auth()->id();
+//     function getTasksForDay($day)
+//     {
+//         $userID = auth()->id();
 
-        $currentDayOfWeek = getDayOfWeek($day);
+//         $currentDayOfWeek = getDayOfWeek($day);
 
-        return Task::with([
-            'participants',
-            'reminder',
-            'reminder.recurring',
-            'durations'
+//         return Task::with([
+//             'participants',
+//             'reminder',
+//             'reminder.recurring',
+//             'durations'
 
-        ])->where('concluded', 'false')->where(function ($query) use ($userID) {
+//         ])->where('concluded', 'false')->where(function ($query) use ($userID) {
 
-            $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-                $query->where('user_id', $userID)->where('status', 'accepted');
-            });
-        })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
+//             $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+//                 $query->where('user_id', $userID)->where('status', 'accepted');
+//             });
+//         })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
 
-            $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
+//             $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
 
-                $query->where(function ($query) use ($day, $currentDayOfWeek) {
+//                 $query->where(function ($query) use ($day, $currentDayOfWeek) {
 
-                    $query->where('specific_date', $day)->where('specific_date_weekday', $currentDayOfWeek);
-                })->orWhere($currentDayOfWeek, 'true');
-            });
-        })->get();
-    }
-}
+//                     $query->where('specific_date', $day)->where('specific_date_weekday', $currentDayOfWeek);
+//                 })->orWhere($currentDayOfWeek, 'true');
+//             });
+//         })->get();
+//     }
+// }
 
 if (!function_exists('getlabelOverviewForDay')) {
 
@@ -1737,5 +1737,52 @@ if (!function_exists('getlabelOverviewForDay')) {
         }
 
         return $labelOverview;
+    }
+}
+
+if (!function_exists('getSelectedUserTasksBuilder')) {
+
+    function getSelectedUserTasksBuilder($selectedDate)
+    {
+        $currentUserID =  auth()->id();
+
+        $carbonDate = getCarbonDate($selectedDate);
+
+        $weekdayOfSelectDate = getDayOfWeek($carbonDate);
+
+        return Task::with([
+
+            'participants',
+            'reminder',
+            'reminder.recurring',
+            'durations'
+
+        ])->where('concluded', 'false')->where(function ($query) use ($currentUserID) {
+
+            $query->where('created_by', $currentUserID)->orWhereHas('participants', function ($query) use ($currentUserID) {
+                $query->where('user_id', $currentUserID)->where('status', 'accepted');
+            });
+        })->whereHas('reminder', function ($query) use ($selectedDate, $weekdayOfSelectDate) {
+
+            $query->whereHas('recurring', function ($query) use ($selectedDate, $weekdayOfSelectDate) {
+
+                $query->where(function ($query) use ($selectedDate, $weekdayOfSelectDate) {
+
+                    $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekdayOfSelectDate);
+                })->orWhere($weekdayOfSelectDate, 'true');
+            });
+        });
+    }
+}
+if (!function_exists('sortByStart')) {
+
+    function sortByStart($builder)
+    {
+        $collection = $builder->get();
+        $currentUserID =  auth()->id();
+
+        return $collection->sortBy(function ($task) use ($currentUserID) {
+            return $task->durations->where('user_id', $currentUserID)->first()->start ?? '23:59:59';
+        });
     }
 }

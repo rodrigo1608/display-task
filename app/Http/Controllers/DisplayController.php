@@ -22,28 +22,7 @@ class DisplayController extends Controller
 
         $currentDayOfWeek = getDayOfWeek($date);
 
-        $hasAnytaskToday = Task::with([
-
-            'participants',
-            'reminder',
-            'reminder.recurring',
-            'durations'
-
-        ])->where('concluded', 'false')->where(function ($query) use ($userID) {
-
-            $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-                $query->where('user_id', $userID)->where('status', 'accepted');
-            });
-        })->whereHas('reminder', function ($query) use ($date, $currentDayOfWeek) {
-
-            $query->whereHas('recurring', function ($query) use ($date, $currentDayOfWeek) {
-
-                $query->where(function ($query) use ($date, $currentDayOfWeek) {
-
-                    $query->where('specific_date', $date->format('Y-m-d'))->where('specific_date_weekday', $currentDayOfWeek);
-                })->orWhere($currentDayOfWeek, 'true');
-            });
-        })->exists();
+        $hasAnytaskToday = getSelectedUserTasksBuilder($date)->exists();
 
         $now = getCarbonNow();
 

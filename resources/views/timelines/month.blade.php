@@ -110,7 +110,8 @@
 
                                     @php
                                         $isToday = $day->isToday();
-                                        $tasks = getTasksForDay($day);
+                                        $tasksBulder = getSelectedUserTasksBuilder($day);
+                                        $tasks = sortByStart($tasksBulder);
                                     @endphp
 
                                     <p class="poppins fs-6">
