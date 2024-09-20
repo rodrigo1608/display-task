@@ -458,70 +458,80 @@
             </div>
 
         </div>
+        <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
 
-        <script>
-            const start = document.getElementById('start').value;
-            const end = document.getElementById('end').value;
+            {{-- botão de voltar --}}
+            <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
+                title="voltar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+            </a>
 
-            const formStart = document.getElementById('formStart');
-            const formEnd = document.getElementById('formEnd');
+            <script>
+                const start = document.getElementById('start').value;
+                const end = document.getElementById('end').value;
 
-            formStart.value = start
-            formEnd.value = end
+                const formStart = document.getElementById('formStart');
+                const formEnd = document.getElementById('formEnd');
 
-            //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
+                formStart.value = start
+                formEnd.value = end
 
-            const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
+                //Abaixo manipula o registro de quantas opções foram selecionadas no accordion de horário de alerta.
 
-                const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
+                const handleInputBasedOnCheckboxSelection = (affectedInput, checkBoxesInputs, valueToFill = '') => {
 
-                const affectedInputIsEmpty = affectedInput.value.trim() == '';
+                    const isAnyInputChecked = checkBoxesInputs.some(element => element.checked);
 
-                const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
+                    const affectedInputIsEmpty = affectedInput.value.trim() == '';
 
-                affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
+                    const affectedInputMustBeFilled = !isAnyInputChecked && affectedInputIsEmpty;
 
-            }
+                    affectedInputMustBeFilled ? affectedInput.value = valueToFill : affectedInput.value = '';
 
-            const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
+                }
 
-            const customAlertTime = document.querySelector('#custom-alert-time');
+                const alertOptionsCounterLabel = document.querySelector('.alertOptionsCounter');
 
-            const alertOptionsCollection = document.querySelectorAll('.alertOption');
+                const customAlertTime = document.querySelector('#custom-alert-time');
 
-            const alertOptions = Array.from(alertOptionsCollection);
+                const alertOptionsCollection = document.querySelectorAll('.alertOption');
 
-            const displaySelectedAlertCounter = () => {
+                const alertOptions = Array.from(alertOptionsCollection);
 
-                const checkedOptions = alertOptions.filter(option => option.checked);
-                const checkedRegister = checkedOptions.length;
+                const displaySelectedAlertCounter = () => {
 
-                checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
-                        checkedRegister + ')') :
-                    alertOptionsCounterLabel.innerText = "";
-            }
+                    const checkedOptions = alertOptions.filter(option => option.checked);
+                    const checkedRegister = checkedOptions.length;
 
-            displaySelectedAlertCounter();
+                    checkedRegister > 0 ? alertOptionsCounterLabel.innerText = ('(' +
+                            checkedRegister + ')') :
+                        alertOptionsCounterLabel.innerText = "";
+                }
 
-            alertOptions.forEach(optionAlert => {
+                displaySelectedAlertCounter();
 
-                optionAlert.addEventListener('click', () => {
+                alertOptions.forEach(optionAlert => {
 
-                    displaySelectedAlertCounter();
+                    optionAlert.addEventListener('click', () => {
 
-                    handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
+                        displaySelectedAlertCounter();
+
+                        handleInputBasedOnCheckboxSelection(customAlertTime, alertOptions);
+
+                    })
+
+                    customAlertTime.addEventListener('change', () => {
+                        alertOptions.forEach(checkBox => {
+
+                            checkBox.checked = false;
+                            alertOptionsCounterLabel.innerText = '';
+                        });
+                    })
 
                 })
+            </script>
 
-                customAlertTime.addEventListener('change', () => {
-                    alertOptions.forEach(checkBox => {
-
-                        checkBox.checked = false;
-                        alertOptionsCounterLabel.innerText = '';
-                    });
-                })
-
-            })
-        </script>
-
-    @endsection
+        @endsection

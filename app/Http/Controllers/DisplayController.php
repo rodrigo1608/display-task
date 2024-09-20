@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Task;
 use Carbon\Carbon;
 
 class DisplayController extends Controller
@@ -15,37 +16,35 @@ class DisplayController extends Controller
 
     public function displayDay(Request $request)
     {
-        dd($request->all());
+
         $userID = auth()->id();
 
-        $today = getToday();
+        $date =  empty($request->all()) ? getToday() : getCarbonDate($request->date);
 
-        $currentDayOfWeek = getDayOfWeek($today);
+        $currentDayOfWeek = getDayOfWeek($date);
 
-        // $tasksTodayBuilder = Task::with([
+        $hasAnytaskToday = Task::with([
 
-        //     'participants',
-        //     'reminder',
-        //     'reminder.recurring',
-        //     'durations'
+            'participants',
+            'reminder',
+            'reminder.recurring',
+            'durations'
 
-        // ])->where('concluded', 'false')->where(function ($query) use ($userID) {
+        ])->where('concluded', 'false')->where(function ($query) use ($userID) {
 
-        //     $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-        //         $query->where('user_id', $userID)->where('status', 'accepted');
-        //     });
-        // })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
+            $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+                $query->where('user_id', $userID)->where('status', 'accepted');
+            });
+        })->whereHas('reminder', function ($query) use ($date, $currentDayOfWeek) {
 
-        //     $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
+            $query->whereHas('recurring', function ($query) use ($date, $currentDayOfWeek) {
 
-        //         $query->where(function ($query) use ($today, $currentDayOfWeek) {
+                $query->where(function ($query) use ($date, $currentDayOfWeek) {
 
-        //             $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
-        //         })->orWhere($currentDayOfWeek, 'true');
-        //     });
-        // });
-
-        // $tasksToday = $tasksTodayBuilder->get();
+                    $query->where('specific_date', $date->format('Y-m-d'))->where('specific_date_weekday', $currentDayOfWeek);
+                })->orWhere($currentDayOfWeek, 'true');
+            });
+        })->exists();
 
         $now = getCarbonNow();
 
@@ -60,7 +59,7 @@ class DisplayController extends Controller
         //     return $task->durations->where('user_id', $userID)->first()->start ?? '23:59:59';
         // });
 
-        return view('timelines/day', compact('position'));
+        return view('timelines/day', compact('position', 'hasAnytaskToday', 'date'));
     }
 
     public function displayWeek()

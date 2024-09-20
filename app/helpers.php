@@ -1613,6 +1613,8 @@ if (!function_exists('getTasksForDayAndTime')) {
 
     function getTasksForDayAndTime($time, $day)
     {
+        // dd($day);
+
         $time = getCarbonTime($time);
 
         $timePlusOneHour = $time->copy()->addHour()->subSecond();
@@ -1621,7 +1623,7 @@ if (!function_exists('getTasksForDayAndTime')) {
 
         $currentDayOfWeek = getDayOfWeek($day);
 
-        // dd(Task::with([
+        // $testTask =  Task::with([
         //     'participants',
         //     'reminder',
         //     'reminder.recurring',
@@ -1632,20 +1634,25 @@ if (!function_exists('getTasksForDayAndTime')) {
         //     $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
         //         $query->where('user_id', $userID)->where('status', 'accepted');
         //     });
-        // })->whereHas('reminder', function ($query) use ($today, $currentDayOfWeek) {
+        // })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
 
-        //     $query->whereHas('recurring', function ($query) use ($today, $currentDayOfWeek) {
+        //     $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
 
-        //         $query->where(function ($query) use ($today, $currentDayOfWeek) {
+        //         $query->where(function ($query) use ($day, $currentDayOfWeek) {
 
-        //             $query->where('specific_date', $today)->where('specific_date_weekday', $currentDayOfWeek);
+        //             $query->where('specific_date', $day->format('Y-m-d'))->where('specific_date_weekday', $currentDayOfWeek);
         //         })->orWhere($currentDayOfWeek, 'true');
         //     });
         // })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
 
         //     $query->where('user_id', $userID)->whereBetween('start', [$time->format('H:i:s'), $timePlusOneHour->format('H:i:s')]);
-        // })->get());
+        // })->get();
 
+        // if ($testTask->isNotEmpty()) {
+        //     // dd($testTask);
+        // }
+
+        // dd($day->format('Y-m-d'));
 
         return Task::with([
             'participants',
@@ -1664,7 +1671,7 @@ if (!function_exists('getTasksForDayAndTime')) {
 
                 $query->where(function ($query) use ($day, $currentDayOfWeek) {
 
-                    $query->where('specific_date', $day)->where('specific_date_weekday', $currentDayOfWeek);
+                    $query->where('specific_date', $day->format('Y-m-d'))->where('specific_date_weekday', $currentDayOfWeek);
                 })->orWhere($currentDayOfWeek, 'true');
             });
         })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
@@ -1704,5 +1711,31 @@ if (!function_exists('getTasksForDay')) {
                 })->orWhere($currentDayOfWeek, 'true');
             });
         })->get();
+    }
+}
+
+if (!function_exists('getlabelOverviewForDay')) {
+
+    function getlabelOverviewForDay($day, $tasksExist)
+    {
+        $labelOverview = "";
+        $weekdayInPortuguese = getDayOfWeek($day, 'pt-br');
+        if (!$tasksExist) {
+
+            $labelOverview = $day->isToday()
+                ? "Nenhuma tarefa agendada para hoje, " . getFormatedDateBR($day)
+                : "Nenhuma tarefa agendada para  " . getFormatedDateBR($day) . ",  $weekdayInPortuguese.";
+        } elseif ($tasksExist != null) {
+
+            $formatedDate = getFormatedDateBR($day);
+
+            $labelOverview = $day->isToday()
+                ? "Agenda de hoje, " . $formatedDate
+                : "Agenda de " . $formatedDate . ",  $weekdayInPortuguese.";
+        } else {
+            $labelOverview = $day->isToday() ? "Agenda de hoje, " . getFormatedDateBR($day) : "Agenda de " . getFormatedDateBR($day) . ",  $weekdayInPortuguese.";
+        }
+
+        return $labelOverview;
     }
 }

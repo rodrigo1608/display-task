@@ -117,7 +117,7 @@
                                     <p class="poppins fs-6">
                                         @if ($isToday)
                                             <span
-                                                class="poppins-semibold rounded bg-black px-2 py-1 text-white">{{ $day->format('d') }}</span>
+                                                class="today-target poppins-semibold rounded bg-black px-2 py-1 text-white">{{ $day->format('d') }}</span>
                                         @elseif(!$day->isCurrentMonth())
                                             <span class="text-light-secondary">
                                                 {{ $day->format('d') }}</span>
@@ -145,15 +145,26 @@
                                         @endif
                                     </p>
 
-                                    @foreach ($tasks as $task)
+                                    @foreach ($tasks->take(4) as $task)
                                         <div class="w-100 mb-1 rounded ps-2"
                                             style="background-color:{{ $task->creator->color }}; overflow:auto">
+
                                             <p class="roboto m-0 p-0 text-white">
                                                 {{ Str::limit($task->title, 20) }}</p>
                                         </div>
                                     @endforeach
 
+                                    @if (count($tasks) > 4)
+                                        @php
+                                            $remaining = count($tasks) - 4;
+                                            $pluralOrSingular = $remaining === 1 ? 'tarefa' : 'tarefas';
+                                        @endphp
+
+                                        <p class="roboto"> + {{ $remaining . $pluralOrSingular }}</p>
+                                    @endif
+
                                 </button>
+
                             </form>
                         @endif
                     @endforeach
@@ -211,13 +222,29 @@
     </div>
 
     <style>
-        .day-block {
-            height: 18vh;
-        }
-
         .text-light-secondary {
             color: #A9A9A9;
             /* cor mais clara */
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const todayTarget = document.querySelector('.today-target');
+            const scrollContainer = document.querySelector('.full-height-78vh');
+
+            console.log(todayTarget);
+
+            console.log(scrollContainer);
+
+            if (todayTarget && scrollContainer) {
+
+                let todayTargetPosition = todayTarget.getBoundingClientRect().top;
+
+                scrollContainer.scrollTop = todayTargetPosition - scrollContainer.clientHeight / 2;
+            }
+
+        })
+    </script>
 @endsection

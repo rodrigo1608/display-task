@@ -4,9 +4,57 @@
 
     <div class="container">
 
+        <div class="row mt-5">
+
+
+
+            <div class='col'>
+
+                <div class='row d-flex justify-content-evenly align-items-center mb-3 px-5 py-3'>
+
+                    <div class='col-md-7'>
+
+                        @php
+                            $labelOverview = getlabelOverviewForDay($date, $hasAnytaskToday);
+                        @endphp
+
+                        <h2 class="fs-5 poppins-regular m-0 p-0">{{ $labelOverview }}</h2>
+                    </div>
+
+                    <div class="col-md-2 me-5">
+
+                        <form action="{{ route('display.displayDay') }}" method="get">
+                            @csrf
+                            <div class="d-flex">
+
+                                <input type="date" id="input-date" name="date"
+                                    class="form-control rounded-0 rounded-start border-end-1 fs-6"
+                                    value="{{ old('specific_date', request()->input('date', Carbon\Carbon::now()->format('Y-m-d'))) }}">
+
+                                {{-- Botão para enviar a pesquisa de tarefas por data --}}
+                                <button type="submit" class="btn btn-secondary rounded-end rounded-0 border-start-0 py-0"
+                                    title="Enviar data">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        width="19" height="19" stroke-width="1.5" stroke="currentColor"
+                                        class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                    </svg>
+
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row full-height-93vh">
 
-            <div class="container-day col-9 container p-0">
+            <div class="container-day col-md-9 container p-0">
 
                 <div id="current-time-marker" class="bg-danger"
                     style="position:absolute; top:50%; left:0; height: 2px;  width:100%; z-index:2; ">
@@ -27,8 +75,7 @@
                             </div>
 
                             @php
-                                $today = getToday();
-                                $tasks = getTasksForDayAndTime($blockTime, $today);
+                                $tasks = getTasksForDayAndTime($blockTime, $date);
                             @endphp
 
                             @if (!$tasks->isEmpty())
@@ -74,17 +121,21 @@
     </div>
 
     <script>
-        let counter = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const timeMarker = document.querySelector('#time-marker');
+            const scrollContainer = document.querySelector('.full-height-78vh');
+
+
+            if (timeMarker && scrollContainer) {
+
+                let timeMarkerPosition = timeMarker.getBoundingClientRect().top;
+
+                scrollContainer.scrollTop = timeMarkerPosition - scrollContainer.clientHeight / 2;
+            }
+        })
 
         function autoRefreshEveryMinute() {
-
-            // let hourBlock = document.querySelector('#hour-block');
-
-            // let positionValueOfHourBlock = parseFloat(hourBlock.style.top.slice(0, -1));
-
-            // positionValueOfHourBlock -= 0.185;
-
-            // hourBlock.style.top = positionValueOfHourBlock + '%';
 
             location.reload();
 
@@ -92,6 +143,7 @@
 
         setInterval(autoRefreshEveryMinute, 60000);
     </script>
+
 
 @endsection
 
