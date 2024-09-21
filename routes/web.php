@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', function () {
-    return redirect()->route('display.displayDay');
+    return redirect()->route('display.day');
 });
 
 Auth::routes(['verify' => true]);
@@ -28,20 +28,29 @@ Route::get('home', [HomeController::class, 'index'])->name('home');
 
 Route::resource('reminder', ReminderController::class);
 
-Route::resource('task', TaskController::class);
-Route::put('task/{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('task.acceptPendingTask');
-Route::post('tasks/{id}/markAsConcluded', [TaskController::class, 'markAsConcluded'])->name('tasks.markAsConcluded');
+Route::prefix('task')->name('task.')->group(function () {
+    Route::resource('task', TaskController::class);
+    Route::put('{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('acceptPendingTask');
+    Route::post('{id}/mark-as-concluded', [TaskController::class, 'markAsConcluded'])->name('markAsConcluded');
+});
 
-Route::get('user/{id}', [UserController::class, 'edit'])->name('user.edit');
-Route::put('user/{id}', [UserController::class, 'update'])->name('user.update');
+Route::prefix('user')->name('user.')->group(function () {
+    Route::get('{id}', [UserController::class, 'edit'])->name('edit');
+    Route::put('{id}', [UserController::class, 'update'])->name('update');
+});
 
-Route::post('participant/{taskID}', [ParticipantController::class, 'add'])->name('participant.add');
-Route::delete('participant', [ParticipantController::class, 'destroy'])->name('participant.destroy');
+Route::prefix('participant')->name('participant.')->group(function () {
+    Route::post('{taskID}', [ParticipantController::class, 'add'])->name('add');
+    Route::delete('/', [ParticipantController::class, 'destroy'])->name('destroy');
+});
 
 Route::post('feedback', [FeedbackController::class, 'store'])->name('feedback.store');
 
 Route::get('search_tasks', [FilterController::class, 'searchByTitle'])->name('search_tasks.searchByTitle');
 
-Route::get('display/day', [DisplayController::class, 'displayDay'])->name('display.displayDay');
-Route::get('display/week', [DisplayController::class, 'displayWeek'])->name('display.displayWeek');
-Route::get('display/month', [DisplayController::class, 'displayMonth'])->name('display.displayMonth');
+Route::prefix('display')->name('display.')->group(function () {
+    Route::get('day', [DisplayController::class, 'displayDay'])->name('day');
+    Route::get('week', [DisplayController::class, 'displayWeek'])->name('week');
+    Route::get('month', [DisplayController::class, 'displayMonth'])->name('month');
+    Route::get('panel', [DisplayController::class, 'displayPanel'])->name('panel');
+});

@@ -23,7 +23,7 @@
 
                     <div class="col-md-2 me-5">
 
-                        <form action="{{ route('display.day') }}" method="get">
+                        <form action="{{ route('display.displayDay') }}" method="get">
                             @csrf
                             <div class="d-flex">
 

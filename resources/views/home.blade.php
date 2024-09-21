@@ -142,12 +142,14 @@
                                                     <a href="{{ route('task.show', ['task' => $task->id]) }}"
                                                         class="btn btn-secondary">Ver tarefa</a>
                                                 </div>
+
                                             </div>
+
                                         </div>
+
                                     </div>
                                 @endforeach
                             @endif
-
 
                         </div>
 

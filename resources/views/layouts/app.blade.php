@@ -310,6 +310,10 @@
                         </a>
 
                         <a href="{{ route('home') }}" class="side-link">
+                            <li class="list-group-item" aria-current="true">Meu geral</li>
+                        </a>
+
+                        <a href="{{ route('home') }}" class="side-link">
                             <li class="list-group-item" aria-current="true">Painel geral</li>
                         </a>
 
