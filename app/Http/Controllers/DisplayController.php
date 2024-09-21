@@ -120,4 +120,34 @@ class DisplayController extends Controller
         // dd($daysWithEmpty);
         return view('timelines/month', compact('daysWithEmpty', 'carbonWeekDays', 'months', 'selectedMOnthInPortuguese', 'selectedYear'));
     }
+
+    public function displayPanel()
+    {
+        $today = getCarbonNow();
+        $formatedToday = $today->format('Y-m-d');
+
+        $weekdayOfSelectDate = getDayOfWeek($today);
+
+        $allTasksforTodayBuilder =   Task::with([
+            'reminder',
+            'reminder.recurring',
+            'durations'
+
+        ])->where('concluded', 'false')->whereHas('reminder', function ($query) use ($formatedToday, $weekdayOfSelectDate) {
+
+            $query->whereHas('recurring', function ($query) use ($formatedToday, $weekdayOfSelectDate) {
+
+                $query->where(function ($query) use ($formatedToday, $weekdayOfSelectDate) {
+
+                    $query->where('specific_date', $formatedToday)->where('specific_date_weekday', $weekdayOfSelectDate);
+                })->orWhere($weekdayOfSelectDate, 'true');
+            });
+        });
+
+        $allTasksforToday =  sortByStart($allTasksforTodayBuilder);
+        $hasAnytaskToday = $allTasksforTodayBuilder->exists();
+
+        $now = getCarbonNow();
+        return view('timelines/panel', compact('now', 'allTasksforToday', 'hasAnytaskToday'));
+    }
 }

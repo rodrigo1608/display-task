@@ -1730,13 +1730,36 @@ if (!function_exists('getlabelOverviewForDay')) {
             $formatedDate = getFormatedDateBR($day);
 
             $labelOverview = $day->isToday()
-                ? "Agenda de hoje, " . $formatedDate
-                : "Agenda de " . $formatedDate . ",  $weekdayInPortuguese.";
+                ? "Hoje, " . $formatedDate
+                : $formatedDate . ",  $weekdayInPortuguese.";
         } else {
             $labelOverview = $day->isToday() ? "Agenda de hoje, " . getFormatedDateBR($day) : "Agenda de " . getFormatedDateBR($day) . ",  $weekdayInPortuguese.";
         }
 
         return $labelOverview;
+    }
+}
+
+if (!function_exists('getPaneldateLabel')) {
+
+    function getPaneldateLabel($tasksExist)
+    {
+        $panelLabel = "";
+
+        $day = getCarbonNow();
+
+        $weekdayInPortuguese = getDayOfWeek($day, 'pt-br');
+
+        if (!$tasksExist) {
+            $panelLabel =  "Nenhuma tarefa agendada para hoje, " . getFormatedDateBR($day);
+        } else {
+
+            $formatedDate = getFormatedDateBR($day);
+
+            $panelLabel = $formatedDate . ",  " . ucfirst($weekdayInPortuguese);
+        }
+
+        return $panelLabel;
     }
 }
 
@@ -1774,6 +1797,8 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
         });
     }
 }
+
+
 if (!function_exists('sortByStart')) {
 
     function sortByStart($builder)

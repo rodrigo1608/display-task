@@ -297,23 +297,23 @@
                             $today = Carbon\Carbon::today()->format('Y-m-d');
                         @endphp
 
-                        <a href="{{ route('display.displayDay') }}" class="side-link">
+                        <a href="{{ route('display.day') }}" class="side-link">
                             <li class="list-group-item">Meu dia</li>
                         </a>
 
-                        <a href="{{ route('display.displayWeek') }}" class="side-link">
+                        <a href="{{ route('display.week') }}" class="side-link">
                             <li class="list-group-item">Minha semana</li>
                         </a>
 
-                        <a href="{{ route('display.displayMonth') }}" class="side-link">
+                        <a href="{{ route('display.month') }}" class="side-link">
                             <li class="list-group-item">Meu mês</li>
                         </a>
 
                         <a href="{{ route('home') }}" class="side-link">
-                            <li class="list-group-item" aria-current="true">Meu geral</li>
+                            <li class="list-group-item" aria-current="true">Meu painel</li>
                         </a>
 
-                        <a href="{{ route('home') }}" class="side-link">
+                        <a href="{{ route('display.panel') }}" class="side-link">
                             <li class="list-group-item" aria-current="true">Painel geral</li>
                         </a>
 

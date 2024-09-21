@@ -6,19 +6,18 @@
 
         <div class="row mt-5">
 
-
-
             <div class='col'>
 
                 <div class='row d-flex justify-content-evenly align-items-center mb-3 px-5 py-3'>
 
-                    <div class='col-md-7'>
+                    <div class='col-md-7 mt-2'>
 
                         @php
                             $labelOverview = getlabelOverviewForDay($date, $hasAnytaskToday);
                         @endphp
 
                         <h2 class="fs-5 poppins-regular m-0 p-0">{{ $labelOverview }}</h2>
+
                     </div>
 
                     <div class="col-md-2 me-5">
@@ -48,7 +47,9 @@
                         </form>
 
                     </div>
+
                 </div>
+
             </div>
         </div>
 

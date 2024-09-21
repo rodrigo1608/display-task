@@ -1,161 +1,105 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
 
-@section('content')
+<head>
 
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- CSRF Token -->
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>{{ config('app.name', 'Tela Tarefa') }}</title>
+
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+            rel="stylesheet">
+
+        <!-- Scripts -->
+        @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+        {{-- styles --}}
+
+        @if (Auth::check())
+            <style>
+                .profile-border {
+                    border: 0.4rem solid {{ Auth::user()->color }};
+                }
+            </style>
+        @endif
+
+    </head>
+</head>
+
+<body>
     <div class="container">
 
-        <div class="row mt-5">
+        <div class="row d-flex align-items-center mt-5">
 
+            {{-- botão de voltar --}}
 
+            <div class="col-md-2">
 
-            <div class='col'>
+                <a class="btn btn-primary me-3 py-2" href="{{ route('home') }}"
+                    aria-label="Voltar para a pagina inicial">
 
-                <div class='row d-flex justify-content-evenly align-items-center mb-3 px-5 py-3'>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                        viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
 
-                    <div class='col-md-7'>
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                    </svg>
 
-                        @php
-                            $labelOverview = getlabelOverviewForDay($date, $hasAnytaskToday);
-                        @endphp
-
-                        <h2 class="fs-5 poppins-regular m-0 p-0">{{ $labelOverview }}</h2>
-                    </div>
-
-                    <div class="col-md-2 me-5">
-
-                        <form action="{{ route('display.displayDay') }}" method="get">
-                            @csrf
-                            <div class="d-flex">
-
-                                <input type="date" id="input-date" name="date"
-                                    class="form-control rounded-0 rounded-start border-end-1 fs-6"
-                                    value="{{ old('specific_date', request()->input('date', Carbon\Carbon::now()->format('Y-m-d'))) }}">
-
-                                {{-- Botão para enviar a pesquisa de tarefas por data --}}
-                                <button type="submit" class="btn btn-secondary rounded-end rounded-0 border-start-0 py-0"
-                                    title="Enviar data">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        width="19" height="19" stroke-width="1.5" stroke="currentColor"
-                                        class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                    </svg>
-
-                                </button>
-
-                            </div>
-
-                        </form>
-
-                    </div>
-                </div>
+                </a>
             </div>
-        </div>
 
-        <div class="row full-height-93vh">
+            <div class="fs-1 col-md-7 text-center">
+                <time class="m-0" id="clock">Carregando...</time>
+            </div>
 
-            <div class="container-day col-md-9 container p-0">
+            <div class='col-md-3 mt-2'>
 
-                <div id="current-time-marker" class="bg-danger"
-                    style="position:absolute; top:50%; left:0; height: 2px;  width:100%; z-index:2; ">
-                </div>
+                @php
+                    $labelOverview = getPaneldateLabel($hasAnytaskToday);
+                @endphp
 
-                <div class="d-flex flex-column align-items-center justify-content-center m-0"
-                    style="position:absolute; top: {{ $position }}%; left: 0; width:100% ">
-
-                    @for ($i = 0; $i < 24; $i++)
-                        @php
-                            $blockTime = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
-                        @endphp
-
-                        <div class="row border-top border-black" style="position:relative; height:100px; width:98%;">
-
-                            <div class="col-md-2 fs-6" style="position:absolute; top:-13px; left:-17%;">
-                                <p class="poppins-light text-secondary text-end">{{ $i }}h</p>
-                            </div>
-
-                            @php
-                                $tasks = getTasksForDayAndTime($blockTime, $date);
-                            @endphp
-
-                            @if (!$tasks->isEmpty())
-                                @foreach ($tasks as $task)
-                                    @php
-
-                                        $duration = getDuration($task);
-
-                                        $start = getCarbonTime($duration->start);
-
-                                        $end = getCarbonTime($duration->end);
-
-                                        $blockStartTaskStartGap = getCarbonTime($blockTime)->diffInMinutes($start);
-
-                                        $taskPositionTop = ($blockStartTaskStartGap * 100) / 60;
-
-                                        $durationInMinutes = $start->diffInMinutes($end);
-
-                                        $taskContainerHeigh = ($durationInMinutes * 100) / 60;
-
-                                    @endphp
-
-                                    <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 w-100 task-container text-decoration-none rounded border border-2 border-black"
-                                        style="height:{{ $taskContainerHeigh }}px; position:absolute; left:0; z-index: 1; background:{{ $task->creator->color }};
-                                        top:{{ $taskPositionTop }}%">
-
-                                        <p class="text-white">{{ $task->title }} - {{ $start->format('H:i') }} até
-                                            {{ $end->format('H:i') }}</p>
-                                    </a>
-                                @endforeach
-                            @endif
-
-                        </div>
-                    @endfor
-
-                </div>
+                <h2 class="fs-3 poppins m-0 p-0">
+                    {{ $labelOverview }}
+                </h2>
 
             </div>
 
         </div>
 
-    </div>
+        <script>
+            function startClock() {
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-
-            const timeMarker = document.querySelector('#time-marker');
-            const scrollContainer = document.querySelector('.full-height-78vh');
-
-
-            if (timeMarker && scrollContainer) {
-
-                let timeMarkerPosition = timeMarker.getBoundingClientRect().top;
-
-                scrollContainer.scrollTop = timeMarkerPosition - scrollContainer.clientHeight / 2;
+                setInterval(updateClock, 1000);
             }
-        })
 
-        function autoRefreshEveryMinute() {
+            function updateClock() {
 
-            location.reload();
-
-        }
-
-        setInterval(autoRefreshEveryMinute, 60000);
-    </script>
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                let seconds = now.getSeconds();
 
 
-@endsection
+                hours = hours < 10 ? "0" + hours : hours;
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
 
+                document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            }
 
+            // Iniciar o relógio ao carregar a página
+            startClock();
+        </script>
 
+</body>
 
-
-{{-- // Inicializa o valor do top em 50%
-let subValue = 50;
-
-// Função que subtrai 0.1% do valor do top a cada minuto
-
-
-// Chama a função a cada 1 minuto (60000 ms)
-// setInterval(moveTimeLine, 60000); --}}
+</html>
