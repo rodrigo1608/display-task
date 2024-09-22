@@ -18,18 +18,16 @@ class DisplayController extends Controller
     {
 
         $userID = auth()->id();
-        $date =  empty($request->all()) ? getToday() : getCarbonDate($request->date);
+
+        $date =  empty($request->all())
+            ? getToday()
+            : getCarbonDate($request->date);
 
         $currentDayOfWeek = getDayOfWeek($date);
 
         $hasAnytaskToday = getSelectedUserTasksBuilder($date)->exists();
 
-        $now = getCarbonNow();
-
-        $startOfDay = $now->copy()->startOfDay();
-
-        // Calcula o número de minutos desde o início do dia
-        $minutesSinceStartOfDay = $startOfDay->diffInMinutes($now);
+        $minutesSinceStartOfDay =  getMinutesSinceStartOfDay();
 
         $position = 50 - ($minutesSinceStartOfDay *  0.185);
 
@@ -124,7 +122,12 @@ class DisplayController extends Controller
     public function displayPanel()
     {
         $today = getCarbonNow();
+
         $formatedToday = $today->format('Y-m-d');
+
+        $minutesSinceStartOfDay =  getMinutesSinceStartOfDay();
+
+        $positionLeft = 50 - ($minutesSinceStartOfDay *  0.1801);
 
         $weekdayOfSelectDate = getDayOfWeek($today);
 
@@ -148,6 +151,6 @@ class DisplayController extends Controller
         $hasAnytaskToday = $allTasksforTodayBuilder->exists();
 
         $now = getCarbonNow();
-        return view('timelines/panel', compact('now', 'allTasksforToday', 'hasAnytaskToday'));
+        return view('timelines/panel', compact('now', 'allTasksforToday', 'hasAnytaskToday', 'positionLeft'));
     }
 }

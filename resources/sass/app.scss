@@ -248,7 +248,14 @@ body,
 }
 
 //Container do display
-.full-height-93vh {
+
+
+.full-height-88vh {
+    height: 88vh;
+    overflow: hidden;
+}
+
+.full-height-80vh {
     height: 80vh;
     overflow: auto;
 }

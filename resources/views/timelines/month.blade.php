@@ -4,7 +4,7 @@
     <div class="container">
 
         <form class="d-flex align_items-center justify-content-end mt-5 flex-row gap-2 p-0"
-            action="{{ route('display.displayMonth') }}" method="GET">
+            action="{{ route('display.month') }}" method="GET">
 
             <div>
 
@@ -100,7 +100,7 @@
 
                     @foreach ($daysWithEmpty as $day)
                         @if ($nameOfWeekDay === getDayOfWeek($day, 'pt-br'))
-                            <form action="{{ route('display.displayDay') }}"method="get">
+                            <form action="{{ route('display.day') }}"method="get">
                                 @csrf
 
                                 <input type="hidden" name="date" value="{{ $day->format('Y-m-d') }}">

@@ -1811,3 +1811,24 @@ if (!function_exists('sortByStart')) {
         });
     }
 }
+if (!function_exists('getHourForBlock')) {
+
+    function getHourForBlock(int $index)
+    {
+
+        return str_pad($index, 2, '0', STR_PAD_LEFT) . ':00';
+    }
+}
+
+if (!function_exists('getMinutesSinceStartOfDay')) {
+
+    function getMinutesSinceStartOfDay()
+    {
+
+        $now = getCarbonNow();
+
+        $startOfDay = $now->copy()->startOfDay();
+
+        return $startOfDay->diffInMinutes($now);
+    }
+}

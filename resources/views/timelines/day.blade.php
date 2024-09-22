@@ -53,7 +53,7 @@
             </div>
         </div>
 
-        <div class="row full-height-93vh">
+        <div class="row full-height-80vh">
 
             <div class="container-day col-md-9 container p-0">
 
@@ -66,7 +66,7 @@
 
                     @for ($i = 0; $i < 24; $i++)
                         @php
-                            $blockTime = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
+                            $blockTime = getHourForBlock($i);
                         @endphp
 
                         <div class="row border-top border-black" style="position:relative; height:100px; width:98%;">
@@ -99,13 +99,28 @@
 
                                     @endphp
 
+                                    {{-- Bloco da tarefa --}}
                                     <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 w-100 task-container text-decoration-none rounded border border-2 border-black"
-                                        style="height:{{ $taskContainerHeigh }}px; position:absolute; left:0; z-index: 1; background:{{ $task->creator->color }};
-                                        top:{{ $taskPositionTop }}%">
+                                        class="col-md-10 task-container text-decoration-none rounded"
+                                        style="
+                                        height:{{ $taskContainerHeigh }}px;
+                                        position:absolute;
+                                        left: 50%;
+                                        transform: translateX(-50%);
+                                        z-index: 1;
+                                        background-color:white;
+                                        border:3px solid {{ $task->creator->color }};
+                                        top:{{ $taskPositionTop }}%;
+                                        width:95%;
+                                        overflow:hidden
+                                        ">
 
-                                        <p class="text-white">{{ $task->title }} - {{ $start->format('H:i') }} até
-                                            {{ $end->format('H:i') }}</p>
+                                        <p class="fs-5 roboto text-black">{{ $task->title }} <span
+                                                class="roboto-black mx-2"> |
+                                            </span>
+                                            {{ $start->format('H:i') }} <span class="mx-2"> até</span>
+                                            {{ $end->format('H:i') }}
+                                        </p>
                                     </a>
                                 @endforeach
                             @endif

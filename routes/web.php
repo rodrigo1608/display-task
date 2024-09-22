@@ -29,8 +29,8 @@ Route::get('home', [HomeController::class, 'index'])->name('home');
 Route::resource('reminder', ReminderController::class);
 
 Route::resource('task', TaskController::class);
-Route::put('{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('acceptPendingTask');
-Route::post('{id}/mark-as-concluded', [TaskController::class, 'markAsConcluded'])->name('markAsConcluded');
+Route::put('task/{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('task.acceptPendingTask');
+Route::post('task/{id}/mark-as-concluded', [TaskController::class, 'markAsConcluded'])->name('task.markAsConcluded');
 
 Route::prefix('user')
     ->name('user.')

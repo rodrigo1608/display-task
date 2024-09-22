@@ -593,7 +593,7 @@
                 </div>
                 <div class="modal-footer">
 
-                    <form class="d-inline-flex" action="{{ route('tasks.markAsConcluded', $task->id) }}" method="POST">
+                    <form class="d-inline-flex" action="{{ route('task.markAsConcluded', $task->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-secondary me-4">Confirmar</button>
                     </form>

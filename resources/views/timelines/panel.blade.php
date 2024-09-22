@@ -21,22 +21,32 @@
 
         <!-- Scripts -->
         @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-
-        {{-- styles --}}
-
-        @if (Auth::check())
-            <style>
-                .profile-border {
-                    border: 0.4rem solid {{ Auth::user()->color }};
-                }
-            </style>
-        @endif
-
     </head>
 </head>
 
 <body>
-    <div class="container">
+    <div style="
+    position:fixed;
+    left:50%;
+     transform: translateX(-50%);
+    top:5%;
+    ">
+        <time class="" id="clock" style="font-size: 3rem;">Carregando...</time>
+    </div>
+
+    <div id="time-marker" class="bg-danger p-0"
+        style="
+        width:3px;
+        height:85vh;
+        position:fixed;
+        top:15%;
+        left:50%;
+        transform: translateX(-50%);
+        z-index:2
+    ">
+    </div>
+
+    <div class="container-fluid px-5">
 
         <div class="row d-flex align-items-center mt-5">
 
@@ -57,19 +67,16 @@
                 </a>
             </div>
 
-            <div class="fs-1 col-md-7 text-center">
-                <time class="m-0" id="clock">Carregando...</time>
-            </div>
 
-            <div class='col-md-3 mt-2'>
+            <div class='col-md-10 mt-2 text-end'>
 
                 @php
                     $labelOverview = getPaneldateLabel($hasAnytaskToday);
                 @endphp
 
-                <h2 class="fs-3 poppins m-0 p-0">
+                <time class="fs-2 poppins m-0 p-0">
                     {{ $labelOverview }}
-                </h2>
+                </time>
 
             </div>
 
@@ -99,6 +106,38 @@
             // Iniciar o relógio ao carregar a página
             startClock();
         </script>
+
+        <div class="row full-height-88vh mt-4" style="position:relative">
+
+            <div class="d-flex mt-5 p-0"
+                style="
+                flex-wrap: nowrap;
+                position:absolute;
+                left:{{ $positionLeft }}%;
+                height:100%;
+            ">
+                @for ($i = 0; $i < 24; $i++)
+                    <div class="h-100 border-end"
+                        style="
+                        min-width:200px;
+                        margin: 0;
+                        padding: 0;
+                        position:relative;
+                    ">
+                        @php
+                            $blockTime = getHourForBlock($i);
+                        @endphp
+
+                        <time style="position:absolute; top:-5%;left:-10%">
+                            {{ $blockTime }}
+                        </time>
+
+                    </div>
+                @endfor
+
+            </div>
+
+        </div>
 
 </body>
 

@@ -34,13 +34,13 @@
                 <div class="col m-0 mt-2 p-0" style="{{ $loop->last ? '' : 'border-right: 1px solid lightgrey;' }}">
 
                     @for ($i = 0; $i < 24; $i++)
-                        <div class="" style="border-top: 1px solid black; height:100px; position:relative;">
+                        <div style="border-top: 1px solid black; height:100px; position:relative;">
 
                             @php
 
                                 $isToday = checkIsToday($carbonWeekDay);
 
-                                $blockTime = str_pad($i, 2, '0', STR_PAD_LEFT) . ':00';
+                                $blockTime = getHourForBlock($i);
 
                                 $time = getCarbonTime($blockTime);
 
@@ -89,12 +89,27 @@
                                     @endphp
 
                                     <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 w-100 task-container text-decoration-none rounded border border-2 border-black"
-                                        style="height:{{ $taskContainerHeigh }}px; position:absolute; left:0; z-index: 1; background:{{ $task->creator->color }};
-                                    top:{{ $taskPositionTop }}%">
+                                        class="col-md-10 task-container text-decoration-none d-flex rounded px-2"
+                                        style="
+                                        height:{{ $taskContainerHeigh }}px;
+                                        position:absolute;
+                                        left: 50%;
+                                        transform: translateX(-50%);
+                                        z-index: 1;
+                                        background-color:white;
+                                        border:3px solid {{ $task->creator->color }};
+                                        top:{{ $taskPositionTop }}%;
+                                        width:96%;
+                                        overflow:hidden;
+                                        ">
 
-                                        <p class="text-white">{{ $task->title }} - {{ $start->format('H:i') }} até
-                                            {{ $end->format('H:i') }}</p>
+                                        <p class="fs-6 roboto text-black">{{ $task->title }} <span
+                                                class="roboto-black mx-2"> |
+                                            </span> {{ $start->format('H:i') }}
+                                            até
+                                            {{ $end->format('H:i') }}
+                                        </p>
+
                                     </a>
                                 @endif
                             @endforeach
