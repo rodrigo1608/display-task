@@ -250,9 +250,11 @@ body,
 //Container do display
 
 
-.full-height-88vh {
-    height: 88vh;
-    overflow: hidden;
+.full-height-84vh {
+    height: 84vh;
+    overflow-x: auto;
+    /* Ativa o overflow no eixo horizontal (x) */
+    overflow-y: hidden;
 }
 
 .full-height-80vh {

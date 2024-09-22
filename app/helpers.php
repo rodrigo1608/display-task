@@ -1824,8 +1824,8 @@ if (!function_exists('getMinutesSinceStartOfDay')) {
 
     function getMinutesSinceStartOfDay()
     {
-
         $now = getCarbonNow();
+        $now = getCarbonTime('00:00');
 
         $startOfDay = $now->copy()->startOfDay();
 

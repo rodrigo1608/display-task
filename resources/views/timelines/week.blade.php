@@ -117,6 +117,7 @@
                             @if ($shouldDisplayTimeMarker)
                                 @php
                                     $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
+
                                     $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
                                 @endphp
 

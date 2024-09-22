@@ -4,7 +4,7 @@
 
     <div class="container">
 
-        <div class="row mt-5">
+        <div class="'row' mt-5">
 
             <div class='col'>
 
@@ -57,16 +57,27 @@
 
             <div class="container-day col-md-9 container p-0">
 
-                <div id="current-time-marker" class="bg-danger"
-                    style="position:absolute; top:50%; left:0; height: 2px;  width:100%; z-index:2; ">
-                </div>
-
-                <div class="d-flex flex-column align-items-center justify-content-center m-0"
-                    style="position:absolute; top: {{ $position }}%; left: 0; width:100% ">
+                <div class="d-flex flex-column align-items-center justify-content-center m-0 mt-2" style=" width:100% ">
 
                     @for ($i = 0; $i < 24; $i++)
                         @php
+
+                            $now = getCarbonNow();
+
                             $blockTime = getHourForBlock($i);
+
+                            $time = getCarbonTime($blockTime);
+
+                            $tasks = getTasksForDayAndTime($blockTime, $date);
+
+                            $timePlusOneHour = $time->copy()->addHour()->subSecond();
+
+                            $shouldDisplayTimeMarker = $now->between($time, $timePlusOneHour);
+
+                            $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
+
+                            $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
+
                         @endphp
 
                         <div class="row border-top border-black" style="position:relative; height:100px; width:98%;">
@@ -75,9 +86,22 @@
                                 <p class="poppins-light text-secondary text-end">{{ $i }}h</p>
                             </div>
 
-                            @php
-                                $tasks = getTasksForDayAndTime($blockTime, $date);
-                            @endphp
+
+                            @if ($shouldDisplayTimeMarker)
+                                @php
+                                    $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
+
+                                    $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
+
+                                @endphp
+                                <div id="time-marker" class="bg-danger"
+                                    style="
+                                    height:3px;
+                                    position:absolute;
+                                    top:{{ $timeMarkerPosition }}px;">
+                                </div>
+                            @endif
+
 
                             @if (!$tasks->isEmpty())
                                 @foreach ($tasks as $task)
@@ -140,19 +164,20 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             const timeMarker = document.querySelector('#time-marker');
-            const scrollContainer = document.querySelector('.full-height-78vh');
-
+            const scrollContainer = document.querySelector('.full-height-80vh');
 
             if (timeMarker && scrollContainer) {
 
                 let timeMarkerPosition = timeMarker.getBoundingClientRect().top;
 
-                scrollContainer.scrollTop = timeMarkerPosition - scrollContainer.clientHeight / 2;
+                scrollContainer.scrollTop = (timeMarkerPosition - scrollContainer.clientHeight / 2) - 200;
+
             }
         })
 
         function autoRefreshEveryMinute() {
 
+            console.log("Recarregando a página a cada minuto");
             location.reload();
 
         }
@@ -162,9 +187,6 @@
 
 
 @endsection
-
-
-
 
 
 {{-- // Inicializa o valor do top em 50%

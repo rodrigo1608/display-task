@@ -34,18 +34,6 @@
         <time class="" id="clock" style="font-size: 3rem;">Carregando...</time>
     </div>
 
-    <div id="time-marker" class="bg-danger p-0"
-        style="
-        width:3px;
-        height:85vh;
-        position:fixed;
-        top:15%;
-        left:50%;
-        transform: translateX(-50%);
-        z-index:2
-    ">
-    </div>
-
     <div class="container-fluid px-5">
 
         <div class="row d-flex align-items-center mt-5">
@@ -65,8 +53,8 @@
                     </svg>
 
                 </a>
-            </div>
 
+            </div>
 
             <div class='col-md-10 mt-2 text-end'>
 
@@ -95,7 +83,6 @@
                 let minutes = now.getMinutes();
                 let seconds = now.getSeconds();
 
-
                 hours = hours < 10 ? "0" + hours : hours;
                 minutes = minutes < 10 ? "0" + minutes : minutes;
                 seconds = seconds < 10 ? "0" + seconds : seconds;
@@ -107,26 +94,60 @@
             startClock();
         </script>
 
-        <div class="row full-height-88vh mt-4" style="position:relative">
+        <div class="row full-height-84vh mt-4" style="position:relative">
 
             <div class="d-flex mt-5 p-0"
                 style="
                 flex-wrap: nowrap;
-                position:absolute;
-                left:{{ $positionLeft }}%;
                 height:100%;
             ">
                 @for ($i = 0; $i < 24; $i++)
-                    <div class="h-100 border-end"
+                    @php
+
+                        $now = getCarbonNow();
+
+                        $blockTime = getHourForBlock($i);
+
+                        $time = getCarbonTime($blockTime);
+
+                        $tasks = getTasksForDayAndTime($blockTime, $now);
+
+                        $timePlusOneHour = $time->copy()->addHour()->subSecond();
+
+                        $shouldDisplayTimeMarker = $now->between($time, $timePlusOneHour);
+
+                        $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
+
+                        $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
+
+                    @endphp
+
+                    <div class="{{ $i === 0 ? 'border-start border-end' : 'border-end' }}"
                         style="
                         min-width:200px;
                         margin: 0;
                         padding: 0;
                         position:relative;
                     ">
-                        @php
-                            $blockTime = getHourForBlock($i);
-                        @endphp
+
+                        @if ($shouldDisplayTimeMarker)
+                            @php
+                                $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
+
+                                $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
+                            @endphp
+
+
+                            <div id="time-marker" class="bg-danger p-0"
+                                style="
+                                    width:3px;
+                                    height:85vh;
+                                    position:absolute;
+                                    left:{{ $timeMarkerPosition }}%;
+                                    z-index:2
+                            ">
+                            </div>
+                        @endif
 
                         <time style="position:absolute; top:-5%;left:-10%">
                             {{ $blockTime }}
@@ -138,6 +159,38 @@
             </div>
 
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const timeMarker = document.querySelector('#time-marker');
+                const scrollContainer = document.querySelector('.full-height-84vh');
+
+                if (timeMarker && scrollContainer) {
+                    // Calcula a posição do timeMarker em relação ao scrollContainer
+                    let timeMarkerPosition = timeMarker.getBoundingClientRect().left - scrollContainer
+                        .getBoundingClientRect().left;
+
+                    // Calcula a posição centralizada desejada
+                    let desiredScrollLeft = timeMarkerPosition - (scrollContainer.clientWidth / 2) + (timeMarker
+                        .offsetWidth / 2) - 50;
+
+                    // Se a diferença entre o valor atual e o desejado for significativa, ajusta o scroll
+                    if (Math.abs(scrollContainer.scrollLeft - desiredScrollLeft) > 1) {
+                        scrollContainer.scrollLeft = desiredScrollLeft;
+                    }
+
+                    console.log("Posição atual do scroll:", scrollContainer.scrollLeft);
+                }
+            });
+
+            function autoRefreshEveryMinute() {
+                console.log("Recarregando a página a cada minuto");
+                location.reload();
+            }
+
+            setInterval(autoRefreshEveryMinute, 60000);
+        </script>
 
 </body>
 

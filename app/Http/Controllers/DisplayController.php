@@ -13,7 +13,6 @@ class DisplayController extends Controller
         $this->middleware(['auth', 'verified']);
     }
 
-
     public function displayDay(Request $request)
     {
 
