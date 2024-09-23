@@ -189,7 +189,7 @@ class TaskController extends Controller
 
         $feedbacks = Feedback::all();
 
-        return redirect()->route('display.displayDay', compact('task'))->with('success', 'Tarefa criada com sucesso!');
+        return redirect()->route('display.day', compact('task'))->with('success', 'Tarefa criada com sucesso!');
     }
 
     /**

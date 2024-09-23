@@ -164,29 +164,35 @@
             document.addEventListener('DOMContentLoaded', function() {
 
                 const timeMarker = document.querySelector('#time-marker');
+
                 const scrollContainer = document.querySelector('.full-height-84vh');
 
-                if (timeMarker && scrollContainer) {
-                    // Calcula a posição do timeMarker em relação ao scrollContainer
-                    let timeMarkerPosition = timeMarker.getBoundingClientRect().left - scrollContainer
-                        .getBoundingClientRect().left;
+                const screenWidth = window.innerWidth;
 
-                    // Calcula a posição centralizada desejada
-                    let desiredScrollLeft = timeMarkerPosition - (scrollContainer.clientWidth / 2) + (timeMarker
-                        .offsetWidth / 2) - 50;
+                scrollContainer.scrollTo(0, 0);
 
-                    // Se a diferença entre o valor atual e o desejado for significativa, ajusta o scroll
-                    if (Math.abs(scrollContainer.scrollLeft - desiredScrollLeft) > 1) {
-                        scrollContainer.scrollLeft = desiredScrollLeft;
-                    }
+                requestAnimationFrame(() => {
 
-                    console.log("Posição atual do scroll:", scrollContainer.scrollLeft);
-                }
+                    // scrollContainerLeftPosition = scrollContainer.getBoundingClientRect().left;
+
+                    const timeMarkerHorizontalPostion = timeMarker.getBoundingClientRect().x;
+
+                    const halfScreenWidth = screenWidth / 2
+
+                    const adjustedScrollPosition = timeMarkerHorizontalPostion - halfScreenWidth;
+
+                    // Ajuste o scroll para a posição do timeMarker
+                    scrollContainer.scrollTo(adjustedScrollPosition, 0);
+
+                });
+
             });
 
             function autoRefreshEveryMinute() {
+
                 console.log("Recarregando a página a cada minuto");
                 location.reload();
+
             }
 
             setInterval(autoRefreshEveryMinute, 60000);
