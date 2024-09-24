@@ -26,6 +26,7 @@
 
 <body>
 
+
     {{-- off - canvas --}}
 
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
@@ -147,27 +148,30 @@
 
             {{-- botão de offcanvas --}}
 
+            <div class="col-md-2">
 
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
 
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
+                    </button>
 
-                </button>
-                <ul class="dropdown-menu">
-                    <li> <button class="dropdown-item" type="button" data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
-                            title="Visualizar barra lateral">
-                            Opções de tela
+                    <ul class="dropdown-menu">
+                        <li> <button class="dropdown-item" type="button" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
+                                title="Visualizar barra lateral">
+                                Opções de tela
 
-                        </button>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="{{ route('task.create') }}">
-                            Criar Tarefa
-                        </a>
-                    </li>
-                </ul>
+                            </button>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('task.create') }}">
+                                Criar Tarefa
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
             </div>
 
             <div class='col-md-10 mt-2 text-end'>
@@ -208,7 +212,7 @@
             startClock();
         </script>
 
-        <div class="row full-height-84vh mt-4" style="position:relative">
+        <div class="row full-height-84vh mt-5" style="position:relative">
 
             <div class="d-flex mt-5 p-0"
                 style="
@@ -233,13 +237,12 @@
 
                     @endphp
 
-                    <div id="hour-block" class="{{ $i === 0 ? 'border-start border-end' : 'border-end' }}"
+                    <div id="hour-block" class=""
                         style="
-                        min-width:200px;
-                        margin: 0;
-                        padding: 0;
-                        position:relative;
-                    ">
+                        border-left: {{ $i === 0 ? '2px dashed #abb2b9' : 'none' }};
+                        border-right: 2px dashed #abb2b9;
+                        min-width:200px; margin: 0;
+                        padding: 0; position:relative; ">
 
                         @if ($shouldDisplayTimeMarker)
                             @php
@@ -260,9 +263,16 @@
                             </div>
                         @endif
 
-                        <time id="block-time" style="position:absolute; top:-5%;left:-10%">
-                            {{ $blockTime }}
-                        </time>
+                        @if ($i >= 1)
+                            <time id="block-time" class="fs-4"
+                                style="
+                                position:absolute;
+                                top:-5%;
+                                left:-15%
+                            ">
+                                {{ $blockTime }}
+                            </time>
+                        @endif
 
                         @foreach ($tasks as $task)
                             @php
@@ -369,8 +379,7 @@
                     const previousTaskHeight = previousTask.offsetHeight;
                     const previousTaskTop = parseFloat(previousTask.style.top);
 
-
-                    const newTop = previousTaskTop + previousTaskHeight + 10;
+                    const newTop = previousTaskTop + previousTaskHeight + 5;
                     taskContainer.style.top = `${newTop}px`;
                 }
             });

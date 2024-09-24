@@ -107,6 +107,7 @@ class HomeController extends Controller
             }
         }
         if ($selectedUserTasks != null) {
+
             foreach ($selectedUserTasks as $task) {
 
                 $taskID = $task->id;
@@ -157,40 +158,6 @@ class HomeController extends Controller
                 $recurring = $task->reminder->recurring;
 
                 $task->status = $duration->status;
-
-                // if (isset($recurring->specific_date)) {
-
-                //     $specificDate = getCarbonDate($recurring->specific_date);
-
-                //     $isPast = $specificDate->isBefore($today);
-                //     $isTodaySpecificDate = checkIsToday($specificDate);
-
-                //     if ($isPast) {
-
-                //         $task->status = 'finished';
-                //     } elseif ($isTodaySpecificDate) {
-
-                //         $task->status = getTaskStatus($duration);
-                //     } else {
-
-                //         $task->status = 'starting';
-                //     }
-                // } else {
-
-                //     $todayWeekday = getDayOfWeek($today);
-
-                //     $repeatingDays = getRepeatingDays($recurring);
-
-                //     foreach ($repeatingDays as $day) {
-
-                //         if ($day ===  $todayWeekday) {
-
-                //             $task->status = getTaskStatus($duration);
-                //         } else {
-                //             $task->status = 'finished';
-                //         }
-                //     }
-                // }
             }
         }
 

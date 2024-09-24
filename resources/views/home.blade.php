@@ -165,6 +165,7 @@
                                 <div class="card-body text-secondary">
 
                                     <ul class="roboto text-black" style="list-style-type: circle">
+
                                         @foreach ($orderedReminders as $reminders)
                                             @foreach ($reminders as $reminder)
                                                 <li class="mt-2">{{ $reminder->title }}</li>
