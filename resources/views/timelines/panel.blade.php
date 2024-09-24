@@ -25,12 +25,119 @@
 </head>
 
 <body>
+
+    {{-- off - canvas --}}
+
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+        aria-labelledby="offcanvasWithBothOptionsLabel">
+
+        <div class="w-100 text-end">
+            <button type="button" class="btn-close me-4 mt-4" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+
+        <div class="offcanvas-header">
+
+            <div class="w-100 d-flex flex-column ps-4">
+
+                <div
+                    class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
+
+                    <img class="img-size" src="{{ asset('storage/' . auth()->user()->profile_picture) }}"
+                        alt="Imagem do usuário">
+
+                </div>
+
+                <div class='mt-2 text-start'>
+
+                    <h2 class="fs-4 poppins-medium m-0 p-0">
+                        {{ auth()->user()->name }}
+                        {{ auth()->user()->lastname }}
+                    </h2>
+
+                    <p class="fs-5 roboto">{{ auth()->user()->role }} </p>
+
+                    <p class="fs-5 roboto m-0 p-0">{{ auth()->user()->email }} </p>
+
+                    <p class="fs-5 roboto m-0">{{ auth()->user()->telephone }} </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="offcanvas-body">
+
+            <ul class="list-group poppins">
+
+                @php
+                    $today = Carbon\Carbon::today()->format('Y-m-d');
+                @endphp
+
+                <a href="{{ route('display.day') }}" class="side-link">
+                    <li class="list-group-item">Meu dia</li>
+                </a>
+
+                <a href="{{ route('display.week') }}" class="side-link">
+                    <li class="list-group-item">Minha semana</li>
+                </a>
+
+                <a href="{{ route('display.month') }}" class="side-link">
+                    <li class="list-group-item">Meu mês</li>
+                </a>
+
+                <a href="{{ route('home') }}" class="side-link">
+                    <li class="list-group-item" aria-current="true">Meu painel</li>
+                </a>
+
+                <a href="{{ route('display.panel') }}" class="side-link">
+                    <li class="list-group-item" aria-current="true">Painel geral</li>
+                </a>
+
+            </ul>
+
+            <div class="mt-3">
+
+                <form action="{{ route('home') }}" method="get" class="d-flex me-5 flex-row">
+                    @csrf
+                    <select name="select_filter" class="form-select rounded-0 rounded-start border-end-1 fs-6"
+                        aria-label="Default select example">
+
+                        <option selected disabled> Filtrar tarefas</option>
+
+                        <option value="created_by_me"> Criadas por mim</option>
+
+                        <option value="participating">Estou participando</option>
+
+                        <option value="concluded"> Concluídas</option>
+
+                    </select>
+
+                    {{-- botão de enviar --}}
+                    <button class="btn btn-secondary rounded-end rounded-0 border-start-0" type="submit"
+                        aria-label="Enviar filtro">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-6" width="19" height="19">
+
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+
     <div style="
     position:fixed;
     left:50%;
      transform: translateX(-50%);
     top:5%;
     ">
+
         <time class="" id="clock" style="font-size: 3rem;">Carregando...</time>
     </div>
 
@@ -38,22 +145,29 @@
 
         <div class="row d-flex align-items-center mt-5">
 
-            {{-- botão de voltar --}}
+            {{-- botão de offcanvas --}}
 
-            <div class="col-md-2">
 
-                <a class="btn btn-primary me-3 py-2" href="{{ route('home') }}"
-                    aria-label="Voltar para a pagina inicial">
 
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="size-6">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    aria-expanded="false">
 
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                    </svg>
+                </button>
+                <ul class="dropdown-menu">
+                    <li> <button class="dropdown-item" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
+                            title="Visualizar barra lateral">
+                            Opções de tela
 
-                </a>
-
+                        </button>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{{ route('task.create') }}">
+                            Criar Tarefa
+                        </a>
+                    </li>
+                </ul>
             </div>
 
             <div class='col-md-10 mt-2 text-end'>
@@ -102,27 +216,24 @@
                 height:100%;
             ">
                 @for ($i = 0; $i < 24; $i++)
+
                     @php
 
                         $now = getCarbonNow();
 
                         $blockTime = getHourForBlock($i);
 
-                        $time = getCarbonTime($blockTime);
+                        $startBlockTime = getCarbonTime($blockTime);
 
-                        $tasks = getTasksForDayAndTime($blockTime, $now);
+                        $tasks = getTasksByStartTime($blockTime, $now);
 
-                        $timePlusOneHour = $time->copy()->addHour()->subSecond();
+                        $endBlockTime = $startBlockTime->copy()->addHour()->subSecond();
 
-                        $shouldDisplayTimeMarker = $now->between($time, $timePlusOneHour);
-
-                        $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
-
-                        $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
+                        $shouldDisplayTimeMarker = $now->between($startBlockTime, $endBlockTime);
 
                     @endphp
 
-                    <div class="{{ $i === 0 ? 'border-start border-end' : 'border-end' }}"
+                    <div id="hour-block" class="{{ $i === 0 ? 'border-start border-end' : 'border-end' }}"
                         style="
                         min-width:200px;
                         margin: 0;
@@ -137,8 +248,7 @@
                                 $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
                             @endphp
 
-
-                            <div id="time-marker" class="bg-danger p-0"
+                            <div id="time-marker" class="bg-danger p-0" aria-hidden="true"
                                 style="
                                     width:3px;
                                     height:85vh;
@@ -146,12 +256,56 @@
                                     left:{{ $timeMarkerPosition }}%;
                                     z-index:2
                             ">
+
                             </div>
                         @endif
 
-                        <time style="position:absolute; top:-5%;left:-10%">
+                        <time id="block-time" style="position:absolute; top:-5%;left:-10%">
                             {{ $blockTime }}
                         </time>
+
+                        @foreach ($tasks as $task)
+                            @php
+                                $duration = getDuration($task);
+
+                                $start = getCarbonTime($duration->start);
+
+                                $end = getCarbonTime($duration->end);
+
+                                $blockStartTaskStartGap = $startBlockTime->diffInMinutes($start);
+
+                                $taskPositionLeft = ($blockStartTaskStartGap * 100) / 60;
+
+                                $durationInMinutes = $start->diffInMinutes($end);
+
+                                $taskContainerHeigh = ($durationInMinutes * 200) / 60;
+
+                            @endphp
+
+                            {{-- Bloco da tarefa --}}
+
+                            <a id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
+                                data-task-id="{{ $task->id }}" href="{{ route('task.show', $task->id) }}"
+                                class="col-md-10 task-container text-decoration-none rounded"
+                                style="
+                                min-width:{{ $taskContainerHeigh }}px;
+                                position:absolute;
+                                left:{{ $taskPositionLeft }}%;
+                                z-index: 1;
+                                background-color:white;
+                                border:5px solid {{ $task->creator->color }};
+                                overflow:hidden
+                                ">
+
+                                <p class="fs-5 roboto text-black">{{ $task->title }} <span
+                                        class="roboto-black mx-2"> |
+                                    </span>
+                                    {{ $start->format('H:i') }} <span class="mx-2"> até</span>
+                                    {{ $end->format('H:i') }}
+                                </p>
+
+                            </a>
+                        @endforeach
 
                     </div>
                 @endfor
@@ -163,6 +317,8 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
+
+                //Lógica para lidar com a posição do scroll centralizado quando a página recarregar
                 const timeMarker = document.querySelector('#time-marker');
 
                 const scrollContainer = document.querySelector('.full-height-84vh');
@@ -196,6 +352,28 @@
             }
 
             setInterval(autoRefreshEveryMinute, 60000);
+
+            // Lógica para lidar com a posição do bloco da tarefa:
+
+
+            const taskContainers = document.querySelectorAll('.task-container');
+            let previousTaskBottom = 0;
+
+            taskContainers.forEach((taskContainer, index) => {
+                if (index === 0) {
+
+                    taskContainer.style.top = '0px';
+                } else {
+
+                    const previousTask = taskContainers[index - 1];
+                    const previousTaskHeight = previousTask.offsetHeight;
+                    const previousTaskTop = parseFloat(previousTask.style.top);
+
+
+                    const newTop = previousTaskTop + previousTaskHeight + 10;
+                    taskContainer.style.top = `${newTop}px`;
+                }
+            });
         </script>
 
 </body>

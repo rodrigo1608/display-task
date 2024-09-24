@@ -1799,6 +1799,37 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
 }
 
 
+if (!function_exists('getTasksByStartTime')) {
+
+    function getTasksByStartTime($blockTime)
+    {
+        $start = getCarbonTime($blockTime);
+        $end =  $start->copy()->addHour()->subSecond();
+
+        $today = getCarbonNow()->startOfDay();
+
+        $dayOfWeek = getDayOfWeek($today);
+
+        $formatedToday = $today->format('Y-m-d');
+
+        return Task::with([
+            'reminder',
+            'reminder.recurring',
+            'durations'
+
+        ])->where('concluded', 'false')->whereHas('reminder', function ($query) use ($formatedToday, $dayOfWeek) {
+
+            $query->whereHas('recurring', function ($query) use ($formatedToday, $dayOfWeek) {
+
+                $query->where('specific_date', $formatedToday)->where('specific_date_weekday', $dayOfWeek)->orWhere($dayOfWeek, 'true');
+            });
+        })->whereHas('durations', function ($query) use ($start, $end) {
+
+            $query->whereBetween('start', [$start->format('H:i:s'), $end->format('H:i:s')]);
+        })->get();
+    }
+}
+
 if (!function_exists('sortByStart')) {
 
     function sortByStart($builder)

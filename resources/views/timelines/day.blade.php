@@ -86,7 +86,6 @@
                                 <p class="poppins-light text-secondary text-end">{{ $i }}h</p>
                             </div>
 
-
                             @if ($shouldDisplayTimeMarker)
                                 @php
                                     $blockStartTimeMarkerStartGap = getCarbonTime($blockTime)->diffInMinutes($now);
@@ -98,10 +97,10 @@
                                     style="
                                     height:3px;
                                     position:absolute;
-                                    top:{{ $timeMarkerPosition }}px;">
+                                    top:{{ $timeMarkerPosition }}px;
+                                    z-index:3">
                                 </div>
                             @endif
-
 
                             @if (!$tasks->isEmpty())
                                 @foreach ($tasks as $task)
@@ -124,6 +123,7 @@
                                     @endphp
 
                                     {{-- Bloco da tarefa --}}
+
                                     <a href="{{ route('task.show', $task->id) }}"
                                         class="col-md-10 task-container text-decoration-none rounded"
                                         style="
@@ -145,6 +145,7 @@
                                             {{ $start->format('H:i') }} <span class="mx-2"> até</span>
                                             {{ $end->format('H:i') }}
                                         </p>
+
                                     </a>
                                 @endforeach
                             @endif

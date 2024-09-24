@@ -52,10 +52,19 @@
 
             <div class="container-fluid">
 
+                {{-- botão do offcanvas --}}
+
                 @if (Auth::check())
                     <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
-                        title="Visualizar barra lateral">+</button>
+                        title="Visualizar barra lateral">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-6" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                    </button>
                 @endif
 
                 <a class="navbar-brand poppins-regular ms-5 font-black" href="{{ url('/') }}"

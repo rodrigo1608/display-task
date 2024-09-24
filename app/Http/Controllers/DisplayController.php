@@ -135,7 +135,7 @@ class DisplayController extends Controller
 
         $weekdayOfSelectDate = getDayOfWeek($today);
 
-        $allTasksforTodayBuilder =   Task::with([
+        $allTasksforTodayBuilder = Task::with([
             'reminder',
             'reminder.recurring',
             'durations'
@@ -151,10 +151,13 @@ class DisplayController extends Controller
             });
         });
 
-        $allTasksforToday =  sortByStart($allTasksforTodayBuilder);
         $hasAnytaskToday = $allTasksforTodayBuilder->exists();
 
         $now = getCarbonNow();
-        return view('timelines/panel', compact('now', 'allTasksforToday', 'hasAnytaskToday', 'positionLeft'));
+
+        return view('timelines/panel', compact(
+            'now',
+            'hasAnytaskToday',
+        ));
     }
 }

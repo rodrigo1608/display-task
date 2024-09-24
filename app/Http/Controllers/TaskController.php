@@ -382,7 +382,7 @@ class TaskController extends Controller
 
         $notificationTime->update($notificationTimeAttributes);
 
-        return redirect()->route('display.displayDay')->with('success', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('display.day')->with('success', 'Tarefa atualizada com sucesso!');
     }
 
     public function acceptPendingTask(SetPendingTask $request, int $id)
