@@ -291,13 +291,16 @@
 
                                 $taskContainerHeigh = ($durationInMinutes * 200) / 60;
 
+                                $participants = $task->participants()->get();
+                                $imgPositionLeft = 60;
+
                             @endphp
 
                             {{-- Bloco da tarefa --}}
 
                             <a id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
                                 data-task-id="{{ $task->id }}" href="{{ route('task.show', $task->id) }}"
-                                class="task-container text-decoration-none rounded"
+                                class="task-container text-decoration-none rounded p-3"
                                 style="
                                 min-width:{{ $taskContainerHeigh }}px;
                                 position:absolute;
@@ -308,10 +311,40 @@
                                 overflow:hidden
                                 ">
 
-                                <p class="fs-5 poppins-regular m-0 ms-1 text-black">{{ $task->title }}</p>
-                                <p class="roboto fs-4 mx-1 text-black">
-                                    {{ $start->format('H:i') }} <span class="mx-2"> até</span>
-                                    {{ $end->format('H:i') }}</p>
+                                <div class="d-flex flex-row">
+
+                                    <div class="task-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                                        style="
+                                        border: 0.2rem solid white;
+                                        position:relative;
+                                        ">
+
+                                        <img class="w-100"
+                                            src="{{ asset('storage/' . $task->creator->profile_picture) }}"
+                                            alt="Imagem do usuário">
+
+                                    </div>
+
+                                    @foreach ($participants as $participant)
+                                        <div class="task-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                                            style="
+                                            border: 0.2rem solid white;
+                                            position:absolute;
+                                            left: {{ $imgPositionLeft }}px;
+                                    ">
+
+                                            <img class="w-100"
+                                                src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                alt="Imagem do usuário">
+
+                                        </div>
+
+                                        @php
+                                            $imgPositionLeft += 60;
+                                        @endphp
+                                    @endforeach
+
+                                </div>
 
                             </a>
                         @endforeach

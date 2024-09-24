@@ -4,7 +4,7 @@
 
     <div class="container">
 
-        <div class="'row' mt-5">
+        <div class="'row' mb-5 mt-5">
 
             <div class='col'>
 
@@ -16,7 +16,7 @@
                             $labelOverview = getlabelOverviewForDay($date, $hasAnytaskToday);
                         @endphp
 
-                        <h2 class="fs-5 poppins-regular m-0 p-0">{{ $labelOverview }}</h2>
+                        <h2 class="fs-4 poppins-regular m-0 p-0">{{ $labelOverview }}</h2>
 
                     </div>
 
@@ -53,7 +53,7 @@
             </div>
         </div>
 
-        <div class="row full-height-80vh">
+        <div class="row full-height-76vh mt-5">
 
             <div class="container-day col-md-9 container p-0">
 

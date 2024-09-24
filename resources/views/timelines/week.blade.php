@@ -15,20 +15,25 @@
 
                     $formatedWeekDay = ucfirst($abbreviated) . '.';
 
+                    $isToday = $carbonWeekDay->isToday();
+
                 @endphp
 
                 <div class="col p-0">
 
-                    <p class="poppins fs-6 text-center">{{ $formatedWeekDay }}</p>
+                    <p class="{{ $isToday ? 'poppins-semibold fs-5' : 'poppins fs-6' }} text-center">
+                        {{ $formatedWeekDay }}
+                    </p>
 
-                    <p class="poppins-regular fs-4 text-center">{{ $carbonWeekDay->day }}</p>
+                    <p class="{{ $isToday ? 'poppins-medium fs-3' : 'poppins fs-4' }} text-center">
+                        {{ $carbonWeekDay->day }}</p>
 
                 </div>
             @endforeach
 
         </div>
 
-        <div class="full-height-78vh row m-0 mt-2 p-0 px-5">
+        <div class="full-height-73vh row m-0 mt-5 p-0 px-5">
 
             @foreach ($carbonWeekDays as $carbonWeekDay)
                 <div class="col m-0 mt-2 p-0" style="{{ $loop->last ? '' : 'border-right: 1px solid lightgrey;' }}">
