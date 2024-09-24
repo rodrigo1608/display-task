@@ -21,14 +21,13 @@
 
         <!-- Scripts -->
         @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
     </head>
 </head>
 
 <body>
 
-
     {{-- off - canvas --}}
-
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
         aria-labelledby="offcanvasWithBothOptionsLabel">
 
@@ -40,8 +39,8 @@
 
             <div class="w-100 d-flex flex-column ps-4">
 
-                <div
-                    class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
+                <div class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                    style="border: 0.4rem solid {{ Auth::user()->color }};">
 
                     <img class="img-size" src="{{ asset('storage/' . auth()->user()->profile_picture) }}"
                         alt="Imagem do usuário">
@@ -157,6 +156,11 @@
                     </button>
 
                     <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('task.create') }}">
+                                Criar Tarefa
+                            </a>
+                        </li>
                         <li> <button class="dropdown-item" type="button" data-bs-toggle="offcanvas"
                                 data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
                                 title="Visualizar barra lateral">
@@ -164,11 +168,7 @@
 
                             </button>
                         </li>
-                        <li>
-                            <a class="dropdown-item" href="{{ route('task.create') }}">
-                                Criar Tarefa
-                            </a>
-                        </li>
+
                     </ul>
                 </div>
 
@@ -264,11 +264,12 @@
                         @endif
 
                         @if ($i >= 1)
-                            <time id="block-time" class="fs-4"
+                            <time id="block-time" class="fs-5 poppins"
                                 style="
+                                color:#4F4F4F;
                                 position:absolute;
                                 top:-5%;
-                                left:-15%
+                                left:-10%
                             ">
                                 {{ $blockTime }}
                             </time>
@@ -296,7 +297,7 @@
 
                             <a id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
                                 data-task-id="{{ $task->id }}" href="{{ route('task.show', $task->id) }}"
-                                class="col-md-10 task-container text-decoration-none rounded"
+                                class="task-container text-decoration-none rounded"
                                 style="
                                 min-width:{{ $taskContainerHeigh }}px;
                                 position:absolute;
@@ -307,12 +308,10 @@
                                 overflow:hidden
                                 ">
 
-                                <p class="fs-5 roboto text-black">{{ $task->title }} <span
-                                        class="roboto-black mx-2"> |
-                                    </span>
+                                <p class="fs-5 poppins-regular m-0 ms-1 text-black">{{ $task->title }}</p>
+                                <p class="roboto fs-4 mx-1 text-black">
                                     {{ $start->format('H:i') }} <span class="mx-2"> até</span>
-                                    {{ $end->format('H:i') }}
-                                </p>
+                                    {{ $end->format('H:i') }}</p>
 
                             </a>
                         @endforeach
