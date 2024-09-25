@@ -54,7 +54,11 @@ class SetPendingTask extends FormRequest
 
         $start = getCarbonTime($duration->start);
 
-        $willNotStartSoon = $now->diffInMinutes($start, true) > 30 && $task->reminder->recurring->specific_date === null;
+        $recurring = $task->reminder->recurring;
+
+        $willNotStartSoon = $now->diffInMinutes($start, true) > 30;
+
+        // $recurring->specific_date !== null;
 
         // Filtra as opções onde as chaves estão marcadas como 'true'
         $trueOptions = array_filter($alertOptions, function ($label, $key) {
