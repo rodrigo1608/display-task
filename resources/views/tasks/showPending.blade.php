@@ -251,12 +251,11 @@
                                                 <div class="col-md-7 p-0">
 
                                                     <p
-                                                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
-                                                        text-success
+                                                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') alert alert-success
                                                         @elseif (getDuration($task)->status === 'in_progress')
-                                                         border-warning-subtle text-warning
+                                                         alert alert-warning
                                                         @elseif (getDuration($task)->status === 'finished')
-                                                          border-danger-subtle  text-danger @endif m-0 rounded border border-2 py-2 text-center">
+                                                         alert alert-danger @endif border-3 m-0 rounded text-center">
                                                         {{ $task->notificationAlert }}
                                                     </p>
 
@@ -392,9 +391,13 @@
 
                         @if ($firstError)
                             <div class="row">
+
                                 <div class="col-md-6 offset-3 invalid-feedback d-block">
+
                                     <strong>{{ $firstError }}</strong>
+
                                 </div>
+
                             </div>
                         @endif
 
@@ -403,12 +406,11 @@
 
                                 <div class="col-md-12 p-0">
                                     <p
-                                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') border-success-subtle
-                                    text-success
+                                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') alert alert-success
                                     @elseif (getDuration($task)->status === 'in_progress')
-                                     border-warning-subtle text-warning
+                                     alert alert-warning
                                     @elseif (getDuration($task)->status === 'finished')
-                                      border-danger-subtle  text-danger @endif m-0 rounded border border-2 py-2 text-center">
+                                     alert alert-danger @endif m-0 rounded border border-2 py-2">
                                         {{ $task->notificationAlert }}
                                     </p>
                                 </div>

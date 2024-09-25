@@ -1446,6 +1446,7 @@ if (!function_exists('getRemindersByWeekday')) {
     function getRemindersByWeekday($daysOfWeek)
     {
         $weekDayReminders = [];
+
         $userID = auth()->id();
 
         foreach (array_keys($daysOfWeek) as $dayOfWeek) {
@@ -1456,8 +1457,11 @@ if (!function_exists('getRemindersByWeekday')) {
 
                     $query->where($dayOfWeek, true)->orWhere('specific_date_weekday', $dayOfWeek);
                 })->join('notification_times', 'reminders.id', '=', 'notification_times.reminder_id')
+
                 ->select('reminders.*', 'notification_times.custom_time')
+
                 ->orderBy('notification_times.custom_time')
+
                 ->get();
         }
 
@@ -1519,14 +1523,19 @@ if (!function_exists('getAlertAboutNotificationTime')) {
 
         $start =  getCarbonTime($duration->start);
 
-        $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+        $recurring = $task->reminder->recurring;
+
+        $currentDayOfWeek = strtolower(getCarbonNow()->format('l'));
+
+        $isRecurrenceToday = $recurring->$currentDayOfWeek === 'true';
+
+        $hasSpecificDate = filled($recurring->specific_date);
 
         $specificDayAlertMessages = getSpecificDayAlerts();
 
         $recurringAlertMessages  = getRecurringAlerts();
 
         if ($hasSpecificDate) {
-
 
             switch ($duration->status) {
 
@@ -1546,7 +1555,7 @@ if (!function_exists('getAlertAboutNotificationTime')) {
 
                     return $specificDayAlertMessages['finished'];
             }
-        } else {
+        } elseif ($isRecurrenceToday) {
 
             switch ($duration->status) {
 
