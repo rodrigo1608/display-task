@@ -18,6 +18,9 @@ use Illuminate\Http\Request;
 class FilterController extends Controller
 {
 
+
+
+
     public function __construct()
     {
         $this->middleware(['auth', 'verified']);
@@ -25,8 +28,17 @@ class FilterController extends Controller
 
     public function searchByTitle(Request $request)
     {
+        $currentUserID = auth()->id();
 
-        $tasksFilteredByTitle = Task::where('concluded', 'false')->where('title', 'LIKE', "%$request->title_filter%")->get();
+        $tasksFilteredByTitle = Task::where('concluded', 'false')->where('created_by', $currentUserID)->orWhereHas('participants', function ($query) use ($currentUserID) {
+            $query->where('user_id', $currentUserID)->where('status', 'accepted');
+        })->where('title', 'LIKE', "%$request->title_filter%")->get();;
+
+
+
+
+
+
 
         return view('tasks/filtered', compact('tasksFilteredByTitle'));
     }

@@ -31,7 +31,8 @@
                                     value="{{ old('specific_date', request()->input('date', Carbon\Carbon::now()->format('Y-m-d'))) }}">
 
                                 {{-- Botão para enviar a pesquisa de tarefas por data --}}
-                                <button type="submit" class="btn btn-secondary rounded-end rounded-0 border-start-0 py-0"
+
+                                <button type="submit" class="btn btn-primary rounded-end rounded-0 border-start-0 py-0"
                                     title="Enviar data">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         width="19" height="19" stroke-width="1.5" stroke="currentColor"
@@ -53,7 +54,7 @@
             </div>
         </div>
 
-        <div class="row full-height-76vh mt-5">
+        <div id="day-schedule-container" class="row full-height-76vh mt-5">
 
             <div class="container-day col-md-9 container p-0">
 
@@ -93,6 +94,7 @@
                                     $timeMarkerPosition = ($blockStartTimeMarkerStartGap * 100) / 60;
 
                                 @endphp
+
                                 <div id="time-marker" class="bg-danger"
                                     style="
                                     height:3px;
@@ -165,7 +167,8 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             const timeMarker = document.querySelector('#time-marker');
-            const scrollContainer = document.querySelector('.full-height-80vh');
+            const scrollContainer = document.querySelector('#day-schedule-container');
+
 
             if (timeMarker && scrollContainer) {
 

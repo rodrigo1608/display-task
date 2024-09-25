@@ -267,7 +267,7 @@ class TaskController extends Controller
                 :  view('tasks/show', compact('possibleParticipants', 'task'));
         } else {
 
-            return redirect('display_day.displayDay');
+            return redirect('display.day');
         }
     }
 
@@ -459,7 +459,7 @@ class TaskController extends Controller
 
         $participant->save();
 
-        return redirect()->route('display.displayDay');
+        return redirect()->route('display.day')->with('success', 'Tarefa aceita com sucesso!');
     }
 
     /**
@@ -478,6 +478,6 @@ class TaskController extends Controller
 
         $task->update(['concluded' => true]);
 
-        return  redirect()->route('display.displayDay')->with('success', 'Tarefa concluída!');
+        return  redirect()->route('display.day')->with('success', 'Tarefa concluída!');
     }
 }

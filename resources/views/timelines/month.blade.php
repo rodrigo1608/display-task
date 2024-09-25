@@ -3,6 +3,8 @@
 @section('content')
     <div class="container">
 
+
+        {{-- Formulário para o usuário selecionar as tarefas com base no mês e ano --}}
         <form class="d-flex align_items-center justify-content-end mt-5 flex-row gap-2 p-0"
             action="{{ route('display.month') }}" method="GET">
 
@@ -39,6 +41,7 @@
                 <select class="btn btn-primary" name="year" id="year">
 
                     @php
+
                         $currentYear = date('Y');
                         $startYear = $currentYear - 5;
                         $endYear = $currentYear + 5;
@@ -55,7 +58,7 @@
 
             </div>
 
-            {{-- Botão para enviar a data desejada para ver as tarefas do mês --}}
+            {{-- Botão para enviar a data escolhida em relação ao ano e mês --}}
             <button type="submit" class="btn btn-secondary rounded-circle py-2" title="Enviar data">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="19" height="19"
                     stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -76,8 +79,9 @@
                     $formattedWeekDay = ucfirst($abbreviated) . '.';
                 @endphp
 
-                <div class="col p-0">
-                    <p class="poppins-extralight fs-6 text-center">{{ $formattedWeekDay }}</p>
+                <div class="col mb-3 p-0 text-center">
+                    <span id="abreviated-day-of-week-container"
+                        class="{{ $carbonWeekDay->isToday() ? 'poppins-semibold' : ' poppins-extralight' }} fs-5">{{ $formattedWeekDay }}</span>
                 </div>
             @endforeach
 

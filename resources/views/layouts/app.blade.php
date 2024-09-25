@@ -230,12 +230,17 @@
         </nav>
 
         @if (session('success'))
-            <div class="w-100" style="position:absolute;  z-index: 1000;">
+            <div style="position:fixed; left:42%; top:10% z-index: 2;">
+
                 <div id="success-alert" class="row justify-content-center mt-4">
-                    <div class="alert alert-success col-7 text-center">
+
+                    <div class="alert alert-success p-4 text-center">
+
                         {{ session('success') }}
                     </div>
+
                 </div>
+
             </div>
         @endif
 
