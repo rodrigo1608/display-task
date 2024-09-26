@@ -136,9 +136,11 @@
                                         @if ($isFirstDayOfMonth)
                                             @php
                                                 $monthInEnglish = $day->format('F');
+
                                                 $monthToDisplay = mb_substr($months[$monthInEnglish], 0, 3, 'UTF-8');
 
                                             @endphp
+
                                             @if (!$day->isCurrentMonth())
                                                 <span class="poppins-extralight text-light-secondary">
                                                     {{ $monthToDisplay }}.</span>
@@ -150,11 +152,28 @@
                                     </p>
 
                                     @foreach ($tasks->take(4) as $task)
-                                        <div class="w-100 mb-1 rounded ps-2"
+                                        @php
+                                            $durarion = getDuration($task);
+                                            $start = getCarbonTime($durarion->start)->format('H:m');
+                                            $end = getCarbonTime($durarion->end)->format('H:m');
+                                        @endphp
+
+                                        <div class="w-100 d-flex mb-1 flex-row rounded ps-2"
                                             style="background-color:{{ $task->creator->color }}; overflow:auto">
 
-                                            <p class="roboto m-0 p-0 text-white">
-                                                {{ Str::limit($task->title, 20) }}</p>
+                                            <time class="roboto m-0 mt-1 p-0 text-white">
+
+                                                <svg stroke="currentColor" stroke-width="1.5"
+                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                    class="size-6 mx-1 p-0" style="width: 1.4em; height: 2.4em; ">
+
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                </svg>
+
+                                                <span class="mx-1"> {{ $start }}</span> -
+                                                <span class="mx-1">{{ $end }}</span>
+                                            </time>
                                         </div>
                                     @endforeach
 
