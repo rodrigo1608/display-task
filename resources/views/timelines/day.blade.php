@@ -54,9 +54,9 @@
             </div>
         </div>
 
-        <div id="day-schedule-container" class="row full-height-76vh mt-5">
+        <div id="day-schedule-container" class="row full-height-76vh mt-5 rounded">
 
-            <div class="container-day col-md-9 container p-0">
+            <div class="container-day col-md-9 container rounded p-0">
 
                 <div class="d-flex flex-column align-items-center justify-content-center m-0 mt-2" style=" width:100% ">
 
@@ -81,7 +81,14 @@
 
                         @endphp
 
-                        <div class="row border-top border-black" style="position:relative; height:100px; width:98%;">
+                        <div class="row"
+                            style="
+                             border-top-width: 2px;
+                             border-top-style: solid;
+                            border-color:#E6E6E6;
+                        background-color: #FAFAFA  ;
+
+                        position:relative; height:100px; width:98%;">
 
                             <div class="col-md-2 fs-6" style="position:absolute; top:-13px; left:-17%;">
                                 <p class="poppins-light text-secondary text-end">{{ $i }}h</p>
