@@ -275,7 +275,7 @@
                             </time>
                         @endif
 
-                        @foreach ($tasks as $task)
+                        @foreach ($tasks as $index => $task)
                             @php
                                 $duration = getDuration($task);
 
@@ -298,7 +298,8 @@
                             @endphp
 
                             {{-- Bloco da tarefa --}}
-                            <a href="{{ route('task.show', $task->id) }}" class="text-decoration-none"
+                            <a data-index="{{ $index }}" href="{{ route('task.show', $task->id) }}"
+                                class="text-decoration-none"
                                 style="
                                 position:absolute;
                                 top:{{ $taskPositionTop }}px;
@@ -319,7 +320,7 @@
                                         ">
                                     </div>
 
-                                    <div class="d-flex mt-1 rounded px-2 py-3"
+                                    <div class="d-flex {{ $taskContainerWidth <= 200 ? 'align-items-center flex-column ' : '' }} {{ $taskContainerWidth < 400 ? 'justify-content-center  ' : '' }} mt-1 rounded px-2 py-3"
                                         style="
                                         position-relative;
                                         box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
@@ -338,38 +339,127 @@
                                             <img class="w-100"
                                                 src="{{ asset('storage/' . $task->creator->profile_picture) }}"
                                                 alt="Imagem do usuário">
-
                                         </div>
 
-                                        <div class="d-flex flex-column ms-3">
+                                        @if ($taskContainerWidth <= 200)
+                                            <div class="d-flex flex-column ms-3">
+                                                <span
+                                                    class="poppins-semibold fs-5 text-nowrap mt-2 text-center text-black">{{ \Illuminate\Support\Str::limit($task->title, 18, '...') }}
+                                                </span>
 
-                                            <span
-                                                class="poppins-regular fs-4 text-nowrap text-black">{{ $task->title }}</span>
-                                            <span class="roboto fs-5 text-secondary">{{ $start->format('H:i') }}
-                                                até
-                                                {{ $end->format('H:i') }}</span>
-                                            {{-- @dd($end) --}}
+                                                <span class="roboto fs-5 text-black">
 
-                                            <div class="d-flex justify-content-start flex-row">
+                                                    @if (count($participants) > 0)
+                                                        <span class="roboto d-flex mt-2 text-black">
+                                                            {{-- Ícone de participante --}}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                                stroke="currentColor" class="size-6 me-2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
 
-                                                @foreach ($participants as $participant)
-                                                    <div class="rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
-                                                        style="
-                                                                width:40px;
-                                                                height:40px;
-                                                                border: 0.2rem solid {{ $participant->color }};
-                                                        ">
+                                                            {{ count($participants) }}
+                                                            {{ count($participants) > 1 ? 'participantes' : 'participante' }}
+                                                        </span>
+                                                    @endif
 
-                                                        <img class="w-100"
-                                                            src="{{ asset('storage/' . $participant->profile_picture) }}"
-                                                            alt="Imagem do usuário">
+                                                    {{-- Ícone do relógio --}}
+                                                    <div class="mt-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
 
+                                                        {{ $start->format('H:i') }}
+                                                        -
+                                                        {{ $end->format('H:i') }}
                                                     </div>
-                                                @endforeach
+
+                                                </span>
+
                                             </div>
-                                        </div>
+                                        @elseif($taskContainerWidth <= 400)
+                                            <div class="d-flex flex-column ms-3">
+                                                <span
+                                                    class="poppins-regular fs-3 text-nowrap text-black">{{ \Illuminate\Support\Str::limit($task->title, 20, '...') }}</span>
+
+                                                <span class="roboto fs-5 d-flex flex-row text-black">
 
 
+                                                    @if (count($participants) > 0)
+                                                        <span class="roboto d-flex text-black">
+                                                            {{-- Ícone de participante --}}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                                stroke="currentColor" class="size-6 me-2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
+
+                                                            {{ count($participants) }}
+                                                            {{ count($participants) > 1 ? 'participantes' : 'participante' }}
+                                                        </span>
+                                                        <span class="mx-2">|</span>
+                                                    @endif
+                                                    {{-- Ícone do relógio --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                        stroke="currentColor" class="size-6 me-2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+
+                                                    {{ $start->format('H:i') }}
+                                                    até
+                                                    {{ $end->format('H:i') }}
+
+                                                </span>
+
+                                            </div>
+                                        @elseif($taskContainerWidth > 400)
+                                            <div class="d-flex flex-column ms-3">
+                                                <span
+                                                    class="poppins-regular fs-2 text-nowrap text-black">{{ $task->title }}</span>
+
+                                                <span class="roboto fs-5 d-flex flex-row text-black">
+
+
+                                                    @if (count($participants) > 0)
+                                                        <span class="roboto d-flex text-black">
+                                                            {{-- Ícone de participante --}}
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                                stroke="currentColor" class="size-6 me-2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                                    d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                            </svg>
+
+                                                            {{ count($participants) }}
+                                                            {{ count($participants) > 1 ? 'participantes' : 'participante' }}
+                                                        </span>
+                                                        <span class="mx-2">|</span>
+                                                    @endif
+                                                    {{-- Ícone do relógio --}}
+                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                        stroke="currentColor" class="size-6 me-2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+
+
+
+                                                    {{ $start->format('H:i') }}
+                                                    até
+                                                    {{ $end->format('H:i') }}
+
+                                                </span>
+
+                                            </div>
+                                        @endif
 
                                     </div>
 
@@ -426,19 +516,23 @@
             // Lógica para lidar com a posição do bloco da tarefa:
 
             const taskContainers = document.querySelectorAll('.text-decoration-none');
+
             let previousTaskBottom = 0;
 
-            taskContainers.forEach((taskContainer, index) => {
-                if (index === 0) {
+            taskContainers.forEach((taskContainer) => {
+
+                const taskContainerIndex = taskContainer.getAttribute('data-index');
+
+                if (taskContainerIndex === 0) {
 
                     taskContainer.style.top = '0px';
                 } else {
 
-                    const previousTask = taskContainers[index - 1];
+                    const previousTask = taskContainer.previousElementSibling;
                     const previousTaskHeight = previousTask.offsetHeight;
                     const previousTaskTop = parseFloat(previousTask.style.top);
 
-                    const newTop = previousTaskTop + previousTaskHeight + 5;
+                    const newTop = previousTaskTop + previousTaskHeight + 15;
                     taskContainer.style.top = `${newTop}px`;
                 }
             });
