@@ -425,7 +425,7 @@
 
             // Lógica para lidar com a posição do bloco da tarefa:
 
-            const taskContainers = document.querySelectorAll('.task-container');
+            const taskContainers = document.querySelectorAll('.text-decoration-none');
             let previousTaskBottom = 0;
 
             taskContainers.forEach((taskContainer, index) => {
