@@ -422,11 +422,13 @@
 
                 </div>
 
-                <div class="me-2 mt-5 text-end" style="">
+                <div class="me-5 mt-5 text-end" style="">
 
                     {{-- botão de voltar --}}
-                    <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
-                        title="voltar">
+
+                    <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial"
+                        href="{{ route('display.day') }}" title="voltar">
+
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                             viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -435,6 +437,7 @@
                     </a>
 
                 </div>
+
             </div>
 
         </div>

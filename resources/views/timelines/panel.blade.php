@@ -285,67 +285,95 @@
 
                                 $blockStartTaskStartGap = $startBlockTime->diffInMinutes($start);
 
+                                $taskPositionTop = 110;
+
                                 $taskPositionLeft = ($blockStartTaskStartGap * 100) / 60;
 
                                 $durationInMinutes = $start->diffInMinutes($end);
 
-                                $taskContainerHeigh = ($durationInMinutes * 200) / 60;
+                                $taskContainerWidth = ($durationInMinutes * 200) / 60;
 
                                 $participants = $task->participants()->get();
-                                $imgPositionLeft = 60;
 
                             @endphp
 
                             {{-- Bloco da tarefa --}}
-
-                            <a id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
-                                data-task-id="{{ $task->id }}" href="{{ route('task.show', $task->id) }}"
-                                class="task-container text-decoration-none rounded p-3"
+                            <a href="{{ route('task.show', $task->id) }}" class="text-decoration-none"
                                 style="
-                                min-width:{{ $taskContainerHeigh }}px;
                                 position:absolute;
+                                top:{{ $taskPositionTop }}px;
                                 left:{{ $taskPositionLeft }}%;
-                                z-index: 1;
-                                background-color:white;
-                                border:5px solid {{ $task->creator->color }};
-                                overflow:hidden
-                                ">
+                                min-width:{{ $taskContainerWidth }}px;
+                                max-width:{{ $taskContainerWidth }}px;
+                                z-index:1;
+                                "
+                                title="{{ $task->title }}">
 
-                                <div class="d-flex flex-row">
+                                <div id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
+                                    data-task-id="{{ $task->id }}" class="">
 
-                                    <div class="task-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                                    <div class="rounded-pill"
                                         style="
-                                        border: 0.2rem solid white;
-                                        position:relative;
+                                            min-height:1.5vh;
+                                            background-color:{{ $task->creator->color }};
                                         ">
-
-                                        <img class="w-100"
-                                            src="{{ asset('storage/' . $task->creator->profile_picture) }}"
-                                            alt="Imagem do usuário">
-
                                     </div>
 
-                                    @foreach ($participants as $participant)
-                                        <div class="task-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
-                                            style="
-                                            border: 0.2rem solid white;
-                                            position:absolute;
-                                            left: {{ $imgPositionLeft }}px;
-                                    ">
+                                    <div class="d-flex mt-1 rounded px-2 py-3"
+                                        style="
+                                        position-relative;
+                                        box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2);
+                                        background-color:white;
+                                        overflow:hidden
+                                        ">
 
+                                        <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
+                                            style="
+                                            min-width:80px;
+                                            min-height:80px;
+                                            max-width:80px;
+                                            max-height:80px;
+                                            border: 0.3rem solid {{ $task->creator->color }};
+                                        ">
                                             <img class="w-100"
-                                                src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                src="{{ asset('storage/' . $task->creator->profile_picture) }}"
                                                 alt="Imagem do usuário">
 
                                         </div>
 
-                                        @php
-                                            $imgPositionLeft += 60;
-                                        @endphp
-                                    @endforeach
+                                        <div class="d-flex flex-column ms-3">
+
+                                            <span
+                                                class="poppins-regular fs-4 text-nowrap text-black">{{ $task->title }}</span>
+                                            <span class="roboto fs-5 text-secondary">{{ $start->format('H:i') }}
+                                                até
+                                                {{ $end->format('H:i') }}</span>
+                                            {{-- @dd($end) --}}
+
+                                            <div class="d-flex justify-content-start flex-row">
+
+                                                @foreach ($participants as $participant)
+                                                    <div class="rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                                                        style="
+                                                                width:40px;
+                                                                height:40px;
+                                                                border: 0.2rem solid {{ $participant->color }};
+                                                        ">
+
+                                                        <img class="w-100"
+                                                            src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                            alt="Imagem do usuário">
+
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+
+
+                                    </div>
 
                                 </div>
-
                             </a>
                         @endforeach
 
@@ -396,7 +424,6 @@
             setInterval(autoRefreshEveryMinute, 60000);
 
             // Lógica para lidar com a posição do bloco da tarefa:
-
 
             const taskContainers = document.querySelectorAll('.task-container');
             let previousTaskBottom = 0;
