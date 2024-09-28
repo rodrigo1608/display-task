@@ -43,7 +43,7 @@ if (!function_exists('getFormatedDateBR')) {
 
     function getFormatedDateBR($date)
     {
-        return Carbon::parse($date)->format('d/m/Y');
+        return Carbon::parse($date)->format('d. m. Y');
     }
 }
 
@@ -1756,16 +1756,17 @@ if (!function_exists('getPaneldateLabel')) {
         $panelLabel = "";
 
         $day = getCarbonNow();
+        $day = getCarbonDate('1-02-2025');
 
         $weekdayInPortuguese = getDayOfWeek($day, 'pt-br');
 
         if (!$tasksExist) {
-            $panelLabel =  "Nenhuma tarefa agendada para hoje, " . getFormatedDateBR($day);
+            $panelLabel =  "<span class='fs-4 poppins-extralight'>Nenhuma tarefa agendada para hoje . </span> " . getFormatedDateBR($day);
         } else {
 
             $formatedDate = getFormatedDateBR($day);
 
-            $panelLabel = $formatedDate . ",  " . ucfirst($weekdayInPortuguese);
+            $panelLabel = "<span class='fs-4'>" . ucfirst($weekdayInPortuguese) . ". </span> "  . $formatedDate;
         }
 
         return $panelLabel;
@@ -1776,13 +1777,14 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
 
     function getSelectedUserTasksBuilder($selectedDate)
     {
+
         $currentUserID =  auth()->id();
 
         $carbonDate = getCarbonDate($selectedDate);
 
         $weekdayOfSelectDate = getDayOfWeek($carbonDate);
 
-        return Task::with([
+        $selectedUserTaskBuilder =   Task::with([
 
             'participants',
             'reminder',
@@ -1800,10 +1802,12 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
 
                 $query->where(function ($query) use ($selectedDate, $weekdayOfSelectDate) {
 
-                    $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekdayOfSelectDate);
+                    $query->where('specific_date', $selectedDate->format('Y-m-d'))->where('specific_date_weekday', $weekdayOfSelectDate);
                 })->orWhere($weekdayOfSelectDate, 'true');
             });
         });
+
+        return  $selectedUserTaskBuilder;
     }
 }
 

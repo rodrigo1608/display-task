@@ -132,10 +132,10 @@
     </div>
 
     <div style="
-    position:fixed;
-    left:50%;
-     transform: translateX(-50%);
-    top:5%;
+        position:fixed;
+        left:50%;
+        transform: translateX(-50%);
+        top:5%;
     ">
 
         <time class="" id="clock" style="font-size: 3rem;">Carregando...</time>
@@ -180,8 +180,8 @@
                     $labelOverview = getPaneldateLabel($hasAnytaskToday);
                 @endphp
 
-                <time class="fs-2 poppins m-0 p-0">
-                    {{ $labelOverview }}
+                <time class="fs-1 poppins m-0 p-0">
+                    {!! $labelOverview !!}
                 </time>
 
             </div>
@@ -293,7 +293,7 @@
 
                                 $taskContainerWidth = ($durationInMinutes * 200) / 60;
 
-                                $participants = $task->participants()->get();
+                                $participants = $task->participants()->where('status', 'accepted')->get();
 
                             @endphp
 
@@ -344,13 +344,13 @@
                                         @if ($taskContainerWidth <= 200)
                                             <div class="d-flex flex-column ms-3">
                                                 <span
-                                                    class="poppins-semibold fs-5 text-nowrap mt-2 text-center text-black">{{ \Illuminate\Support\Str::limit($task->title, 18, '...') }}
+                                                    class="poppins-regular fs-4 text-nowrap mt-2 text-center text-black">{{ \Illuminate\Support\Str::limit($task->title, 14, '...') }}
                                                 </span>
 
                                                 <span class="roboto fs-5 text-black">
 
                                                     @if (count($participants) > 0)
-                                                        <span class="roboto d-flex mt-2 text-black">
+                                                        <span class="roboto d-flex text-secondary mt-2">
                                                             {{-- Ícone de participante --}}
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                                 width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
@@ -365,7 +365,7 @@
                                                     @endif
 
                                                     {{-- Ícone do relógio --}}
-                                                    <div class="mt-2">
+                                                    <div class="text-secondary mt-2">
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                             width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
                                                             stroke="currentColor" class="size-6">
@@ -386,11 +386,10 @@
                                                 <span
                                                     class="poppins-regular fs-3 text-nowrap text-black">{{ \Illuminate\Support\Str::limit($task->title, 20, '...') }}</span>
 
-                                                <span class="roboto fs-5 d-flex flex-row text-black">
-
+                                                <span class="roboto fs-5 text-black">
 
                                                     @if (count($participants) > 0)
-                                                        <span class="roboto d-flex text-black">
+                                                        <span class="roboto d-flex text-secondary mt-2">
                                                             {{-- Ícone de participante --}}
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                                 width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
@@ -402,19 +401,21 @@
                                                             {{ count($participants) }}
                                                             {{ count($participants) > 1 ? 'participantes' : 'participante' }}
                                                         </span>
-                                                        <span class="mx-2">|</span>
                                                     @endif
-                                                    {{-- Ícone do relógio --}}
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
-                                                        stroke="currentColor" class="size-6 me-2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                    </svg>
 
-                                                    {{ $start->format('H:i') }}
-                                                    até
-                                                    {{ $end->format('H:i') }}
+                                                    {{-- Ícone do relógio --}}
+                                                    <div class="text-secondary mt-2">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
+
+                                                        {{ $start->format('H:i') }}
+                                                        -
+                                                        {{ $end->format('H:i') }}
+                                                    </div>
 
                                                 </span>
 
@@ -422,13 +423,12 @@
                                         @elseif($taskContainerWidth > 400)
                                             <div class="d-flex flex-column ms-3">
                                                 <span
-                                                    class="poppins-regular fs-2 text-nowrap text-black">{{ $task->title }}</span>
+                                                    class="poppins-regular fs-3 text-nowrap text-black">{{ $task->title }}</span>
 
                                                 <span class="roboto fs-5 d-flex flex-row text-black">
 
-
                                                     @if (count($participants) > 0)
-                                                        <span class="roboto d-flex text-black">
+                                                        <span class="roboto d-flex text-secondary">
                                                             {{-- Ícone de participante --}}
                                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                                 width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
@@ -443,18 +443,22 @@
                                                         <span class="mx-2">|</span>
                                                     @endif
                                                     {{-- Ícone do relógio --}}
-                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                        width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
-                                                        stroke="currentColor" class="size-6 me-2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                    </svg>
+                                                    <div class="text-secondary">
+
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            width="1.5em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor" class="size-6 me-2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
 
 
 
-                                                    {{ $start->format('H:i') }}
-                                                    até
-                                                    {{ $end->format('H:i') }}
+                                                        {{ $start->format('H:i') }}
+                                                        até
+                                                        {{ $end->format('H:i') }}
+                                                    </div>
 
                                                 </span>
 

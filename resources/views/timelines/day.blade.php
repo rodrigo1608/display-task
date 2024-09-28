@@ -86,9 +86,8 @@
                              border-top-width: 2px;
                              border-top-style: solid;
                             border-color:#E6E6E6;
-                        background-color: #FAFAFA  ;
-
-                        position:relative; height:100px; width:98%;">
+                            background-color: #FAFAFA;
+                            position:relative; height:100px; width:98%;">
 
                             <div class="col-md-2 fs-6" style="position:absolute; top:-13px; left:-17%;">
                                 <p class="poppins-light text-secondary text-end">{{ $i }}h</p>

@@ -23,9 +23,8 @@ class DisplayController extends Controller
             : getCarbonDate($request->date);
 
         $currentDayOfWeek = getDayOfWeek($date);
-
+        // dd(getSelectedUserTasksBuilder($date)->get());
         $hasAnytaskToday = getSelectedUserTasksBuilder($date)->exists();
-
 
         $totalMinutesInDay = 1440; // Total de minutos em um dia
         $blockHeight = 100; // Altura de cada bloco de uma hora (100px no exemplo)
