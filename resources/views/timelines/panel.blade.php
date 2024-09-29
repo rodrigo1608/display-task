@@ -138,7 +138,7 @@
         top:5%;
     ">
 
-        <time class="" id="clock" style="font-size: 3rem;">Carregando...</time>
+        <time class="poppins" id="clock" style="font-size: 3.2rem;">Carregando...</time>
     </div>
 
     <div class="container-fluid px-5">
@@ -150,7 +150,7 @@
             <div class="col-md-2">
 
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
 
                     </button>

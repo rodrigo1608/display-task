@@ -43,7 +43,7 @@ if (!function_exists('getFormatedDateBR')) {
 
     function getFormatedDateBR($date)
     {
-        return Carbon::parse($date)->format('d. m. Y');
+        return Carbon::parse($date)->format('d.m.Y');
     }
 }
 
@@ -1728,21 +1728,22 @@ if (!function_exists('getlabelOverviewForDay')) {
     function getlabelOverviewForDay($day, $tasksExist)
     {
         $labelOverview = "";
+
         $weekdayInPortuguese = getDayOfWeek($day, 'pt-br');
         if (!$tasksExist) {
 
             $labelOverview = $day->isToday()
-                ? "Nenhuma tarefa agendada para hoje, " . getFormatedDateBR($day)
-                : "Nenhuma tarefa agendada para  " . getFormatedDateBR($day) . ",  $weekdayInPortuguese.";
+                ? "<span class='fs-5 poppins-extralight'>Nenhuma tarefa para hoje.</span> " . getFormatedDateBR($day)
+                : "<span class='fs-5 poppins-extralight'>Nenhuma tarefa para </span> " . getFormatedDateBR($day) . " . " . ucfirst($weekdayInPortuguese);
         } elseif ($tasksExist != null) {
 
             $formatedDate = getFormatedDateBR($day);
 
             $labelOverview = $day->isToday()
-                ? "Hoje, " . $formatedDate
-                : $formatedDate . ",  $weekdayInPortuguese.";
+                ? "<span class='fs-5 poppins-extralight'>Hoje, </span>  " . $formatedDate . " .  " . ucfirst($weekdayInPortuguese)
+                : "<span class='fs-5 poppins-extralight'>" . ucfirst($weekdayInPortuguese) . " . </span>  " . "$formatedDate";
         } else {
-            $labelOverview = $day->isToday() ? "Agenda de hoje, " . getFormatedDateBR($day) : "Agenda de " . getFormatedDateBR($day) . ",  $weekdayInPortuguese.";
+            $labelOverview = $day->isToday() ? "Agenda de hoje, " . getFormatedDateBR($day) : "Agenda de " . getFormatedDateBR($day) . " . " . ucfirst($weekdayInPortuguese);
         }
 
         return $labelOverview;
@@ -1761,7 +1762,7 @@ if (!function_exists('getPaneldateLabel')) {
         $weekdayInPortuguese = getDayOfWeek($day, 'pt-br');
 
         if (!$tasksExist) {
-            $panelLabel =  "<span class='fs-4 poppins-extralight'>Nenhuma tarefa agendada para hoje . </span> " . getFormatedDateBR($day);
+            $panelLabel =  "<span class='fs-3 poppins-extralight'>Nenhuma tarefa para hoje. </span> " . getFormatedDateBR($day);
         } else {
 
             $formatedDate = getFormatedDateBR($day);

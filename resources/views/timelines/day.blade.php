@@ -16,7 +16,7 @@
                             $labelOverview = getlabelOverviewForDay($date, $hasAnytaskToday);
                         @endphp
 
-                        <h2 class="fs-4 poppins-regular m-0 p-0">{{ $labelOverview }}</h2>
+                        <h2 class="fs-4 poppins m-0 p-0">{!! $labelOverview !!}</h2>
 
                     </div>
 
@@ -133,28 +133,73 @@
                                     {{-- Bloco da tarefa --}}
 
                                     <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 task-container text-decoration-none rounded"
+                                        class="task-container text-decoration-none d-flex flex-row rounded p-0 p-0"
                                         style="
-                                        height:{{ $taskContainerHeigh }}px;
-                                        position:absolute;
-                                        left: 50%;
-                                        transform: translateX(-50%);
-                                        z-index: 1;
-                                        background-color:white;
-                                        border:3px solid {{ $task->creator->color }};
-                                        top:{{ $taskPositionTop }}%;
-                                        width:95%;
-                                        overflow:hidden
-                                        ">
+                                            min-height:{{ $taskContainerHeigh }}px;
+                                            max-height:{{ $taskContainerHeigh }}px;
+                                            position:absolute;
+                                            left: 50%;
+                                            transform: translateX(-50%);
+                                            z-index: 1;
+                                            top:{{ $taskPositionTop }}%;
+                                            width:95%;
+                                            overflow:hidden;
+                                             align-items: stretch;
+                                        "
+                                        title="{{ $task->title }}">
 
-                                        <p class="fs-5 roboto text-black">{{ $task->title }} <span
-                                                class="roboto-black mx-2"> |
-                                            </span>
-                                            {{ $start->format('H:i') }} <span class="mx-2"> até</span>
-                                            {{ $end->format('H:i') }}
-                                        </p>
+                                        <div class="rounded-pill"
+                                            style="
+                                            min-width:1.5vh;
+                                            max-width:1.5vh;
+
+                                            background-color:{{ $task->creator->color }};
+                                        ">
+                                        </div>
+
 
                                     </a>
+
+                                    {{-- <a href="{{ route('task.show', $task->id) }}"
+                                        class="col-md-10 task-container text-decoration-none d-flex flex-row rounded p-0"
+                                        style="
+                                            height:{{ $taskContainerHeigh }}px;
+                                            position:absolute;
+                                            left: 50%;
+                                            transform: translateX(-50%);
+                                            z-index: 1;
+                                            top:{{ $taskPositionTop }}%;
+                                            width:95%;
+                                            overflow:hidden
+                                        "
+                                        title="{{ $task->title }}">
+
+                                        <div class="rounded-pill h-100"
+                                            style="
+                                            min-width:1.5vh;
+                                            max-width:1.5vh;
+                                            background-color:{{ $task->creator->color }};
+                                        ">
+                                        </div>
+
+                                        <div class="w-100 bg-white px-3"
+                                            style="
+                                            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+                                            overflow:hidden;
+                                            ">
+
+                                            <span class="fs-5 roboto text-black">{{ $task->title }}
+
+                                                <span class="roboto-black mx-2"> |
+
+                                                    {{ $start->format('H:i') }} <span class="mx-2"> até</span>
+                                                    {{ $end->format('H:i') }}
+                                                </span>
+                                            </span>
+
+                                        </div>
+
+                                    </a> --}}
                                 @endforeach
                             @endif
 
