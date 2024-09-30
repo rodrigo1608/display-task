@@ -212,7 +212,13 @@
             startClock();
         </script>
 
-        <div class="row full-height-84vh mt-5" style="position:relative">
+        <div class="row full-height-84vh mt-4"
+            style="
+                position:relative;
+                height: 84vh;
+                overflow-x: auto;
+                overflow-y: hidden;
+            ">
 
             <div class="d-flex mt-5 p-0"
                 style="

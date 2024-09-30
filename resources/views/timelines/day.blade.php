@@ -132,8 +132,10 @@
 
                                     {{-- Bloco da tarefa --}}
 
+
+
                                     <a href="{{ route('task.show', $task->id) }}"
-                                        class="task-container text-decoration-none d-flex flex-row rounded p-0 p-0"
+                                        class="task-container text-decoration-none d-inline-flex flex-row rounded p-0"
                                         style="
                                             min-height:{{ $taskContainerHeigh }}px;
                                             max-height:{{ $taskContainerHeigh }}px;
@@ -143,22 +145,134 @@
                                             z-index: 1;
                                             top:{{ $taskPositionTop }}%;
                                             width:95%;
-                                            overflow:hidden;
-                                             align-items: stretch;
-                                        "
+                                            align-items: stretch;
+                                            "
                                         title="{{ $task->title }}">
 
-                                        <div class="rounded-pill"
+                                        <div class="rounded-pill me-1"
                                             style="
                                             min-width:1.5vh;
                                             max-width:1.5vh;
-
                                             background-color:{{ $task->creator->color }};
                                         ">
                                         </div>
 
+                                        <div class="w-100 ms-1 rounded bg-white px-3"
+                                            style="
+                                            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+                                            overflow:hidden;
+                                            ">
 
+                                            <div
+                                                class="fs-5 poppins d-flex {{ $taskContainerHeigh >= 100 ? 'flex-column' : '' }} text-black">
+
+                                                <span class="">{{ $task->title }}</span>
+
+                                                @php
+                                                    $participantsAmount = count(
+                                                        $task->participants()->where('status', 'accepted')->get(),
+                                                    );
+                                                @endphp
+
+                                                @if ($taskContainerHeigh < 100)
+                                                    <div class="text-secondary d-flex mx-2 flex-row">
+
+                                                        <span class="mx-3"> | </span>
+                                                        {{-- Ícone do relógio --}}
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            width="1.5em" viewBox="0 0 24 24" stroke-width="1   "
+                                                            stroke="currentColor" class="size-6 mx-1">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
+
+                                                        {{ $start->format('H:i') }} <span class="mx-2"> até</span>
+                                                        {{ $end->format('H:i') }}
+
+
+                                                        @if ($participantsAmount > 0)
+                                                            <span class="mx-3"> | </span>
+
+                                                            <span class="d-flex">
+                                                                {{-- Ícone de participante --}}
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                    width="1.5em" viewBox="0 0 24 24" stroke-width="1"
+                                                                    stroke="currentColor" class="size-6 me-1">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                                </svg>
+
+                                                                {{ $participantsAmount }}
+                                                                {{ $participantsAmount > 1 ? 'participantes' : 'participante' }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @elseif($taskContainerHeigh < 130)
+                                                    <div class="text-secondary d-flex mt-2 flex-row">
+                                                        {{-- Ícone do relógio --}}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            width="1.4em" viewBox="0 0 24 24" stroke-width="1"
+                                                            stroke="currentColor" class="size-6 m-0">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
+
+                                                        {{ $start->format('H:i') }} <span class="mx-2"> até</span>
+                                                        {{ $end->format('H:i') }}
+
+                                                        @if ($participantsAmount > 0)
+                                                            <span class="mx-3"> | </span>
+                                                            <span class="d-flex text-secondary">
+                                                                {{-- Ícone de participante --}}
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                    width="1.5em" viewBox="0 0 24 24" stroke-width="1"
+                                                                    stroke="currentColor" class="size-6 me-1">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                                </svg>
+
+                                                                {{ $participantsAmount }}
+                                                                {{ $participantsAmount > 1 ? 'participantes' : 'participante' }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                @else
+                                                    <span class="text-secondary mt-2">
+                                                        {{-- Ícone do relógio --}}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                            width="1.4em" viewBox="0 0 24 24" stroke-width="1"
+                                                            stroke="currentColor" class="size-6 m-0">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                        </svg>
+
+                                                        {{ $start->format('H:i') }} <span class="mx-2"> até</span>
+                                                        {{ $end->format('H:i') }}
+
+                                                        @if ($participantsAmount > 0)
+                                                            <span class="d-flex text-secondary mt-2">
+                                                                {{-- Ícone de participante --}}
+                                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                                    width="1.5em" viewBox="0 0 24 24" stroke-width="1"
+                                                                    stroke="currentColor" class="size-6 me-2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                                </svg>
+
+                                                                {{ $participantsAmount }}
+                                                                {{ $participantsAmount > 1 ? 'participantes' : 'participante' }}
+                                                            </span>
+                                                        @endif
+                                                    </span>
+                                                @endif
+
+                                            </div>
+
+                                        </div>
                                     </a>
+
+
 
                                     {{-- <a href="{{ route('task.show', $task->id) }}"
                                         class="col-md-10 task-container text-decoration-none d-flex flex-row rounded p-0"
@@ -182,22 +296,7 @@
                                         ">
                                         </div>
 
-                                        <div class="w-100 bg-white px-3"
-                                            style="
-                                            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-                                            overflow:hidden;
-                                            ">
 
-                                            <span class="fs-5 roboto text-black">{{ $task->title }}
-
-                                                <span class="roboto-black mx-2"> |
-
-                                                    {{ $start->format('H:i') }} <span class="mx-2"> até</span>
-                                                    {{ $end->format('H:i') }}
-                                                </span>
-                                            </span>
-
-                                        </div>
 
                                     </a> --}}
                                 @endforeach
