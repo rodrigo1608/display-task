@@ -22,7 +22,6 @@
 
                 <select class="btn btn-primary" name="month" id="month">
 
-
                     @foreach ($months as $monthInEN => $monthInPTBR)
                         <option value="{{ $monthInEN }}"
                             {{ $monthInPTBR === $selectedMOnthInPortuguese ? 'selected' : '' }}>
@@ -59,7 +58,7 @@
             </div>
 
             {{-- Botão para enviar a data escolhida em relação ao ano e mês --}}
-            <button type="submit" class="btn btn-secondary rounded-circle py-2" title="Enviar data">
+            <button type="submit" class="btn btn-primary rounded-circle py-2" title="Enviar data">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="19" height="19"
                     stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -90,10 +89,12 @@
         @php
             $dayIndex = 0;
             $totalDays = count($daysWithEmpty);
-
         @endphp
 
-        <div class="full-height-78vh row">
+        <div class="row" style="
+        height: 75vh;
+        overflow: auto;
+        ">
 
             @foreach ($carbonWeekDays as $carbonWeekDay)
                 @php
