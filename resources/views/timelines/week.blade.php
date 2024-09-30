@@ -33,13 +33,14 @@
 
         </div>
 
-        <div class="full-height-73vh row m-0 mt-5 p-0 px-5">
+        <div id="scroll-container" class="full-height-73vh row m-0 mt-5 p-0 px-5">
 
             @foreach ($carbonWeekDays as $carbonWeekDay)
-                <div class="col m-0 mt-2 p-0" style="{{ $loop->last ? '' : 'border-right: 1px solid lightgrey;' }}">
+                <div class="col m-0 mt-2 p-0"
+                    style="background-color: #FAFAFA;{{ $loop->last ? '' : ' border-right: 1px solid #E6E6E6;' }}">
 
                     @for ($i = 0; $i < 24; $i++)
-                        <div style="border-top: 1px solid black; height:100px; position:relative;">
+                        <div style="border-top: 2px dashed #E6E6E6; height:100px; position:relative;">
 
                             @php
 
@@ -94,26 +95,40 @@
                                     @endphp
 
                                     <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 task-container text-decoration-none d-flex rounded px-2"
+                                        class="col-md-10 task-container text-decoration-none d-flex rounded"
                                         style="
-                                        height:{{ $taskContainerHeigh }}px;
+                                        min-height:{{ $taskContainerHeigh }}px;
+                                        max-height:{{ $taskContainerHeigh }}px;
                                         position:absolute;
                                         left: 50%;
                                         transform: translateX(-50%);
                                         z-index: 1;
-                                        background-color:white;
-                                        border:3px solid {{ $task->creator->color }};
                                         top:{{ $taskPositionTop }}%;
                                         width:96%;
-                                        overflow:hidden;
                                         ">
+                                        <div class="rounded"
+                                            style="
+                                            background-color:{{ $task->creator->color }};
+                                            min-width:1vh;
+                                            max-width:1vh;
 
-                                        <p class="fs-6 roboto text-black">{{ $task->title }} <span
-                                                class="roboto-black mx-2"> |
-                                            </span> {{ $start->format('H:i') }}
-                                            até
-                                            {{ $end->format('H:i') }}
-                                        </p>
+                                            ">
+                                        </div>
+
+                                        <div class="fs-6 poppins-regular d-flex flex-column ms-1 bg-white text-black"
+                                            style="
+                                            overflow:hidden;
+                                             box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);">
+
+                                            <span class="ms-1">{{ $task->title }}</span>
+
+                                            <span class="roboto text-secondary ms-1 mt-2">
+
+                                                {{ $start->format('H:i') }}
+                                                até
+                                                {{ $end->format('H:i') }}
+                                            </span>
+                                        </div>
 
                                     </a>
                                 @endif
@@ -167,8 +182,8 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             const timeMarker = document.querySelector('#time-marker');
-            const scrollContainer = document.querySelector('.full-height-78vh');
-
+            const scrollContainer = document.querySelector('#scroll-container');
+            console.log(timeMarker, scrollContainer)
 
             if (timeMarker && scrollContainer) {
 

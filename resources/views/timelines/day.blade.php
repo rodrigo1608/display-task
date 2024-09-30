@@ -103,7 +103,7 @@
 
                                 <div id="time-marker" class="bg-danger"
                                     style="
-                                    height:3px;
+                                    height:2px;
                                     position:absolute;
                                     top:{{ $timeMarkerPosition }}px;
                                     z-index:3">
@@ -178,8 +178,8 @@
                                                     <div class="text-secondary d-flex mx-2 flex-row">
 
                                                         <span class="mx-3"> | </span>
-                                                        {{-- Ícone do relógio --}}
 
+                                                        {{-- Ícone do relógio --}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
                                                             width="1.5em" viewBox="0 0 24 24" stroke-width="1   "
                                                             stroke="currentColor" class="size-6 mx-1">
