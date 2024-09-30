@@ -124,11 +124,13 @@
                         </svg>
 
                     </button>
+
                 </form>
 
             </div>
 
         </div>
+
     </div>
 
     <div style="
@@ -137,7 +139,6 @@
         transform: translateX(-50%);
         top:5%;
     ">
-
         <time class="poppins" id="clock" style="font-size: 3.2rem;">Carregando...</time>
     </div>
 
@@ -245,10 +246,11 @@
 
                     <div id="hour-block" class=""
                         style="
-                        border-left: {{ $i === 0 ? '2px dashed #abb2b9' : 'none' }};
-                        border-right: 2px dashed #abb2b9;
-                        min-width:200px; margin: 0;
-                        padding: 0; position:relative; ">
+                            border-left: {{ $i === 0 ? '2px dashed #abb2b9' : 'none' }};
+                            border-right: 2px dashed #abb2b9;
+                            min-width:200px; margin: 0;
+                            padding: 0; position:relative;
+                        ">
 
                         @if ($shouldDisplayTimeMarker)
                             @php
@@ -265,7 +267,6 @@
                                     left:{{ $timeMarkerPosition }}%;
                                     z-index:2
                             ">
-
                             </div>
                         @endif
 
@@ -283,15 +284,38 @@
 
                         @foreach ($tasks as $index => $task)
                             @php
+
+                                $previousTask = $index > 0 ? $tasks[$index - 1] : null;
+
+                                $previousDuration = null;
+
+                                $previousStart = null;
+
+                                $previousEnd = null;
                                 $duration = getDuration($task);
 
                                 $start = getCarbonTime($duration->start);
 
                                 $end = getCarbonTime($duration->end);
 
-                                $blockStartTaskStartGap = $startBlockTime->diffInMinutes($start);
+                                $overLap = null;
 
-                                $taskPositionTop = 110;
+                                if ($previousTask !== null) {
+                                    $previousDuration = getDuration($previousTask);
+
+                                    $previousStart = getCarbonTime($previousDuration->start);
+
+                                    $previousEnd = getCarbonTime($previousDuration->end);
+
+                                    $overLap =
+                                        ($end->gt($previousStart) && $end->lte($previousEnd)) ||
+                                        ($start->lte($previousStart) && $end->gte($previousEnd)) ||
+                                        ($start->gte($previousStart) && $start->lte($previousEnd));
+                                }
+
+                                dump($overLap);
+
+                                $blockStartTaskStartGap = $startBlockTime->diffInMinutes($start);
 
                                 $taskPositionLeft = ($blockStartTaskStartGap * 100) / 60;
 
@@ -300,24 +324,24 @@
                                 $taskContainerWidth = ($durationInMinutes * 200) / 60;
 
                                 $participants = $task->participants()->where('status', 'accepted')->get();
-
                             @endphp
 
                             {{-- Bloco da tarefa --}}
-                            <a data-index="{{ $index }}" href="{{ route('task.show', $task->id) }}"
+                            <a id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
+                                data-index="{{ $index }}" data-start="{{ $start }}"
+                                data-end="{{ $end }}" href="{{ route('task.show', $task->id) }}"
                                 class="text-decoration-none"
                                 style="
                                 position:absolute;
-                                top:{{ $taskPositionTop }}px;
                                 left:{{ $taskPositionLeft }}%;
+                                top:30px;
                                 min-width:{{ $taskContainerWidth }}px;
                                 max-width:{{ $taskContainerWidth }}px;
                                 z-index:1;
                                 "
                                 title="{{ $task->title }}">
 
-                                <div id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
-                                    data-task-id="{{ $task->id }}" class="">
+                                <div data-task-id="{{ $task->id }}" class="">
 
                                     <div class="rounded-pill"
                                         style="
@@ -487,7 +511,6 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-
                 //Lógica para lidar com a posição do scroll centralizado quando a página recarregar
                 const timeMarker = document.querySelector('#time-marker');
 
@@ -532,18 +555,30 @@
             taskContainers.forEach((taskContainer) => {
 
                 const taskContainerIndex = taskContainer.getAttribute('data-index');
+                console.log(taskContainerIndex)
 
                 if (taskContainerIndex === 0) {
 
                     taskContainer.style.top = '0px';
                 } else {
 
-                    const previousTask = taskContainer.previousElementSibling;
-                    const previousTaskHeight = previousTask.offsetHeight;
-                    const previousTaskTop = parseFloat(previousTask.style.top);
+                    const previousElement = taskContainer.previousElementSibling;
 
-                    const newTop = previousTaskTop + previousTaskHeight + 15;
-                    taskContainer.style.top = `${newTop}px`;
+                    const previousTagName = previousElement.tagName.toLowerCase();
+
+                    if (previousTagName === 'a') {
+
+                        const previousTaskHeight = previousElement.offsetHeight;
+
+
+                        const previousTaskTop = parseFloat(previousElement.style.top);
+                        const newTop = previousTaskTop + previousTaskHeight + 50;
+
+                        taskContainer.style.top = `${newTop}px`;
+                    }
+
+
+
                 }
             });
         </script>

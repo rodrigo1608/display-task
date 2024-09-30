@@ -4,7 +4,7 @@
 
     <div class="container">
 
-        <div class="'row' mb-5 mt-5">
+        <div class="row mb-5 mt-5">
 
             <div class='col'>
 
@@ -33,7 +33,7 @@
                                 {{-- Botão para enviar a pesquisa de tarefas por data --}}
 
                                 <button type="submit" class="btn btn-primary rounded-end rounded-0 border-start-0 py-0"
-                                    title="Enviar data">
+                                    aria-label="Submit date" title="Enviar data">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         width="19" height="19" stroke-width="1.5" stroke="currentColor"
                                         class="size-6">
@@ -131,9 +131,6 @@
                                     @endphp
 
                                     {{-- Bloco da tarefa --}}
-
-
-
                                     <a href="{{ route('task.show', $task->id) }}"
                                         class="task-container text-decoration-none d-inline-flex flex-row rounded p-0"
                                         style="
@@ -175,13 +172,13 @@
                                                 @endphp
 
                                                 @if ($taskContainerHeigh < 100)
-                                                    <div class="text-secondary d-flex mx-2 flex-row">
+                                                    <div class="text-secondary roboto d-flex mx-2 flex-row">
 
-                                                        <span class="mx-3"> | </span>
+                                                        <span class="mx-2"> | </span>
 
                                                         {{-- Ícone do relógio --}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            width="1.5em" viewBox="0 0 24 24" stroke-width="1   "
+                                                            width="1.3em" viewBox="0 0 24 24" stroke-width="1.5   "
                                                             stroke="currentColor" class="size-6 mx-1">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -197,7 +194,7 @@
                                                             <span class="d-flex">
                                                                 {{-- Ícone de participante --}}
                                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                    width="1.5em" viewBox="0 0 24 24" stroke-width="1"
+                                                                    width="1.3em" viewBox="0 0 24 24" stroke-width="1.5"
                                                                     stroke="currentColor" class="size-6 me-1">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                         d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -209,11 +206,12 @@
                                                         @endif
                                                     </div>
                                                 @elseif($taskContainerHeigh < 130)
-                                                    <div class="text-secondary d-flex mt-2 flex-row">
+                                                    <div class="text-secondary roboto d-flex mt-2 flex-row">
+
                                                         {{-- Ícone do relógio --}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            width="1.4em" viewBox="0 0 24 24" stroke-width="1"
-                                                            stroke="currentColor" class="size-6 m-0">
+                                                            width="1.3em" viewBox="0 0 24 24" stroke-width="1.5"
+                                                            stroke="currentColor" class="size-6 m-0 me-1">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                                         </svg>
@@ -226,7 +224,7 @@
                                                             <span class="d-flex text-secondary">
                                                                 {{-- Ícone de participante --}}
                                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                    width="1.5em" viewBox="0 0 24 24" stroke-width="1"
+                                                                    width="1.3em" viewBox="0 0 24 24" stroke-width="1.5"
                                                                     stroke="currentColor" class="size-6 me-1">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                         d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -238,10 +236,10 @@
                                                         @endif
                                                     </div>
                                                 @else
-                                                    <span class="text-secondary mt-2">
+                                                    <span class="text-secondary roboto mt-2">
                                                         {{-- Ícone do relógio --}}
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                            width="1.4em" viewBox="0 0 24 24" stroke-width="1"
+                                                            width="1.3em" viewBox="0 0 24 24" stroke-width="1.5"
                                                             stroke="currentColor" class="size-6 m-0">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -254,7 +252,7 @@
                                                             <span class="d-flex text-secondary mt-2">
                                                                 {{-- Ícone de participante --}}
                                                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none"
-                                                                    width="1.5em" viewBox="0 0 24 24" stroke-width="1"
+                                                                    width="1.3em" viewBox="0 0 24 24" stroke-width="1.5"
                                                                     stroke="currentColor" class="size-6 me-2">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                         d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -271,34 +269,6 @@
 
                                         </div>
                                     </a>
-
-
-
-                                    {{-- <a href="{{ route('task.show', $task->id) }}"
-                                        class="col-md-10 task-container text-decoration-none d-flex flex-row rounded p-0"
-                                        style="
-                                            height:{{ $taskContainerHeigh }}px;
-                                            position:absolute;
-                                            left: 50%;
-                                            transform: translateX(-50%);
-                                            z-index: 1;
-                                            top:{{ $taskPositionTop }}%;
-                                            width:95%;
-                                            overflow:hidden
-                                        "
-                                        title="{{ $task->title }}">
-
-                                        <div class="rounded-pill h-100"
-                                            style="
-                                            min-width:1.5vh;
-                                            max-width:1.5vh;
-                                            background-color:{{ $task->creator->color }};
-                                        ">
-                                        </div>
-
-
-
-                                    </a> --}}
                                 @endforeach
                             @endif
 
@@ -316,18 +286,35 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
+
+            //Lógica para lidar com a posição do scroll centralizado quando a página recarregar
             const timeMarker = document.querySelector('#time-marker');
+
             const scrollContainer = document.querySelector('#day-schedule-container');
 
+            console.log(scrollContainer)
 
-            if (timeMarker && scrollContainer) {
+            const screenHeight = window.innerHeight;
 
-                let timeMarkerPosition = timeMarker.getBoundingClientRect().top;
 
-                scrollContainer.scrollTop = (timeMarkerPosition - scrollContainer.clientHeight / 2) - 200;
+            scrollContainer.scrollTo(0, 0);
 
-            }
-        })
+            requestAnimationFrame(() => {
+
+                // scrollContainerLeftPosition = scrollContainer.getBoundingClientRect().left;
+
+                const timeMarkerVerticalPostion = timeMarker.getBoundingClientRect().y;
+
+                const halfScreenHeight = screenHeight / 2
+
+                const adjustedScrollPosition = timeMarkerVerticalPostion - halfScreenHeight;
+
+                // Ajuste o scroll para a posição do timeMarker
+                scrollContainer.scrollTo(0, adjustedScrollPosition);
+
+            });
+
+        });
 
         function autoRefreshEveryMinute() {
 
@@ -339,15 +326,4 @@
         setInterval(autoRefreshEveryMinute, 60000);
     </script>
 
-
 @endsection
-
-
-{{-- // Inicializa o valor do top em 50%
-let subValue = 50;
-
-// Função que subtrai 0.1% do valor do top a cada minuto
-
-
-// Chama a função a cada 1 minuto (60000 ms)
-// setInterval(moveTimeLine, 60000); --}}

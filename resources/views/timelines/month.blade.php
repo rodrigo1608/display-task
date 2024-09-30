@@ -3,7 +3,6 @@
 @section('content')
     <div class="container">
 
-
         {{-- Formulário para o usuário selecionar as tarefas com base no mês e ano --}}
         <form class="d-flex align_items-center justify-content-end mt-5 flex-row gap-2 p-0"
             action="{{ route('display.month') }}" method="GET">
@@ -25,9 +24,7 @@
                     @foreach ($months as $monthInEN => $monthInPTBR)
                         <option value="{{ $monthInEN }}"
                             {{ $monthInPTBR === $selectedMOnthInPortuguese ? 'selected' : '' }}>
-
                             {{ $monthInPTBR }}
-
                         </option>
                     @endforeach
 
@@ -80,10 +77,10 @@
 
                 <div class="col mb-3 p-0 text-center">
                     <span id="abreviated-day-of-week-container"
-                        class="{{ $carbonWeekDay->isToday() ? 'poppins-semibold' : ' poppins-extralight' }} fs-5">{{ $formattedWeekDay }}</span>
+                        class="{{ $carbonWeekDay->isToday() ? 'poppins-semibold' : ' poppins-extralight' }} fs-5">{{ $formattedWeekDay }}
+                    </span>
                 </div>
             @endforeach
-
         </div>
 
         @php
@@ -91,9 +88,9 @@
             $totalDays = count($daysWithEmpty);
         @endphp
 
-        <div class="row" style="
-        height: 75vh;
-        overflow: auto;
+        <div id="scroll-container" class="row" style="
+            height: 75vh;
+            overflow: auto;
         ">
 
             @foreach ($carbonWeekDays as $carbonWeekDay)
@@ -110,16 +107,26 @@
 
                                 <input type="hidden" name="date" value="{{ $day->format('Y-m-d') }}">
 
+                                @php
+                                    $isToday = $day->isToday();
+
+                                    $tasksBulder = getSelectedUserTasksBuilder($day);
+
+                                    $tasks = sortByStart($tasksBulder);
+
+                                @endphp
+
                                 <button type="submit"
                                     class="day-block w-100 align-items-center d-flex flex-column border-top border-0 bg-white">
 
-                                    @php
+                                    {{-- @php
                                         $isToday = $day->isToday();
                                         $tasksBulder = getSelectedUserTasksBuilder($day);
                                         $tasks = sortByStart($tasksBulder);
-                                    @endphp
+                                        dd($tasksBulder->get());
+                                    @endphp --}}
 
-                                    <p class="poppins fs-6">
+                                    <time class="poppins fs-6">
                                         @if ($isToday)
                                             <span
                                                 class="today-target poppins-semibold rounded bg-black px-2 py-1 text-white">{{ $day->format('d') }}</span>
@@ -150,41 +157,61 @@
                                                     {{ $monthToDisplay }}.</span>
                                             @endif
                                         @endif
-                                    </p>
-
-                                    @foreach ($tasks->take(4) as $task)
+                                    </time>
+                                    @foreach ($tasks->take(3) as $task)
                                         @php
                                             $durarion = getDuration($task);
                                             $start = getCarbonTime($durarion->start)->format('H:m');
                                             $end = getCarbonTime($durarion->end)->format('H:m');
                                         @endphp
 
-                                        <div class="w-100 d-flex mb-1 flex-row rounded ps-2"
-                                            style="background-color:{{ $task->creator->color }}; overflow:auto">
+                                        <div class="d-flex w-100 mb-1 flex-row">
 
-                                            <time class="roboto m-0 mt-1 p-0 text-white">
+                                            <div class="rounded"
+                                                style="
+                                                    width:8px;
+                                                    background-color:{{ $task->creator->color }};
+                                            ">
+                                            </div>
 
-                                                <svg stroke="currentColor" stroke-width="1.5"
-                                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                    class="size-6 mx-1 p-0" style="width: 1.4em; height: 2.4em; ">
+                                            <div class="w-100 rounded pe-2"
+                                                style="
+                                                    overflow:auto;
+                                                    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+                                                ">
 
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                </svg>
+                                                <p class="roboto m-0 py-1 ps-1 text-start">
+                                                    {{ \Illuminate\Support\Str::limit($task->title, 15) }}
+                                                </p>
+                                                {{--
+                                                <time class="roboto m-0 mt-1 p-0">
 
-                                                <span class="mx-1"> {{ $start }}</span> -
-                                                <span class="mx-1">{{ $end }}</span>
-                                            </time>
+                                                    <svg stroke="currentColor" stroke-width="1.5"
+                                                        xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                        viewBox="0 0 24 24" class="size-6 mx-1 p-0"
+                                                        style="width: 1.4em; height: 2.4em; ">
+
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+
+                                                    <span class="mx-1"> {{ $start }}</span> -
+                                                    <span class="mx-1">{{ $end }}</span>
+
+                                                </time> --}}
+
+                                            </div>
+
                                         </div>
                                     @endforeach
 
-                                    @if (count($tasks) > 4)
+                                    @if (count($tasks) > 3)
                                         @php
-                                            $remaining = count($tasks) - 4;
+                                            $remaining = count($tasks) - 3;
                                             $pluralOrSingular = $remaining === 1 ? 'tarefa' : 'tarefas';
                                         @endphp
 
-                                        <p class="roboto"> + {{ $remaining . $pluralOrSingular }}</p>
+                                        <p class="roboto"> + {{ $remaining . ' ' . $pluralOrSingular }}</p>
                                     @endif
 
                                 </button>
@@ -196,51 +223,6 @@
                 </div>
             @endforeach
 
-            {{-- @for ($week = 0; $week < 6; $week++)
-                <div class="row">
-
-                    @for ($dayOfWeek = 0; $dayOfWeek < 7; $dayOfWeek++)
-                        @php
-                            $currentDay = $daysWithEmpty[$dayIndex];
-                        @endphp
-
-                        <div class="col p-0 text-center">
-
-                            <div class="day-block d-flex justify-content-center border">
-
-                                @if ($currentDay)
-                                    <p class="poppins fs-6">{{ \Carbon\Carbon::parse($currentDay)->format('j') }}
-
-                                        @php
-                                            $isFirstDayOfMonth = $currentDay->isSameDay(
-                                                $currentDay->copy()->startOfMonth(),
-                                            );
-                                        @endphp
-
-                                        @if ($isFirstDayOfMonth)
-                                            @php
-                                                $monthInEnglish = $currentDay->format('F');
-                                                $monthToDisplay = mb_substr($months[$monthInEnglish], 0, 3, 'UTF-8');
-                                            @endphp
-
-                                            {{ $monthToDisplay }}
-                                        @endif
-                                    </p>
-                                @else
-                                    <p class="poppins fs-6">&nbsp;</p>
-                                @endif
-
-                            </div>
-
-                        </div>
-
-                        @php
-                            $dayIndex++; // Incrementa o índice para o próximo dia
-                        @endphp
-                    @endfor
-
-                </div>
-            @endfor --}}
         </div>
 
     </div>
@@ -256,19 +238,36 @@
         document.addEventListener('DOMContentLoaded', function() {
 
             const todayTarget = document.querySelector('.today-target');
-            const scrollContainer = document.querySelector('.full-height-78vh');
+            const scrollContainer = document.querySelector('#scroll-container');
 
-            console.log(todayTarget);
+            const screenHeight = window.innerHeight;
 
-            console.log(scrollContainer);
+            scrollContainer.scrollTo(0, 0);
 
-            if (todayTarget && scrollContainer) {
+            requestAnimationFrame(() => {
 
-                let todayTargetPosition = todayTarget.getBoundingClientRect().top;
+                // scrollContainerLeftPosition = scrollContainer.getBoundingClientRect().left;
 
-                scrollContainer.scrollTop = todayTargetPosition - scrollContainer.clientHeight / 2;
-            }
+                const timeMarkerVerticalPostion = todayTarget.getBoundingClientRect().y;
 
-        })
+                const halfScreenHeight = screenHeight / 2
+
+                const adjustedScrollPosition = timeMarkerVerticalPostion - halfScreenHeight;
+
+                // Ajuste o scroll para a posição do timeMarker
+                scrollContainer.scrollTo(0, adjustedScrollPosition);
+
+            });
+
+        });
+
+        function autoRefreshEveryMinute() {
+
+            console.log("Recarregando a página a cada minuto");
+            location.reload();
+
+        }
+
+        setInterval(autoRefreshEveryMinute, 60000);
     </script>
 @endsection

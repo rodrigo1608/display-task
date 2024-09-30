@@ -183,18 +183,31 @@
 
             const timeMarker = document.querySelector('#time-marker');
             const scrollContainer = document.querySelector('#scroll-container');
-            console.log(timeMarker, scrollContainer)
 
-            if (timeMarker && scrollContainer) {
+            const screenHeight = window.innerHeight;
 
-                let timeMarkerPosition = timeMarker.getBoundingClientRect().top;
+            scrollContainer.scrollTo(0, 0);
 
-                scrollContainer.scrollTop = timeMarkerPosition - scrollContainer.clientHeight / 2;
-            }
-        })
+            requestAnimationFrame(() => {
+
+                // scrollContainerLeftPosition = scrollContainer.getBoundingClientRect().left;
+
+                const timeMarkerVerticalPostion = timeMarker.getBoundingClientRect().y;
+
+                const halfScreenHeight = screenHeight / 2
+
+                const adjustedScrollPosition = timeMarkerVerticalPostion - halfScreenHeight;
+
+                // Ajuste o scroll para a posição do timeMarker
+                scrollContainer.scrollTo(0, adjustedScrollPosition);
+
+            });
+
+        });
 
         function autoRefreshEveryMinute() {
 
+            console.log("Recarregando a página a cada minuto");
             location.reload();
 
         }
