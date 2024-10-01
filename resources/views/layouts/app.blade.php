@@ -57,7 +57,9 @@
                 @if (Auth::check())
                     <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
-                        title="Visualizar barra lateral">
+                        title="Visualizar barra lateral"
+                        style="    border: 1px solid lightgrey;
+                                                border-radius: 0.5rem;">
 
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-6" width="24" height="24">
@@ -125,9 +127,14 @@
                                 @csrf
                                 <input type="text" name="title_filter" id="title_filter"
                                     placeholder="Procurar por nome da tarefa"
-                                    class="form-control rounded-0 rounded-start border-end-1 fs-6">
+                                    class="rounded-0 rounded-start border-end-1 fs-6 px-2"
+                                    style="    border: 1px solid lightgrey;
+                                                border-radius: 0.5rem;">
 
-                                <button class="btn btn-secondary rounded-end rounded-0 border-start-0" title="Pesquisar">
+                                <button class="btn btn-primary rounded-end rounded-0 border-1 border-start-0"
+                                    style="    border: 1px solid lightgrey;
+                                                border-radius: 0.5rem;"
+                                    title="Pesquisar">
 
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                         width="19" height="19" stroke-width="1.5" stroke="currentColor"
@@ -230,7 +237,6 @@
         </nav>
 
         @if (session('success'))
-
             <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;">
 
                 <div id="success-alert" class="row justify-content-center mt-4">
@@ -307,69 +313,36 @@
 
                 <div class="offcanvas-body">
 
-                    <ul class="list-group poppins">
+                    <ul class="list-group poppins-extralight fs-5">
 
                         @php
                             $today = Carbon\Carbon::today()->format('Y-m-d');
                         @endphp
 
-                        <a href="{{ route('display.day') }}" class="side-link">
+                        <a href="{{ route('display.day') }}" class="side-link w-50">
                             <li class="list-group-item">Meu dia</li>
                         </a>
 
-                        <a href="{{ route('display.week') }}" class="side-link">
+                        <a href="{{ route('display.week') }}" class="side-link w-50">
                             <li class="list-group-item">Minha semana</li>
                         </a>
 
-                        <a href="{{ route('display.month') }}" class="side-link">
+                        <a href="{{ route('display.month') }}" class="side-link w-50">
                             <li class="list-group-item">Meu mês</li>
                         </a>
 
-                        <a href="{{ route('home') }}" class="side-link">
+                        <a href="{{ route('home') }}" class="side-link w-50">
                             <li class="list-group-item" aria-current="true">Meu painel</li>
                         </a>
 
-                        <a href="{{ route('display.panel') }}" class="side-link">
+                        <a href="{{ route('display.panel') }}" class="side-link w-50">
                             <li class="list-group-item" aria-current="true">Painel geral</li>
                         </a>
 
                     </ul>
 
-                    <div class="mt-3">
-
-                        <form action="{{ route('home') }}" method="get" class="d-flex me-5 flex-row">
-                            @csrf
-                            <select name="select_filter" class="form-select rounded-0 rounded-start border-end-1 fs-6"
-                                aria-label="Default select example">
-
-                                <option selected disabled> Filtrar tarefas</option>
-
-                                <option value="created_by_me"> Criadas por mim</option>
-
-                                <option value="participating">Estou participando</option>
-
-                                <option value="concluded"> Concluídas</option>
-
-                            </select>
-
-                            {{-- botão de enviar --}}
-                            <button class="btn btn-secondary rounded-end rounded-0 border-start-0" type="submit"
-                                aria-label="Enviar filtro">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="size-6" width="19"
-                                    height="19">
-
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                                </svg>
-
-                            </button>
-                        </form>
-
-                    </div>
-
                 </div>
+
             </div>
         @endif
 
