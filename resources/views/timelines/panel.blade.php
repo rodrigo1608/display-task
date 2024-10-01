@@ -292,13 +292,14 @@
                                 $previousStart = null;
 
                                 $previousEnd = null;
+
                                 $duration = getDuration($task);
 
                                 $start = getCarbonTime($duration->start);
 
                                 $end = getCarbonTime($duration->end);
 
-                                $overLap = null;
+                                $overlap = false;
 
                                 if ($previousTask !== null) {
                                     $previousDuration = getDuration($previousTask);
@@ -307,13 +308,11 @@
 
                                     $previousEnd = getCarbonTime($previousDuration->end);
 
-                                    $overLap =
+                                    $overlap =
                                         ($end->gt($previousStart) && $end->lte($previousEnd)) ||
                                         ($start->lte($previousStart) && $end->gte($previousEnd)) ||
                                         ($start->gte($previousStart) && $start->lte($previousEnd));
                                 }
-
-                                dump($overLap);
 
                                 $blockStartTaskStartGap = $startBlockTime->diffInMinutes($start);
 
@@ -327,10 +326,8 @@
                             @endphp
 
                             {{-- Bloco da tarefa --}}
-                            <a id="task-container-{{ $startBlockTime->format('H') }}-{{ $task->id }}"
-                                data-index="{{ $index }}" data-start="{{ $start }}"
-                                data-end="{{ $end }}" href="{{ route('task.show', $task->id) }}"
-                                class="text-decoration-none"
+                            <a data-overlap="{{ $overlap }}" href="{{ route('task.show', $task->id) }}"
+                                class="marked-container text-decoration-none"
                                 style="
                                 position:absolute;
                                 left:{{ $taskPositionLeft }}%;
@@ -548,19 +545,16 @@
 
             // Lógica para lidar com a posição do bloco da tarefa:
 
-            const taskContainers = document.querySelectorAll('.text-decoration-none');
+            const taskContainers = document.querySelectorAll('.marked-container');
 
             let previousTaskBottom = 0;
 
-            taskContainers.forEach((taskContainer) => {
+            taskContainers.forEach(taskContainer => {
 
-                const taskContainerIndex = taskContainer.getAttribute('data-index');
-                console.log(taskContainerIndex)
+                const isTaskOverlapping = taskContainer.getAttribute('data-overlap');
 
-                if (taskContainerIndex === 0) {
 
-                    taskContainer.style.top = '0px';
-                } else {
+                if (isTaskOverlapping) {
 
                     const previousElement = taskContainer.previousElementSibling;
 
@@ -570,14 +564,11 @@
 
                         const previousTaskHeight = previousElement.offsetHeight;
 
-
                         const previousTaskTop = parseFloat(previousElement.style.top);
-                        const newTop = previousTaskTop + previousTaskHeight + 50;
+                        const newTop = previousTaskTop + previousTaskHeight + 10;
 
                         taskContainer.style.top = `${newTop}px`;
                     }
-
-
 
                 }
             });
