@@ -34,12 +34,6 @@ class FilterController extends Controller
             $query->where('user_id', $currentUserID)->where('status', 'accepted');
         })->where('title', 'LIKE', "%$request->title_filter%")->get();;
 
-
-
-
-
-
-
         return view('tasks/filtered', compact('tasksFilteredByTitle'));
     }
 

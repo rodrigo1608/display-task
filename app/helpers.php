@@ -29,9 +29,6 @@ if (!function_exists('getProfilePicturePath')) {
 
             $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
 
-            // rodrigo
-            // @dd($profilePictureName);
-
             return  $image->storeAs('profile_pictures', $profilePictureName);
         }
 
@@ -487,8 +484,6 @@ if (!function_exists('getRecurringTask')) {
 
     function getRecurringTask(Builder $query, $recurrencePattern, $inputData = null)
     {
-        //rodrigo
-        // dd($inputData);
 
         $hasSpecificDate = !is_null($inputData['specific_date']);
 
@@ -501,12 +496,10 @@ if (!function_exists('getRecurringTask')) {
         return $hasSpecificDate
             ?
             $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($specificDate, $dayOfWeek) {
-                // dd($taskReminderRecurringQuery);
                 $taskReminderRecurringQuery->where('specific_date',  $specificDate)->orWhere($dayOfWeek, "true");
             })
             :
             $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
-                // dd($recurrencePattern);
                 $taskReminderRecurringQuery->where('specific_date_weekday', $recurrencePattern)->orWhere($recurrencePattern, 'true');
             });
     }
@@ -595,21 +588,14 @@ if (!function_exists('getConflictingTask')) {
                 addDurationOverlapQuery($taskRecurringsDurtionQuery, $inputData);
             });
 
-        // dd($conflictingTaskBuilder->toSql(), $conflictingTaskBuilder->getBindings());
 
         $conflictingTask = $conflictingTaskBuilder->first();
 
         $hasConflictingTask = $conflictingTaskBuilder->exists();
 
-        //rodrigo
-        // dd($hasConflictingTask);
-
         if ($hasConflictingTask) {
 
             $conflitingTaskData = getConflitingTaskData($conflictingTask);
-
-            //rodrigo
-            // dd($conflitingTaskData);
 
             session()->flash('conflictingTask',  $conflitingTaskData);
 
@@ -956,7 +942,6 @@ if (!function_exists('getNotificationTimeData')) {
 
     function getNotificationTimeData($notificationTime, $notificationPattern)
     {
-        // dd($notificationPattern);
 
         $now = getCarbonNow();
 
@@ -1378,41 +1363,6 @@ if (!function_exists('handleDurationStatus')) {
     }
 }
 
-// $notificationTime = $data['notification_time'];
-
-// $customTime = $notificationTime->custom_time;
-
-// $isToday = checkIsToday()
-
-// if (is_null($customTime)) {
-
-//     $selectedNotificationTimes = getSelectedNotificationTimes($data['notification_time']);
-
-//     foreach ($selectedNotificationTimes as $selectedTime) {
-
-//         dd($selectedTime);
-//     }
-// } else {
-
-//     $isBeforeCustomTime = $isToday && ($now->format('H:i') < $time->format('H:i'));
-
-//     $isNotificationTime = $isToday && ($now->format('H:i') == $time->format('H:i'));
-
-//     $isAfterCustomTime = $isToday && ($now->format('H:i') > $time->format('H:i'));
-// }
-
-
-// dd($selectedNotificationTimes);
-
-// $now = getCarbonNow();
-
-// $isBeforeCustomTime = null;
-
-// $isNotificationTime = null;
-
-// $isAfterCustomTime = null;
-
-// $isToday = checkIsToday($now);
 
 if (!function_exists('getWeekDaysStartingFromToday')) {
 
@@ -1578,9 +1528,9 @@ if (!function_exists('getAlertAboutNotificationTime')) {
     }
 }
 
-if (!function_exists('getFilteredBySelectTasks')) {
+if (!function_exists('getFilteredTasks')) {
 
-    function getFilteredBySelectTasks($request)
+    function getFilteredTasks($request)
     {
         $userID = auth()->id();
 
@@ -1593,25 +1543,23 @@ if (!function_exists('getFilteredBySelectTasks')) {
 
         ]);
 
-        if ($request->has('select_filter') && $request->input('select_filter') === 'concluded') {
+        if ($request->has('select_filter') && $request->input('filter') === 'concluded') {
 
             $selectedUserTasksBuilder = $selectedUserTasksBuilder->where('concluded', 'true')->where(function ($query) use ($userID) {
 
                 $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
                     $query->where('user_id', $userID)->where('status', 'accepted');
                 });
-            })
-                ->orderBy('updated_at', 'desc')
-                ->get();
-        } elseif ($request->has('select_filter') && $request->input('select_filter') === 'created_by_me') {
+            });
+        } elseif ($request->has('filter') && $request->input('filter') === 'created') {
 
             $selectedUserTasksBuilder =  $selectedUserTasksBuilder->where('concluded', 'false')->where(function ($query) use ($userID) {
                 $query->where('created_by', $userID);
-            })->get();
-        } elseif ($request->has('select_filter') && $request->input('select_filter') === 'participating') {
+            });
+        } elseif ($request->has('filter') && $request->input('filter') === 'participating') {
             $selectedUserTasksBuilder  = $selectedUserTasksBuilder->where('concluded', 'false')->whereHas('participants', function ($query) use ($userID) {
                 $query->where('user_id', $userID)->where('status', 'accepted');
-            })->get();
+            });
         }
 
         return $selectedUserTasksBuilder;
@@ -1690,39 +1638,6 @@ if (!function_exists('getTasksForDayAndTime')) {
     }
 }
 
-
-// if (!function_exists('getTasksForDay')) {
-
-//     function getTasksForDay($day)
-//     {
-//         $userID = auth()->id();
-
-//         $currentDayOfWeek = getDayOfWeek($day);
-
-//         return Task::with([
-//             'participants',
-//             'reminder',
-//             'reminder.recurring',
-//             'durations'
-
-//         ])->where('concluded', 'false')->where(function ($query) use ($userID) {
-
-//             $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-//                 $query->where('user_id', $userID)->where('status', 'accepted');
-//             });
-//         })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
-
-//             $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
-
-//                 $query->where(function ($query) use ($day, $currentDayOfWeek) {
-
-//                     $query->where('specific_date', $day)->where('specific_date_weekday', $currentDayOfWeek);
-//                 })->orWhere($currentDayOfWeek, 'true');
-//             });
-//         })->get();
-//     }
-// }
-
 if (!function_exists('getlabelOverviewForDay')) {
 
     function getlabelOverviewForDay($day, $tasksExist)
@@ -1778,7 +1693,6 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
 
     function getSelectedUserTasksBuilder($selectedDate)
     {
-
         $currentUserID =  auth()->id();
 
         $carbonDate = getCarbonDate($selectedDate);
@@ -1803,7 +1717,7 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
 
                 $query->where(function ($query) use ($selectedDate, $weekdayOfSelectDate) {
 
-                    $query->where('specific_date', $selectedDate->format('Y-m-d'))->where('specific_date_weekday', $weekdayOfSelectDate);
+                    $query->where('specific_date', $selectedDate)->where('specific_date_weekday', $weekdayOfSelectDate);
                 })->orWhere($weekdayOfSelectDate, 'true');
             });
         });
@@ -1811,7 +1725,6 @@ if (!function_exists('getSelectedUserTasksBuilder')) {
         return  $selectedUserTaskBuilder;
     }
 }
-
 
 if (!function_exists('getTasksByStartTime')) {
 

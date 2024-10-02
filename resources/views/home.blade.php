@@ -4,25 +4,39 @@
 
     <div class="container">
 
-        <div class="row flex-row">
+        <div class="row d-flex justify-content-center flex-row" style=" border-bottom: 1px solid lightgrey;">
 
-            <div class="d-flex poppins-extralight my-5">
+            <div class="col-md-8 poppins-extralight my-5">
+                @php
+                    $today = getCarbonNow()->format('Y-m-d');
+                @endphp
 
-                <a href="{{ route('home', ['filter' => 'created']) }}"
-                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'created' ? 'selected' : '' }} text-black">
-                    Criadas por mim
+                <a href="{{ route('home') }}"
+                    class="text-decoration-none fs-5 side-link {{ !request('filter') ? 'selected poppins' : '' }} text-black">
+                    Hoje
                 </a>
 
-                <a href="{{ route('home', ['filter' => 'participating']) }}"
-                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'created' ? 'text-decoration-underline' : '' }} ms-5 text-black">
-                    Estou participando
-                </a>
-                <a href="{{ route('home', ['filter' => 'completed']) }}"
-                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'created' ? 'text-decoration-underline' : '' }} ms-5 text-black">
+                <a href="{{ route('home', ['filter' => 'concluded']) }}"
+                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'concluded' ? 'selected poppins' : '' }} ms-5 text-black">
                     Concluídas
                 </a>
 
-                <form action="{{route('home'}}">
+                <a href="{{ route('home', ['filter' => 'participating']) }}"
+                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'participating' ? 'selected poppins' : '' }} ms-5 text-black">
+                    Estou participando
+                </a>
+
+                <a href="{{ route('home', ['filter' => 'created']) }}"
+                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'created' ? 'selected poppins' : '' }} ms-5 text-black">
+                    Criadas por mim
+                </a>
+
+            </div>
+
+            <div class="col-md-4 d-flex justify-content-end align-items-center">
+
+                <form action="{{ route('home') }}" method="get" class="d-flex">
+                    @csrf
 
                     <input type="date" id="input-date" name="specific_date"
                         class="form-control rounded-0 rounded-start border-end-1 fs-6"
@@ -31,6 +45,7 @@
                     {{-- Botão para enviar a pesquisa de tarefas por data --}}
                     <button type="submit" class="btn btn-primary rounded-end rounded-0 border-start-0 py-0"
                         title="Enviar data">
+
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="19"
                             height="19" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -38,39 +53,27 @@
                         </svg>
 
                     </button>
+
                 </form>
 
             </div>
 
-            <div>
-
-            </div>
-
-
         </div>
 
-        </form>
+        <div class="container p-0" style="height:81vh; overflow:auto">
 
-    </div>
+            <div class="row mb-5">
 
-    <div class="row vh-100">
+                <div class="col-md-9" style="position:relative">
 
-        <div class="col-md-9 container" style="position:relative">
+                    <div class="row mt-5">
 
-            <div class="row mt-5">
+                        <div class='col-md-8 mb-2'>
+                            <h2 class="fs-4 poppins-extralight me-1">{!! $labelOverview !!}</h2>
+                        </div>
 
-                <div class="col-md-8 bg-danger d-flex justify-content-end">
+                    </div>
 
-
-
-                </div>
-
-            </div>
-
-            <div class="row mt-5">
-
-                <div class='col-md-8'>
-                    <h2 class="fs-5 me-1">{{ $labelOverview }}</h2>
                 </div>
 
             </div>
@@ -225,11 +228,13 @@
 
             </div>
 
-
-
         </div>
 
+
+
     </div>
+
+
 
     </div>
 @endsection

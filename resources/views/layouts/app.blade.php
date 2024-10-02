@@ -273,8 +273,9 @@
         </script>
 
         @if (Auth::check())
-            <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1"
-                id="offcanvasWithBothOptions" aria-labelledby="offcanvasWithBothOptionsLabel">
+            <div class="offcanvas border-start-0 rounded-end offcanvas-start border border-2 border-black ps-2"
+                data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+                aria-labelledby="offcanvasWithBothOptionsLabel">
 
                 <div class="w-100 text-end">
                     <button type="button" class="btn-close me-4 mt-4" data-bs-dismiss="offcanvas"
@@ -283,7 +284,7 @@
 
                 <div class="offcanvas-header">
 
-                    <div class="w-100 d-flex flex-column ps-4">
+                    <div class="w-100 d-flex flex-column ps-4" style="border-bottom:1px solid lightgrey">
 
                         <div
                             class="profile-picture-container profile-border rounded-circle d-flex justify-content-center align-items-center overflow-hidden">
@@ -295,16 +296,17 @@
 
                         <div class='mt-2 text-start'>
 
-                            <h2 class="fs-4 poppins-medium m-0 p-0">
+                            <h2 class="fs-2 poppins m-0 mb-3 p-0">
                                 {{ $user->name }}
                                 {{ $user->lastname }}
                             </h2>
 
-                            <p class="fs-5 roboto">{{ $user->role }} </p>
+                            <p class="fs-5 roboto-light mb-3">{{ $user->role }} </p>
 
-                            <p class="fs-5 roboto m-0 p-0">{{ $user->email }} </p>
+                            <p class="fs-5 roboto-light m-0 mb-3 p-0">{{ $user->email }} </p>
 
-                            <p class="fs-5 roboto m-0">{{ $user->telephone }} </p>
+                            <p class="fs-5 roboto-light m-0 mb-3">{{ $user->telephone }} </p>
+
                         </div>
 
                     </div>
@@ -319,24 +321,38 @@
                             $today = Carbon\Carbon::today()->format('Y-m-d');
                         @endphp
 
-                        <a href="{{ route('display.day') }}" class="side-link w-50">
+                        <a href="{{ route('display.day') }}"
+                            class="side-link w-50 {{ Route::currentRouteName() == 'display.day' ? 'selected poppins' : '' }}">
+
                             <li class="list-group-item">Meu dia</li>
+
                         </a>
 
-                        <a href="{{ route('display.week') }}" class="side-link w-50">
+                        <a href="{{ route('display.week') }}"
+                            class="side-link w-50 {{ Route::currentRouteName() == 'display.week' ? 'selected poppins' : '' }}">
+
                             <li class="list-group-item">Minha semana</li>
+
                         </a>
 
-                        <a href="{{ route('display.month') }}" class="side-link w-50">
+                        <a href="{{ route('display.month') }}"
+                            class="side-link w-50 {{ Route::currentRouteName() == 'display.month' ? 'selected poppins' : '' }}">
+
                             <li class="list-group-item">Meu mês</li>
+
                         </a>
 
-                        <a href="{{ route('home') }}" class="side-link w-50">
+                        <a href="{{ route('home') }}"
+                            class="side-link w-50 {{ Route::currentRouteName() == 'home' ? 'selected poppins' : '' }}">
+
                             <li class="list-group-item" aria-current="true">Meu painel</li>
+
                         </a>
 
                         <a href="{{ route('display.panel') }}" class="side-link w-50">
+
                             <li class="list-group-item" aria-current="true">Painel geral</li>
+
                         </a>
 
                     </ul>
