@@ -2,7 +2,23 @@
 
 @section('content')
 
-    <div class="container-fluid">
+    <div class="container-fluid pt-5" style="background-color:#F2F2F2; height:94vh; overflow:auto ">
+
+        <div class="container bg-white">
+
+            <div class="row">
+
+                <h1 class="poppins fs-3"> {{ $task->title }}</h1>
+
+            </div>
+
+            <div class="row">
+
+                <p class="roboto col-md-8">{{ $task->description }}</p>
+
+            </div>
+
+        </div>
 
         <div class="row" style="
         height: 86vh;
@@ -16,7 +32,12 @@
                     <div class="card-body ps-5">
 
                         <div class="row">
-                            <h1 class="poppins-regular fs-3"> {{ $task->title }}</h1>
+
+                        </div>
+
+
+                        <div class="row mt-3">
+                            <p class="roboto col-md-8">{{ $task->description }}</p>
                         </div>
 
                         <div class="row mt-4">
@@ -26,10 +47,6 @@
                             <p class="roboto col-md-3">{{ $task->creator_email }} </p>
                         </div>
 
-                        <div class="row mt-3">
-                            <p class="poppins-semibold col-md-2">Descrição: </p>
-                            <p class="roboto col-md-8">{{ $task->description }}</p>
-                        </div>
 
                         @php
                             $hasAnyAttachment = isset($task->attachments) && !empty($task->attachments);
