@@ -100,9 +100,11 @@ class HomeController extends Controller
 
                     $labelOverview = "Tarefas criadas por você:";
                 } else {
+
                     $labelOverview = "Tarefas concluídas:";
                 }
             } else {
+
                 $labelOverview = "Agenda de <span class='fs-2 poppins'>" . getFormatedDateBR($selectedDate) . "</span>,  $weekdayInPortuguese.";
             }
         }
@@ -129,14 +131,11 @@ class HomeController extends Controller
 
                 $duration = $task->durations()->where('user_id', $currentUserID)->where('task_id', $task->id)->first();
 
-
-
                 if ($duration) {
                     $task->start = substr($duration->start, 0, 5);
                     $task->end =  substr($duration->end, 0, 5);
                     $task->status = $duration->status;
                 }
-
 
                 $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
 
@@ -146,7 +145,6 @@ class HomeController extends Controller
                 $recurring = $task->reminder->recurring;
             }
         }
-
 
         return view('home', compact('isThereAnyReminder', 'selectedUserTasks', 'orderedReminders', 'labelOverview'));
     }

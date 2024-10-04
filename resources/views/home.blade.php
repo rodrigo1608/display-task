@@ -60,9 +60,9 @@
 
         </div>
 
-        <div class="container p-0" style="height:81vh; overflow:auto">
+        <div class="container px-1" style="height:81vh; overflow:auto">
 
-            <div class="row mb-5">
+            <div class="row mx-0 mb-5 p-0" style="max-widht:100%">
 
                 <div class="col-md-9" style="position:relative">
 
@@ -78,34 +78,37 @@
 
             </div>
 
-            <div class="row">
+            <div class="row mx-0 p-0" style="max-widht:100%">
 
-                <div class='col-md-8'>
+                <div class='col-md-8 p-0'>
 
-                    <div class="accordion" id="accordionFlushExample">
+                    {{-- accordeon --}}
+                    <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
 
                         @if (isset($selectedUserTasks))
                             @foreach ($selectedUserTasks as $index => $task)
-                                <div class="accordion-item">
+                                <div class="accordion-item px-1 ps-3">
 
                                     <h2 class="accordion-header d-flex">
 
-                                        <button class="accordion-button poppins-semibold collapsed" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#flush-collapse{{ $index }}"
-                                            aria-expanded="false" aria-controls="flush-collapseOne">
+                                        <button class="accordion-button accordion-button-secondary collapsed py-3"
+                                            type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
+                                            aria-controls="flush-collapseOne">
 
-                                            <div class="w-100 d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <span class="fs-5">{{ $task->start }}</span> <span
-                                                        class="mx-1">-</span>
-                                                    <span class="fs-5">{{ $task->end }}</span> <span
-                                                        class="mx-1">:</span>
-                                                    <span class="fs-5"> {{ $task->title }}</span>
-                                                </div>
+                                            <div class="w-100 d-flex flex-column">
 
-                                                @if ($task->concluded === 'false')
-                                                    <div class="me-3 text-end">
-                                                        <p class="roboto fs-6 my-2 ms-4 ps-4">
+                                                <div
+                                                    class="poppins-regular d-flex align-items-center justify-content-between flex-row">
+
+                                                    <div class="mb-3">
+                                                        <span class="fs-2">{{ $task->start }}</span> <span
+                                                            class="poppins-extralight fs-4 mx-2">até</span>
+                                                        <span class="fs-2">{{ $task->end }}</span>
+                                                    </div>
+
+                                                    @if ($task->concluded === 'false')
+                                                        <div class="me-3 text-end">
 
                                                             <svg stroke="currentColor" @class([
                                                                 'text-success' => $task->status === 'starting',
@@ -114,15 +117,19 @@
                                                             ])
                                                                 stroke-width="2" xmlns="http://www.w3.org/2000/svg"
                                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                                                class="size-6" style="width: 1em; height: 1em;">
+                                                                class="size-6" style="width: 1.5em; height: 1.5em;">
                                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                                     d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                                             </svg>
 
-                                                        </p>
+                                                        </div>
+                                                    @endif
 
-                                                    </div>
-                                                @endif
+                                                </div>
+
+                                                <div class="">
+                                                    <span class="fs-4 poppins"> {{ $task->title }}</span>
+                                                </div>
 
                                             </div>
 
@@ -130,49 +137,58 @@
 
                                     </h2>
 
-                                    <div id="flush-collapse{{ $index }}" class="accordion-collapse collapse">
+                                    <div id="flush-collapse{{ $index }}" class="accordion-collapse fs-5 collapse">
 
-                                        <div class="accordion-body">
+                                        <div class="accordion-body mb-4 pb-5" style="border-bottom: solid lightgrey 1px;">
 
-                                            <p class="roboto-light fs-5">
+                                            <p class="roboto fs-5 text-secondary w-75 my-4">
                                                 {{ $task->feedbacks[0]->feedback }}
                                             </p>
 
-                                            <p class="roboto"><span class="poppins-medium">Local:</span>
+                                            <p class="roboto-light"><span class="roboto">Local:</span>
                                                 {{ $task->local }}
                                             </p>
 
-                                            <p class="roboto"><span class="poppins-medium">Criado por:</span>
+                                            <p class="roboto-light"><span class="roboto">Criado por:</span>
                                                 {{ $task->creator->name }} {{ $task->creator->lastname }}
                                             </p>
 
-                                            <p class="roboto"><span class="poppins-medium">Participantes:</span>
-                                                {{ $task->emailsParticipants }}
-                                            </p>
+                                            @php
+                                                $participants = getParticipants($task);
+                                            @endphp
 
-                                            <p class="roboto">
+                                            <div class="d-flex aligm-items-center flex-row">
+
+                                                <span class="roboto align-self-center">Participantes:</span>
+
+                                                @foreach ($participants as $participant)
+                                                    <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
+                                                        style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
+                                                        title="{{ $participant->name }} {{ $participant->lastname }}">
+
+                                                        <img class="w-100"
+                                                            src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                            alt="Imagem do usuário">
+                                                    </div>
+                                                @endforeach
+
+                                            </div>
+
+                                            <p class="roboto-light mt-2">
                                                 {!! $task->recurringMessage !!}
                                             </p>
 
-                                            @if ($task->concluded === 'false')
-                                                @if ($task->status === 'starting')
-                                                    <p class="text-success roboto fs-6">
-                                                        Irá começar
-                                                    </p>
-                                                @elseIf($task->status === 'in_progress')
-                                                    <p class="text-warning roboto fs-6">
-                                                        Sendo realizada
-                                                    </p>
-                                                @else
-                                                    <p class="text-danger roboto fs-6">
-                                                        Tempo expirado
-                                                    </p>
-                                                @endif
-                                            @endif
-
-                                            <div class="text-end">
+                                            <div class="text-end" title="Ver tarefa">
                                                 <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                                    class="btn btn-secondary">Ver tarefa</a>
+                                                    class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg"
+                                                        width="1.5em" height="1.5em" fill="none" viewBox="0 0 24 24"
+                                                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                    </svg>
+                                                </a>
                                             </div>
 
                                         </div>

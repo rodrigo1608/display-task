@@ -48,6 +48,7 @@ class SetPendingTask extends FormRequest
 
         $alertOptions = getAlertOptions();
 
+
         $duration = getDuration($task);
 
         $now = getCarbonNow();
@@ -56,7 +57,7 @@ class SetPendingTask extends FormRequest
 
         $recurring = $task->reminder->recurring;
 
-        $willNotStartSoon = $now->diffInMinutes($start, true) > 30;
+        $willNotStartSoon = $now->diffInMinutes($start, false) > 30;
 
         // $recurring->specific_date !== null;
 
@@ -80,7 +81,6 @@ class SetPendingTask extends FormRequest
         if (!filled($this->input('start'))) {
             return;
         }
-
 
         $start = getCarbonTime($this->input('start'));
 

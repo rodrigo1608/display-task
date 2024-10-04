@@ -333,11 +333,12 @@ if (!function_exists('getRecurringMessage')) {
 
             $recurringMessage = '';
 
-            // $daysOfWeek = getDaysOfWeekInPortuguese();
-
-            // $repeatingDays = getRepeatingDays($daysOfWeek, $recurring);
-
             $repeatingDays = getRepeatingDays($recurring, 'pt-br');
+
+
+            $formattedDays = array_map(function ($day) {
+                return '<span class="fs-4 roboto">' . $day . '</span>';
+            }, $repeatingDays);
 
             $numberOfRepeatingDays = count($repeatingDays);
 
@@ -350,14 +351,14 @@ if (!function_exists('getRecurringMessage')) {
 
                     $lastDay = array_pop($repeatingDays);
 
-                    $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $repeatingDays);
+                    $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $formattedDays);
 
                     $recurringMessage .= ' e ' . $lastDay;
                 } else {
 
-                    $recurringMessage .=    ($repeatingDays[0]) === "sábado" || ($repeatingDays[0]) === 'domingo'
-                        ? 'Todos os ' . ($repeatingDays[0]) . 's'
-                        : 'Todas as ' . $repeatingDays[0] . 's';
+                    $recurringMessage .=    ($formattedDays[0]) === "sábado" || ($formattedDays[0]) === 'domingo'
+                        ? 'Todos os ' . ($formattedDays[0]) . 's'
+                        : 'Todas as ' .  $formattedDays[0] . 's';
                 }
             }
         } else {
@@ -366,8 +367,8 @@ if (!function_exists('getRecurringMessage')) {
 
             $dayOfWeekInPortuguese = getDayOfWeek($date, 'pt-br');
 
-            $formatedDate = '<strong>' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</strong>';
-            $recurringMessage = "Ocorrerá exclusivamente no dia: $formatedDate, $dayOfWeekInPortuguese.";
+            $formatedDate = '<span class="fs-4 roboto">' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</span>';
+            $recurringMessage = "Ocorrerá exclusivamente no dia $formatedDate, $dayOfWeekInPortuguese.";
         }
 
         return $recurringMessage;
@@ -1427,6 +1428,16 @@ if (!function_exists('getDuration')) {
     function getDuration($task)
     {
         return $task->durations()->where('user_id',  $task->created_by)->where('task_id', $task->id)->first();
+    }
+}
+
+if (!function_exists('getParticipants')) {
+    function getParticipants($task)
+    {
+        return $task
+            ->participants()
+            ->where('status', 'accepted')
+            ->get();
     }
 }
 

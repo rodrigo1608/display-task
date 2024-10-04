@@ -58,11 +58,11 @@
                     <button class="btn btn-primary ms-5" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions"
                         title="Visualizar barra lateral"
-                        style="    border: 1px solid lightgrey;
-                                                border-radius: 0.5rem;">
+                        style=" border: 1px solid lightgrey;
+                                border-radius: 0.5rem;">
 
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="size-6" width="24" height="24">
+                            stroke="currentColor" class="size-6" width="1.5em" height="1.5em">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                         </svg>
@@ -91,10 +91,15 @@
                         @auth
 
                             <div class="dropdown">
+                                {{-- Botão de criar eventos --}}
+                                <button class="btn btn-secondary ms-5 px-2" type="button" id="dropdownMenuButtonEvent"
+                                    data-bs-toggle="dropdown" aria-expanded="false" title="Criar evento">
 
-                                <button class="btn btn-secondary ms-5" type="button" id="dropdownMenuButtonEvent"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    Criar evento
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="2" stroke="currentColor" class="size-6" width="1.5em" height="1.2em">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+
                                 </button>
 
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonEvent">
@@ -127,9 +132,7 @@
                                 @csrf
                                 <input type="text" name="title_filter" id="title_filter"
                                     placeholder="Procurar por nome da tarefa"
-                                    class="rounded-0 rounded-start border-end-1 fs-6 px-2"
-                                    style="    border: 1px solid lightgrey;
-                                                border-radius: 0.5rem;">
+                                    class="clean-form-control rounded-0 rounded-start border-end-1 fs-6 px-2">
 
                                 <button class="btn btn-primary rounded-end rounded-0 border-1 border-start-0"
                                     style="    border: 1px solid lightgrey;

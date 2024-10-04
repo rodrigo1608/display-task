@@ -1,421 +1,545 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container p-0">
-        <div class="row">
 
-            <div class="col-md-9 container p-0">
+    <div class="container-fluid pt-5" style="background-color:#F2F2F2; height:94vh; overflow:auto ">
 
-                <div class="card mt-5">
+        <div class="w-50 container mt-5 rounded bg-white ps-4">
 
-                    <div class="card-body p-5">
+            <div class="row px-2 pb-4 pt-3">
 
-                        <div class="">
+                {{-- Botão de visualizar detalhes --}}
 
-                            <div class="row">
+                <div class="text-end">
 
-                                <div class="col-md-10">
+                    <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDetails"
+                        aria-expanded="false" aria-controls="collapseDetails" title="Visualizar os detalhes da tarefa">
 
-                                    <h1 class="roboto-semibold fs-4">{{ $task->title }}
-                                        @if (!$task->isConcluded)
-                                            <svg stroke="currentColor" @class([
-                                                'text-success' => $task->status === 'starting',
-                                                'text-warning' => $task->status === 'in_progress',
-                                                'text-danger' => $task->status === 'finished',
-                                            ]) stroke-width="2"
-                                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                                class="size-6" style="width: 1em; height: 2em; ">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" fill="none"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
 
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                        @endif
-                                    </h1>
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d=" M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                0-8.573-3.007-9.963-7.178Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
 
-                                    @if ($task->isConcluded)
-                                        <p class="text-primary fs-5">
-                                            A tarefa está registrada como concluída
-                                        </p>
-                                    @endif
+                    </button>
 
-                                    <p class="roboto fs-5"> {{ $task->description }}</p>
+                </div>
+
+            </div>
+
+            <div class="row mb-5 p-0">
+
+                <div class="col-10 d-flex align-items-center flex-row">
+
+                    <h2 class="poppins fs-3 m-0 p-0">{{ $task->title }} </h2>
+
+                    @if (!$task->isConcluded)
+                        <div @class([
+                            'ms-2',
+                            'd-inline-flex px-2 flex-row align-items-center p-0',
+                            'alert alert-success' => $task->status === 'starting',
+                            'alert alert-warning' => $task->status === 'in_progress',
+                            'alert alert-danger' => $task->status === 'finished',
+                        ])>
+                            <svg stroke="currentColor" stroke-width="1.5" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24" class="size-6 me-2" style="width: 0.7em; height: 1em; ">
+
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+
+                            <p class="m-0 p-0" style="font-size: 0.8rem;">
+                                @if ($task->status === 'starting')
+                                    A começar
+                                @elseif ($task->status === 'in_progress')
+                                    Em andamento
+                                @elseif ($task->status === 'finished')
+                                    Finalizada
+                                @endif
+                            </p>
+
+                        </div>
+                    @else
+                        <div class="alert alert-info ms-2 p-0 px-2">
+                            <p class="m-0 p-0" style="font-size: 0.8rem;">Concluída</p>
+                        </div>
+                    @endif
+
+                </div>
+
+            </div>
+
+            <div class="row pb-2">
+
+                <div class="col-md-10">
+
+                    <p class="roboto fs-5 text-secondary"> {{ $task->description }}</p>
+
+                </div>
+
+            </div>
+
+            <div class="fs-5 collapse pb-3" id="collapseDetails">
+
+                <div class="row">
+
+                    @if (!$task->isConcluded)
+                        <div class="border-top mb-2 mt-4 border-2">
+
+                            <div class="d-flex align-items-center mt-3 flex-row">
+                                {{-- icone do calendário --}}
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24 " width="1.5em"
+                                    height="1.5em" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                                </svg>
+
+                                <span class="roboto-light ms-3">{!! $task->recurringMessage !!}</span>
+                            </div>
+
+                            <div class="d-flex align-items-center mt-3 flex-row">
+
+                                {{-- Ícone do relógio --}}
+
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="1.5em" viewBox="0 0 24 24"
+                                    stroke-width="1.5   " stroke="currentColor" class="size-6">
+
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+
+                                </svg>
+
+                                <span class="fs-5 roboto ms-3">{{ $task->start }}</span>
+
+                                <span class="roboto-light mx-2">
+                                    até
+                                </span>
+
+                                <span class="fs-5 roboto">{{ $task->end }}</span>
+                            </div>
+
+                        </div>
+                    @endif
+
+                    <div class="mt-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            width="1.5em" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+
+                        <span class="roboto-light ms-3"> {{ $task->local }}</span>
+                    </div>
+
+                    <p class="roboto mb-0 mt-3">Autor</p>
+
+                    <div class="card"
+                        style="
+                            max-width: 50%;
+                            min-width:50%;
+                            border: 1px solid lightgrey;
+                            box-shadow: none;
+                        ">
+
+                        <div class="row g-0">
+
+                            <div class="col-md-2">
+
+                                <div class="rounded-circle d-flex justify-content-center align-items-center mt-2 overflow-hidden"
+                                    style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $task->creator->color }}"
+                                    title="{{ $task->creator->name }} {{ $task->creator->lastname }}">
+
+                                    <img class="w-100" src="{{ asset('storage/' . $task->creator->profile_picture) }}"
+                                        alt="Imagem do usuário">
 
                                 </div>
+                            </div>
 
-                                {{-- Botão de visualizar detalhes --}}
-                                <div class="col-md-2 d-flex align-items-start justify-content-end">
+                            <div class="col-md-8">
 
-                                    <button class="btn btn-secondary shadow" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#collapseDetails" aria-expanded="false"
-                                        aria-controls="collapseDetails" title="Visualizar os detalhes da tarefa">
+                                <div class="card-body">
 
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <div class="d-flex fs-6 flex-column">
+                                        <h5 class="card-title">{{ $task->creator_name }}</h5>
 
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        </svg>
+                                        <span class="roboto-light mx-3 my-1">{{ $task->creator_email }}</span>
 
-                                    </button>
+                                        <span
+                                            class="roboto-light mx-3 my-1">{{ getFormatedTelephone($task->creator) }}</span>
+                                    </div>
+
                                 </div>
 
                             </div>
 
                         </div>
 
-                        <div class="collapse" id="collapseDetails">
+                    </div>
 
-                            <p class= "roboto"><span class="poppins-semibold">Local:</span>
-                                {{ $task->local }}
-                            </p>
+                    @php
+                        $participants = getParticipants($task);
+                    @endphp
 
-                            <p><span class="poppins-semibold">Criado por:</span> {{ $task->creator_name }}</p>
+                    @if ($participants->isNotEmpty())
+                        <p class="roboto mb-0 mt-3">Participantes</p>
+                        <div class="d-flex flex-column p-0">
 
-                            <p><span class="poppins-semibold">Telefone do responsável:</span>
-                                {{ $task->creator_telephone }}</p>
+                            @foreach ($participants as $participant)
+                                <div class="card mb-3"
+                                    style="
+                                        max-width: 50%;
+                                        min-width:50%;
+                                        border: 1px solid lightgrey;
+                                        box-shadow: none;
+                                    ">
 
-                            <p><span class="poppins-semibold">Email do responsável:</span>
+                                    <div class="row g-0">
 
-                                {{ $task->creator_email }}</p>
+                                        <div class="col-md-2">
+                                            <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 mt-2 overflow-hidden"
+                                                style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $participant->color }}"
+                                                title="{{ $participant->name }} {{ $participant->lastname }}">
 
-                            <p class="roboto"><span class="poppins-semibold">Participantes:</span>
-                                {{ $task->emailsParticipants }}
-                            </p>
-
-                            @if (!empty($task->attachments))
-                                <p><span class="poppins-semibold">Anexos:</span></p>
-
-                                <div class="d-flex flex-row flex-wrap">
-
-                                    @foreach ($task->attachments as $index => $attachment)
-                                        <!-- Button trigger modal -->
-                                        <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal"
-                                            data-bs-target="#attach{{ $index }}">
-
-                                            <img style="width:100px" src="{{ asset('storage/' . $attachment->path) }}"
-                                                alt="Attachment Image">
-
-                                        </button>
-
-                                        <!-- Modal -->
-                                        <div class="modal fade modal-xl" id="attach{{ $index }}" tabindex="-1"
-                                            aria-labelledby="attachmentModalLabel" aria-hidden="true">
-
-                                            <div class="modal-dialog">
-
-                                                <div class="modal-content">
-
-                                                    <div class="modal-header">
-
-                                                        <h1 class="modal-title fs-5" id="attachmentModalLabel">
-                                                            Anexo
-                                                            {{ $index + 1 }}</h1>
-
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-
-                                                    <div class="modal-body text-center">
-                                                        <img src="{{ asset('storage/' . $attachment->path) }}"
-                                                            alt="Attachment Image" style="max-width: 100%; height: auto;">
-                                                    </div>
-                                                </div>
+                                                <img class="w-100"
+                                                    src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                    alt="Imagem do usuário">
 
                                             </div>
                                         </div>
-                                    @endforeach
 
+                                        <div class="col-md-8">
+
+                                            <div class="card-body">
+
+                                                <div class="d-flex flex-column fs-6">
+                                                    <h5 class="card-title">{{ $participant->name }}
+
+                                                        {{ $participant->lastname }}</h5>
+
+                                                    <span class="roboto-light mx-3 my-1">{{ $participant->email }}</span>
+
+                                                    <span
+                                                        class="roboto-light mx-3 my-1">{{ getFormatedTelephone($participant) }}</span>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
                                 </div>
-                            @endif
+                            @endforeach
+                        </div>
+                    @endif
 
-                            @if (!$task->isConcluded)
-                                <div class="border-top mb-2 mt-5 border-2">
+                    @if (!empty($task->attachments))
+                        <p><span class="roboto">Anexos:</span></p>
 
-                                    <p class="mt-4">{!! $task->recurringMessage !!}</p>
+                        <div class="d-flex flex-row flex-wrap">
 
-                                    <span class="fs-5">{{ $task->start }}</span> <span class="mx-2"> até
-                                    </span>
-                                    <span class="fs-5">{{ $task->end }}</span>
+                            @foreach ($task->attachments as $index => $attachment)
+                                <!-- Button trigger modal -->
+                                <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal"
+                                    data-bs-target="#attach{{ $index }}" style="border:none;">
 
-                                    @if ($task->status === 'starting')
-                                        <span class="text-success roboto fs-5 ms-4">
-                                            Irá começar
-                                        </span>
-                                    @elseIf($task->status === 'in_progress')
-                                        <span class="text-warning roboto fs-5 ms-4">
-                                            Sendo realizada
-                                        </span>
-                                    @else
-                                        <span class="text-danger roboto fs-5 ms-4">
-                                            Tempo expirado
-                                        </span>
-                                    @endif
+                                    <img style="width:100px" src="{{ asset('storage/' . $attachment->path) }}"
+                                        alt="Attachment Image">
+
+                                </button>
+
+                                <!-- Modal -->
+                                <div class="modal fade modal-xl" id="attach{{ $index }}" tabindex="-1"
+                                    aria-labelledby="attachmentModalLabel" aria-hidden="true">
+
+                                    <div class="modal-dialog">
+
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+
+                                                <h1 class="modal-title fs-5" id="attachmentModalLabel">
+                                                    Anexo
+                                                    {{ $index + 1 }}</h1>
+
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+
+                                            <div class="modal-body text-center">
+                                                <img src="{{ asset('storage/' . $attachment->path) }}"
+                                                    alt="Attachment Image" style="max-width: 100%; height: auto;">
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
-                            @endif
+                            @endforeach
 
                         </div>
+                    @endif
 
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
+
+            {{-- botão de voltar --}}
+            <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
+                title="voltar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+            </a>
+
+            @php
+
+                $shoudDisplayTaskOptions = $task->is_creator
+                    ? !$task->isConcluded
+                    : $task->shoudDisplayButton && !$task->isConcluded;
+
+            @endphp
+
+
+            @if ($shoudDisplayTaskOptions)
+                {{-- Dropdown de opções --}}
+                <div class="btn-group dropup">
+
+                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false" title="Visualizar opções da tarefa">
+
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="32" height="32"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+
+                    </button>
+
+                    <ul class="dropdown-menu fs-5 mb-4">
+
+                        @if ($task->shoudDisplayButton && $task->created_by === auth()->id())
+                            <li>
+                                <button id="participants-button" type="button" class="dropdown-item poppins-regular"
+                                    data-bs-toggle="modal" data-bs-target="#participantsModal">
+                                    Adicionar participantes
+                                    <span id="participantCounterDisplay"></span>
+                                </button>
+                            </li>
+                        @endif
+
+                        @if ($task->shoudDisplayButton)
+                            <li>
+                                <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
+                                    data-bs-target="#staticBackdrop">
+
+                                    Criar Feedback
+
+                                </button>
+                            </li>
+                        @endif
+
+                        @if ($task->is_creator && !$task->isConcluded)
+                            <li>
+                                <a class="dropdown-item poppins-regular"
+                                    href="{{ route('task.edit', $task->id) }}">Editar</a>
+                            </li>
+                        @endif
+
+                        @if ($task->is_creator)
+                            @php
+                                $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+                                $expiredTask = getDuration($task)->status === 'finished';
+                            @endphp
+
+                            <script>
+                                const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+
+                                const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+
+                                function updateParticipantCounter() {
+
+                                    const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
+                                    const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+
+                                    const checkedCounter = checkedParticipants.length;
+
+                                    const hasAnyParticipant = checkedCounter > 0;
+
+                                    if (hasAnyParticipant) {
+                                        participantCounterDisplay.innerText = '(' + checkedCounter + ')';
+                                    } else {
+                                        participantCounterDisplay.innerText = '';
+                                    }
+                                }
+
+                                // updateParticipantCounter();
+
+                                participantCheckboxes.forEach(
+                                    participantCheckbox => participantCheckbox.addEventListener('change', () =>
+                                        updateParticipantCounter()));
+
+                                updateParticipantCounter();
+                            </script>
+
+                            <!-- Button trigger modal -->
+
+                            <li>
+                                <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
+                                    data-bs-target="#completeTaskModal">
+                                    Marcar como concluída
+                                </button>
+                            </li>
+                        @endif
+                    </ul>
+
+                </div>
+            @endif
+
+        </div>
+
+        @php
+            $feedbacks = $task->feedbacks->skip(1);
+        @endphp
+
+        @if (!$feedbacks->isEmpty())
+            <div class="row mt-5">
+
+                <div class="col-md-6 container">
+
+                    <h2 class="fs-4">
+                        Comentários/Observações
+                    </h2>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-6 container py-5">
+
+                    <div class="accordion" id="accordionFeedbacks">
+
+                        @foreach ($feedbacks as $key => $feedback)
+                            <div class="accordion-item border-bottom border-0 border-2">
+
+                                <h2 class="accordion-header">
+
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#panelsStayOpen-collapse{{ $key }}"
+                                        aria-expanded="false" aria-controls="panelsStayOpen-collapse{{ $key }}">
+
+                                        <div class="d-flex justify-content-center align-items-center">
+
+                                            <div
+                                                class="feedback-picture-container justify-content-center feedback-border rounded-circle overflow-hidden">
+
+                                                <img src="{{ url('storage/' . $feedback->user->profile_picture) }}"
+                                                    class="img-size" alt="Imagem do usuário"
+                                                    style="max-width: 100%; height: auto;">
+                                            </div>
+
+                                            <div class="d-flex align-items-center mx-2 flex-row">
+                                                <p class="fs-4 my-0 ms-2">{{ $feedback->user->name }}
+                                                    {{ $feedback->user->lastname }}</p>
+
+                                                <p class="fs-5 roboto text-secondary my-0 ms-2 ms-3 text-end">
+                                                    {{ $feedback->created_at->format('d/m/Y - H:i') }}</p>
+                                            </div>
+
+                                        </div>
+
+                                    </button>
+
+                                </h2>
+
+                                <div id="panelsStayOpen-collapse{{ $key }}" class="accordion-collapse collapse">
+
+                                    <div class="accordion-body">
+
+                                        <p class="roboto text-secondary fs-5">{!! $feedback->feedback !!}</p>
+
+                                        {{-- @dd($feedback->attachments->isEmpty()) --}}
+
+                                        @if (!$feedback->attachments->isEmpty())
+                                            <p><span class="poppins-semibold">Anexos:</span></p>
+
+                                            @foreach ($feedback->attachments as $key => $attachment)
+                                                <!-- Button trigger modal -->
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#feedbackAttachModal{{ $key }}">
+
+                                                    <img style="width:100px"
+                                                        src="{{ asset('storage/' . $attachment->path) }}"
+                                                        alt="Attachment Image">
+
+                                                </button>
+
+                                                <!-- Modal -->
+                                                <div class="modal fade modal-xl"
+                                                    id="feedbackAttachModal{{ $key }}" tabindex="-1"
+                                                    aria-labelledby="feedbackAttachModalLabel{{ $key }}"
+                                                    aria-hidden="true">
+
+                                                    <div class="modal-dialog">
+
+                                                        <div class="modal-content">
+
+                                                            <div class="modal-header">
+
+                                                                <h1 class="modal-title fs-5"
+                                                                    id="feedbackAttachModal{{ $key }}">
+                                                                    Anexo {{ $key }}
+                                                                </h1>
+
+                                                                <button type="button" class="btn-close"
+                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+
+                                                            </div>
+
+                                                            <div class="modal-body">
+
+                                                                <div class="modal-body text-center">
+
+                                                                    <img src="{{ asset('storage/' . $attachment->path) }}"
+                                                                        alt="Attachment Image"
+                                                                        style="max-width: 100%; height: auto;">
+
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        @endforeach
                     </div>
 
                 </div>
 
             </div>
 
-        </div>
+            <div class="h-100 m-5">
 
-    </div>
-
-    <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
-
-        {{-- botão de voltar --}}
-        <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
-            title="voltar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"
-                stroke-width="1.5" stroke="currentColor" class="size-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-            </svg>
-        </a>
-
-        @php
-
-            $shoudDisplayTaskOptions = $task->is_creator
-                ? !$task->isConcluded
-                : $task->shoudDisplayButton && !$task->isConcluded;
-
-        @endphp
-
-
-        @if ($shoudDisplayTaskOptions)
-            {{-- Dropdown de opções --}}
-            <div class="btn-group dropup">
-
-                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                    aria-expanded="false" title="Visualizar opções da tarefa">
-
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="32" height="32"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                    </svg>
-
-                </button>
-
-                <ul class="dropdown-menu fs-5 mb-4">
-
-                    @if ($task->shoudDisplayButton && $task->created_by === auth()->id())
-                        <li>
-                            <button id="participants-button" type="button" class="dropdown-item poppins-regular"
-                                data-bs-toggle="modal" data-bs-target="#participantsModal">
-                                Adicionar participantes
-                                <span id="participantCounterDisplay"></span>
-                            </button>
-                        </li>
-                    @endif
-
-                    @if ($task->shoudDisplayButton)
-                        <li>
-                            <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
-                                data-bs-target="#staticBackdrop">
-
-                                Criar Feedback
-
-                            </button>
-                        </li>
-                    @endif
-
-                    @if ($task->is_creator && !$task->isConcluded)
-                        <li>
-                            <a class="dropdown-item poppins-regular"
-                                href="{{ route('task.edit', $task->id) }}">Editar</a>
-                        </li>
-                    @endif
-
-                    @if ($task->is_creator)
-                        @php
-                            $hasSpecificDate = filled($task->reminder->recurring->specific_date);
-                            $expiredTask = getDuration($task)->status === 'finished';
-                        @endphp
-
-                        <script>
-                            const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
-
-                            const participantCounterDisplay = document.getElementById('participantCounterDisplay');
-
-                            function updateParticipantCounter() {
-
-                                const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
-                                const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
-
-                                const checkedCounter = checkedParticipants.length;
-
-                                const hasAnyParticipant = checkedCounter > 0;
-
-                                if (hasAnyParticipant) {
-                                    participantCounterDisplay.innerText = '(' + checkedCounter + ')';
-                                } else {
-                                    participantCounterDisplay.innerText = '';
-                                }
-                            }
-
-                            // updateParticipantCounter();
-
-                            participantCheckboxes.forEach(
-                                participantCheckbox => participantCheckbox.addEventListener('change', () =>
-                                    updateParticipantCounter()));
-
-                            updateParticipantCounter();
-                        </script>
-
-                        <!-- Button trigger modal -->
-
-                        <li>
-                            <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
-                                data-bs-target="#completeTaskModal">
-                                Marcar como concluída
-                            </button>
-                        </li>
-                    @endif
-                </ul>
 
             </div>
         @endif
-
-    </div>
-
-    @php
-        $feedbacks = $task->feedbacks->skip(1);
-    @endphp
-
-    @if (!$feedbacks->isEmpty())
-        <div class="row mt-5">
-
-            <div class="col-md-6 container">
-
-                <h2 class="fs-4">
-                    Comentários/Observações
-                </h2>
-            </div>
-        </div>
-
-        <div class="row">
-
-            <div class="col-md-6 container py-5">
-
-                <div class="accordion" id="accordionFeedbacks">
-
-                    @foreach ($feedbacks as $key => $feedback)
-                        <div class="accordion-item border-bottom border-0 border-2">
-
-                            <h2 class="accordion-header">
-
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#panelsStayOpen-collapse{{ $key }}" aria-expanded="false"
-                                    aria-controls="panelsStayOpen-collapse{{ $key }}">
-
-                                    <div class="d-flex justify-content-center align-items-center">
-
-                                        <div
-                                            class="feedback-picture-container justify-content-center feedback-border rounded-circle overflow-hidden">
-
-                                            <img src="{{ url('storage/' . $feedback->user->profile_picture) }}"
-                                                class="img-size" alt="Imagem do usuário"
-                                                style="max-width: 100%; height: auto;">
-                                        </div>
-
-                                        <div class="d-flex align-items-center mx-2 flex-row">
-                                            <p class="fs-4 my-0 ms-2">{{ $feedback->user->name }}
-                                                {{ $feedback->user->lastname }}</p>
-
-                                            <p class="fs-5 roboto text-secondary my-0 ms-2 ms-3 text-end">
-                                                {{ $feedback->created_at->format('d/m/Y - H:i') }}</p>
-                                        </div>
-
-                                    </div>
-
-                                </button>
-
-                            </h2>
-
-                            <div id="panelsStayOpen-collapse{{ $key }}" class="accordion-collapse collapse">
-
-                                <div class="accordion-body">
-                                    <p class="roboto fs-5">{!! $feedback->feedback !!}</p>
-
-                                    {{-- @dd($feedback->attachments->isEmpty()) --}}
-
-                                    @if (!$feedback->attachments->isEmpty())
-                                        <p><span class="poppins-semibold">Anexos:</span></p>
-
-                                        @foreach ($feedback->attachments as $key => $attachment)
-                                            <!-- Button trigger modal -->
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                                data-bs-target="#feedbackAttachModal{{ $key }}">
-
-                                                <img style="width:100px"
-                                                    src="{{ asset('storage/' . $attachment->path) }}"
-                                                    alt="Attachment Image">
-
-                                            </button>
-
-                                            <!-- Modal -->
-                                            <div class="modal fade modal-xl" id="feedbackAttachModal{{ $key }}"
-                                                tabindex="-1"
-                                                aria-labelledby="feedbackAttachModalLabel{{ $key }}"
-                                                aria-hidden="true">
-
-                                                <div class="modal-dialog">
-
-                                                    <div class="modal-content">
-
-                                                        <div class="modal-header">
-
-                                                            <h1 class="modal-title fs-5"
-                                                                id="feedbackAttachModal{{ $key }}">
-                                                                Anexo {{ $key }}
-                                                            </h1>
-
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-
-                                                        </div>
-
-                                                        <div class="modal-body">
-
-                                                            <div class="modal-body text-center">
-
-                                                                <img src="{{ asset('storage/' . $attachment->path) }}"
-                                                                    alt="Attachment Image"
-                                                                    style="max-width: 100%; height: auto;">
-
-                                                            </div>
-
-                                                        </div>
-
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    @endif
-
-                                </div>
-
-                            </div>
-
-                        </div>
-                    @endforeach
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="h-100 m-5">
-
-
-        </div>
-    @endif
 
     </div>
 

@@ -63,6 +63,16 @@ body,
     background-color: white;
 }
 
+.accordion-button-secondary {
+    transition: background-color 0.3s ease, border-bottom-color 0.3s ease;
+    border-bottom: solid lightgrey 2px;
+}
+
+.accordion-button-secondary:hover {
+    background-color: rgb(247, 247, 247);
+    border-bottom: solid black 2px;
+}
+
 //buttons - links
 .week-day:hover {
     font-weight: bolder !important;
@@ -227,6 +237,17 @@ body,
     border-radius: 0.5rem;
 }
 
+.clean-form-control {
+    border: 1px solid lightgrey;
+    border-radius: 0.5rem;
+}
+
+.clean-form-control:focus {
+    outline: 2px solid rgb(222, 222, 222);
+    border: 1px solid lightgrey;
+    border-radius: 0.5rem;
+}
+
 .form-control:focus {
     outline: 5px solid rgb(222, 222, 222);
     border: 3px solid black;
@@ -263,10 +284,6 @@ body,
 
 //Container do display
 
-.full-height-76vh {
-    height: 76vh;
-    overflow: auto;
-}
 
 .full-height-73vh {
     height: 73vh;

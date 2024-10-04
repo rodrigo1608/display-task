@@ -54,7 +54,10 @@
             </div>
         </div>
 
-        <div id="day-schedule-container" class="row full-height-76vh mt-5 rounded">
+        <div id="day-schedule-container" class="row full-height-76vh mt-5 rounded"
+            style="
+        height: 73vh;
+        overflow: auto;">
 
             <div class="container-day col-md-9 container rounded p-0">
 

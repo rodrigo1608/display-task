@@ -218,8 +218,6 @@ class TaskController extends Controller
 
             $task->is_creator = $createdBy->id === $userID;
 
-            $task->creator_telephone = getFormatedTelephone($createdBy);
-
             $task->creator_email = $createdBy->email;
 
             $task->description = $task->feedbacks->first()->feedback;
@@ -227,8 +225,6 @@ class TaskController extends Controller
             $task->attachments = $task->feedbacks->first()->attachments->all();
 
             $duration = getDuration($task, $task->created_by);
-
-
 
             $task->start = date('H:i', strtotime($duration->start));
 
