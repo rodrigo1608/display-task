@@ -337,7 +337,7 @@ if (!function_exists('getRecurringMessage')) {
 
 
             $formattedDays = array_map(function ($day) {
-                return '<span class="fs-4 roboto">' . $day . '</span>';
+                return '<span class="roboto fs-5">' . $day . '</span>';
             }, $repeatingDays);
 
             $numberOfRepeatingDays = count($repeatingDays);
@@ -349,9 +349,9 @@ if (!function_exists('getRecurringMessage')) {
 
                 if ($numberOfRepeatingDays > 1) {
 
-                    $lastDay = array_pop($repeatingDays);
+                    $lastDay = array_pop($formattedDays);
 
-                    $recurringMessage = 'Irá se repetir a cada ' . implode(', ', $formattedDays);
+                    $recurringMessage = '<span class="roboto-light">Irá se repetir a cada ' . implode(', ', $formattedDays);
 
                     $recurringMessage .= ' e ' . $lastDay;
                 } else {
