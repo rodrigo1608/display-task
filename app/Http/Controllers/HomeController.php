@@ -62,89 +62,94 @@ class HomeController extends Controller
 
             $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
         } else {
-
-            $selectedUserTasksBuilder = getSelectedUserTasksBuilder($selectedDate);
-
-            $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
+            $selectedUserTasks = getTasksByWeekday();
         }
-
         $labelOverview = "";
 
-        if ($selectedUserTasks != null && $selectedUserTasks->isEmpty()) {
 
-            if ($request->has('filter')) {
+        // if(($selectedUserTasks != null && is_array($selectedUserTasks)){
 
-                if ($request->input('filter') === 'participating') {
+        // }elseif($selectedUserTasks != null && $selectedUserTasks->isEmpty()){
 
-                    $labelOverview = "Você não está participando de nenhuma tarefa";
-                } elseif ($request->input('filter') === 'created_by_me') {
-
-                    $labelOverview = "Atualmente, você não tem nenhuma tarefa criada";
-                } else {
-                    $labelOverview = "Você ainda não concluiu nenhuma tarefa";
-                }
-            } else {
-                $labelOverview = $isToday
-                    ? "Nenhuma tarefa agendada para hoje, <span class='fs-3 poppins'> " . getFormatedDateBR($today) . "</span>  , " .  $weekdayInPortuguese
-
-                    : "Nenhuma tarefa agendada para <span class='fs-3 poppins'> " . getFormatedDateBR($selectedDate) . "</span>, " .  $weekdayInPortuguese;
-            }
-        } elseif ($selectedUserTasks != null) {
-
-            if ($request->has('select_filter')) {
-
-                if ($request->input('select_filter') === 'participating') {
-
-                    $labelOverview = "Tarefas nas quais você está participando:";
-                } elseif ($request->input('select_filter') === 'created_by_me') {
-
-                    $labelOverview = "Tarefas criadas por você:";
-                } else {
-
-                    $labelOverview = "Tarefas concluídas:";
-                }
-            } else {
-
-                $labelOverview = "Agenda de <span class='fs-2 poppins'>" . getFormatedDateBR($selectedDate) . "</span>,  $weekdayInPortuguese.";
-            }
-        }
-        if ($selectedUserTasks != null) {
-
-            foreach ($selectedUserTasks as $task) {
-
-                $taskID = $task->id;
-
-                $creatorOrParticipant  = $task->created_by == $currentUserID ? 'creator' : 'participant';
-
-                $notificationTime = null;
-
-                $notificationTime = $task->reminder->notificationTimes()->where('user_id', $currentUserID)->first()?->getAttributes();
+        // }
 
 
-                if ($task->participants->isEmpty()) {
 
-                    $task->emailsParticipants = "Nenhum participante";
-                } else {
+        //     if ($selectedUserTasks != null && $selectedUserTasks->isEmpty()) {
 
-                    $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
-                }
+        //         if ($request->has('filter')) {
 
-                $duration = $task->durations()->where('user_id', $currentUserID)->where('task_id', $task->id)->first();
+        //             if ($request->input('filter') === 'participating') {
 
-                if ($duration) {
-                    $task->start = substr($duration->start, 0, 5);
-                    $task->end =  substr($duration->end, 0, 5);
-                    $task->status = $duration->status;
-                }
+        //                 $labelOverview = "Você não está participando de nenhuma tarefa";
+        //             } elseif ($request->input('filter') === 'created_by_me') {
 
-                $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
+        //                 $labelOverview = "Atualmente, você não tem nenhuma tarefa criada";
+        //             } else {
+        //                 $labelOverview = "Você ainda não concluiu nenhuma tarefa";
+        //             }
+        //         } else {
+        //             $labelOverview = $isToday
+        //                 ? "Nenhuma tarefa agendada para hoje, <span class='fs-3 poppins'> " . getFormatedDateBR($today) . "</span>  , " .  $weekdayInPortuguese
 
-                $start = isset($task->start) ? getCarbonTime($task->start) : null;
-                $end = isset($task->end) ? getCarbonTime($task->end) : null;
+        //                 : "Nenhuma tarefa agendada para <span class='fs-3 poppins'> " . getFormatedDateBR($selectedDate) . "</span>, " .  $weekdayInPortuguese;
+        //         }
+        //     } elseif ($selectedUserTasks != null) {
 
-                $recurring = $task->reminder->recurring;
-            }
-        }
+        //         if ($request->has('select_filter')) {
+
+        //             if ($request->input('select_filter') === 'participating') {
+
+        //                 $labelOverview = "Tarefas nas quais você está participando:";
+        //             } elseif ($request->input('select_filter') === 'created_by_me') {
+
+        //                 $labelOverview = "Tarefas criadas por você:";
+        //             } else {
+
+        //                 $labelOverview = "Tarefas concluídas:";
+        //             }
+        //         } else {
+
+        //             $labelOverview = "Agenda de <span class='fs-2 poppins'>" . getFormatedDateBR($selectedDate) . "</span>,  $weekdayInPortuguese.";
+        //         }
+        //     }
+        //     if ($selectedUserTasks != null) {
+
+        //         foreach ($selectedUserTasks as $task) {
+
+        //             $taskID = $task->id;
+
+        //             $creatorOrParticipant  = $task->created_by == $currentUserID ? 'creator' : 'participant';
+
+        //             $notificationTime = null;
+
+        //             $notificationTime = $task->reminder->notificationTimes()->where('user_id', $currentUserID)->first()?->getAttributes();
+
+
+        //             if ($task->participants->isEmpty()) {
+
+        //                 $task->emailsParticipants = "Nenhum participante";
+        //             } else {
+
+        //                 $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
+        //             }
+
+        //             $duration = $task->durations()->where('user_id', $currentUserID)->where('task_id', $task->id)->first();
+
+        //             if ($duration) {
+        //                 $task->start = substr($duration->start, 0, 5);
+        //                 $task->end =  substr($duration->end, 0, 5);
+        //                 $task->status = $duration->status;
+        //             }
+
+        //             $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
+
+        //             $start = isset($task->start) ? getCarbonTime($task->start) : null;
+        //             $end = isset($task->end) ? getCarbonTime($task->end) : null;
+
+        //             $recurring = $task->reminder->recurring;
+        //         }
+        //     }
 
         return view('home', compact('isThereAnyReminder', 'selectedUserTasks', 'orderedReminders', 'labelOverview'));
     }

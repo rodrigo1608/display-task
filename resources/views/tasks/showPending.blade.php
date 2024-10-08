@@ -341,13 +341,13 @@
                 @if ($task->shouldDisplayRecurringTimeAlert)
                     <div class="row container mt-4">
 
-                        <div class="col-md-12 my-3 p-0">
+                        <div class="col-md-12 my-3">
                             <span
                                 class="roboto @if (getDuration($task)->status === 'starting') alert alert-success
                                             @elseif (getDuration($task)->status === 'in_progress')
                                              alert alert-warning
                                             @elseif (getDuration($task)->status === 'finished')
-                                             alert alert-danger @endif m-0 rounded py-2">
+                                             alert alert-danger @endif m-0 rounded py-3">
                                 {{ $task->notificationAlert }}
                             </span>
                         </div>
@@ -433,7 +433,7 @@
 
                                                                 <input class="form-check-input alertOption"
                                                                     type="checkbox" value="true"
-                                                                    name="{{ $alertIndex }}"
+                                                                    name="{{ $alertValue }}"
                                                                     id="alert{{ $alertIndex }}CheckDefault"
                                                                     {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
 

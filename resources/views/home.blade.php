@@ -21,14 +21,14 @@
                     Concluídas
                 </a>
 
-                <a href="{{ route('home', ['filter' => 'participating']) }}"
-                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'participating' ? 'selected poppins' : '' }} ms-5 text-black">
-                    Estou participando
-                </a>
-
                 <a href="{{ route('home', ['filter' => 'created']) }}"
                     class="text-decoration-none fs-5 side-link {{ request('filter') == 'created' ? 'selected poppins' : '' }} ms-5 text-black">
                     Criadas por mim
+                </a>
+
+                <a href="{{ route('home', ['filter' => 'participating']) }}"
+                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'participating' ? 'selected poppins' : '' }} ms-5 text-black">
+                    Estou participando
                 </a>
 
             </div>
