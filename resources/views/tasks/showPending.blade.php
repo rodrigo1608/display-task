@@ -2,9 +2,9 @@
 
 @section('content')
 
-    <div class="container-fluid pt-4" style="background-color:#F2F2F2; height:94vh; overflow:auto;">
+    <div class="container-fluid pt-4" style="background-color:#E6E6E6; height:94vh; overflow:auto;">
 
-        <div class="container rounded bg-white p-5" style=" width:60%">
+        <div class="container rounded bg-white px-4" style=" width:60%">
 
             <div class="row d-flex align-items-end py-3">
 
@@ -27,7 +27,6 @@
                 </div>
             @else
                 <div class="row py-3">
-
                     <p class="roboto col-md-8">{!! $task->recurringMessage !!}</p>
                 </div>
 
@@ -51,7 +50,7 @@
 
                         @error('start')
                             <div class="invalid-feedback position-absolute">
-                                <strong>{{ $message }}</strong>
+                                {{ $message }}
                             </div>
                         @enderror
 
@@ -82,7 +81,7 @@
 
                         @error('end')
                             <div class="invalid-feedback position-absolute">
-                                <strong>{{ $message }}</strong>
+                                {{ $message }}
                             </div>
                         @enderror
 
@@ -184,19 +183,18 @@
 
             <div class="row py-3">
 
-                <p class="roboto mb-0">Responsável</p>
+                <div class="col-md-8">
 
-                <div class="mt-3" style="
+                    <div class="row py-3">
+                        <p class="roboto mb-0">Responsável</p>
+                    </div>
 
-                        box-shadow: none;
-                        ">
+                    <div class="row m-0 rounded">
 
-                    <div class="row g-0 rounded border px-1 py-3">
-
-                        <div class="col-md-1">
+                        <div class="col-md-2">
 
                             <div class="rounded-circle d-flex justify-content-center align-items-center mt-2 overflow-hidden"
-                                style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.25em {{ $task->creator->color }}"
+                                style="max-width:5rem; min-width:5rem; max-height:5rem; min-height:5rem; border:solid 0.25em {{ $task->creator->color }}"
                                 title="{{ $task->creator->name }} {{ $task->creator->lastname }}">
 
                                 <img class="w-100" src="{{ asset('storage/' . $task->creator->profile_picture) }}"
@@ -205,8 +203,7 @@
                             </div>
                         </div>
 
-                        <div class="col">
-
+                        <div class="col-md-10 m-0 p-0">
                             <div class="m-2">
 
                                 <div class="d-flex flex-column">
@@ -247,6 +244,7 @@
 
                     </div>
 
+
                 </div>
 
             </div>
@@ -256,11 +254,11 @@
             @endphp
 
             @if ($hasAnyAttachment)
-                <div class="row">
-                    <p class="roboto mb-0 mt-3">Anexo(s)</p>
+                <div class="row border-top py-3">
+                    <p class="roboto mb-0">Anexo(s)</p>
                 </div>
 
-                <div class='row mt-3'>
+                <div class='row'>
 
                     <div class="d-flex flex-row flex-wrap">
 
@@ -292,8 +290,8 @@
                                         </div>
 
                                         <div class="modal-body">
-                                            <img src="{{ asset('storage/' . $attachment->path) }}"
-                                                alt="Attachment Image">
+                                            <img src="{{ asset('storage/' . $attachment->path) }}" width="100%"
+                                                height="auto" alt="Attachment Image">
                                         </div>
 
                                     </div>
@@ -308,18 +306,72 @@
                 </div>
             @endif
 
+        </div>
+
+        <div class="rounded-bottom container px-4 pb-4 shadow"
+            style="width:60%; background-color:#F2F2F2; border-top:solid #D8D8D8 2px">
             @if (!$task->isConcluded)
 
-                <div class="row">
+                @php
+                    $firstError = null;
 
-                    <p class="roboto mb-0 mt-3">Horário
-                        da notificação
-                    </p>
+                    $alertOptions = ['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'];
+
+                    foreach ($alertOptions as $alertIndex) {
+                        if ($errors->has($alertIndex)) {
+                            $firstError = $errors->first($alertIndex);
+                            break;
+                        }
+                    }
+
+                @endphp
+
+                @if ($firstError)
+                    <div class="row">
+
+                        <div class="col-md-6 offset-3 invalid-feedback d-block">
+
+                            {{ $firstError }}
+
+                        </div>
+
+                    </div>
+                @endif
+
+                @if ($task->shouldDisplayRecurringTimeAlert)
+                    <div class="row container mt-4">
+
+                        <div class="col-md-12 my-3 p-0">
+                            <span
+                                class="roboto @if (getDuration($task)->status === 'starting') alert alert-success
+                                            @elseif (getDuration($task)->status === 'in_progress')
+                                             alert alert-warning
+                                            @elseif (getDuration($task)->status === 'finished')
+                                             alert alert-danger @endif m-0 rounded py-2">
+                                {{ $task->notificationAlert }}
+                            </span>
+                        </div>
+
+                    </div>
+                @endif
+                <div class="row mt-4">
+                    @if (!$task->shouldHiddenTimeAlertsOptions)
+                        <div class="col-4">
+                            <p class="roboto m-0">Horário
+                                específico
+                            </p>
+                        </div>
+
+                        <div class="col-4 ms-4">
+                            <p class="roboto m-0">
+                            </p>
+                        </div>
+                    @endif
                 </div>
 
-                <div class="row m-0 mt-3">
+                <div class="row m-0">
 
-                    <div class="col-md-10">
+                    <div class="col-md-11 p-0 px-2">
 
                         <form class="" action="{{ route('task.acceptPendingTask', $task->id) }}" method="post">
                             @csrf
@@ -328,25 +380,19 @@
                             <input type="hidden" id="formStart" name="start">
                             <input type="hidden" id="formEnd" name="end">
 
-                            <div class="d-flex align-items-start">
+                            <div class="d-flex align-items-top row">
 
                                 @if ($task->shouldHiddenTimeAlertsOptions)
-                                    <div class="col-md-7 p-0">
-
-                                        <p
-                                            class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') alert alert-success
-                                                                @elseif (getDuration($task)->status === 'in_progress')
-                                                                 alert alert-warning
-                                                                @elseif (getDuration($task)->status === 'finished')
-                                                                 alert alert-danger @endif border-3 m-0 rounded text-center">
-                                            {{ $task->notificationAlert }}
-                                        </p>
-
-                                    </div>
+                                    <span
+                                        class="fs-6 roboto-semibold col-md-7 @if (getDuration($task)->status === 'starting') alert alert-success
+                                                            @elseif (getDuration($task)->status === 'in_progress')
+                                                             alert alert-warning
+                                                            @elseif (getDuration($task)->status === 'finished')
+                                                             alert alert-danger @endif border-3 m-0 rounded text-center">
+                                        {{ $task->notificationAlert }}
+                                    </span>
                                 @else
                                     <div class="col-md-3 p-0">
-
-
 
                                         <input id="custom-alert-time" type="time" name="time"
                                             class="form-control fs-6 @error('time') is-invalid @enderror m-0 text-center"
@@ -354,23 +400,17 @@
 
                                         @error('time')
                                             <div class="invalid-feedback">
-                                                <strong>{{ $message }}</strong>
+                                                {{ $message }}
                                             </div>
                                         @enderror
 
                                     </div>
 
-                                    <div class="col-md-1 mt-4 text-center">
-                                        <span>
-                                            ou
-                                        </span>
-                                    </div>
-
-                                    <div class="col-md-4 d-flex align-items-end">
+                                    <div class="col-md-4 offset-1 d-flex align-items-start">
 
                                         <div class="accordion" id="accordionPanelsStayOpenExample">
 
-                                            <div class="accordion-item">
+                                            <div class="accordion-item m-0 p-0">
 
                                                 <h2 class="accordion-header">
 
@@ -431,8 +471,9 @@
 
             @endif
 
-            <div class="col-md-2 h-100">
-                <button type="button" class="btn rounded-pill btn-outline-danger poppins-regular fs-5 ms-2 border-2"
+            <div class="col h-100">
+
+                <button type="button" class="btn rounded-circle btn-outline-danger poppins-regular fs-5 ms-2 border-2"
                     data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="24"
                         height="24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -441,56 +482,11 @@
                     </svg>
 
                 </button>
-
             </div>
 
         </div>
 
-        @php
-            $firstError = null;
-
-            $alertOptions = ['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'];
-
-            foreach ($alertOptions as $alertIndex) {
-                if ($errors->has($alertIndex)) {
-                    $firstError = $errors->first($alertIndex);
-                    break;
-                }
-            }
-
-        @endphp
-
-        @if ($firstError)
-            <div class="row">
-
-                <div class="col-md-6 offset-3 invalid-feedback d-block">
-
-                    <strong>{{ $firstError }}</strong>
-
-                </div>
-
-            </div>
-        @endif
-
-        @if ($task->shouldDisplayRecurringTimeAlert)
-            <div class="row container mt-5">
-
-                <div class="col-md-12 p-0">
-                    <p
-                        class="fs-5 roboto-semibold @if (getDuration($task)->status === 'starting') alert alert-success
-                                            @elseif (getDuration($task)->status === 'in_progress')
-                                             alert alert-warning
-                                            @elseif (getDuration($task)->status === 'finished')
-                                             alert alert-danger @endif m-0 rounded border border-2 py-2">
-                        {{ $task->notificationAlert }}
-                    </p>
-                </div>
-
-            </div>
-        @endif
-
     </div>
-
 
     <div class="me-5 mt-5 text-end" style="">
 
@@ -506,19 +502,6 @@
         </a>
 
     </div>
-
-    </div>
-
-
-
-
-    </div>
-
-    </div>
-
-
-
-
 
     <div class="modal fade" id="deleteParticipantModal" tabindex="-1" aria-labelledby="deleteParticipantModalLabel"
         aria-hidden="true">
@@ -539,7 +522,6 @@
                 <div class="modal-body">
                     Deseja realmente não participar da tarefa?
                 </div>
-
 
                 <div class="modal-footer">
                     <form action="{{ route('participant.destroy') }}" method="post">

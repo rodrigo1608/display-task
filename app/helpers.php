@@ -1464,11 +1464,11 @@ if (!function_exists('getRecurringAlerts')) {
 
         return [
 
-            'starting' => 'A tarefa está prestes a começar. Se o horário de alerta exceder 30 minutos, você será notificado novamente apenas na próxima recorrência',
+            'starting' => 'A tarefa está prestes a começar. Se o horário de alerta exceder 30 minutos, você será notificado nas próximas recorrências',
 
-            'in_progress' => 'A tarefa está atualmente em andamento. Você receberá uma nova notificação apenas na próxima recorrênciaa',
+            'in_progress' => 'A tarefa está atualmente em andamento. Você receberá uma nova notificação nas próximas recorrências',
 
-            'finished' => 'A tarefa expirou hoje. A notificação será enviada apenas na próxima recorrência',
+            'finished' => 'A tarefa expirou hoje. A notificação será enviada nas próximas recorrências',
         ];
     }
 }
@@ -1482,11 +1482,11 @@ if (!function_exists('getAlertAboutNotificationTime')) {
 
         $duration = getDuration($task);
 
-        $start =  getCarbonTime($duration->start);
+        $start = getCarbonTime($duration->start);
 
         $recurring = $task->reminder->recurring;
 
-        $currentDayOfWeek = strtolower(getCarbonNow()->format('l'));
+        $currentDayOfWeek = strtolower($now->format('l'));
 
         $isRecurrenceToday = $recurring->$currentDayOfWeek === 'true';
 
@@ -1659,14 +1659,14 @@ if (!function_exists('getlabelOverviewForDay')) {
         if (!$tasksExist) {
 
             $labelOverview = $day->isToday()
-                ? "<span class='fs-5 poppins-extralight'>Nenhuma tarefa para hoje.</span> " . getFormatedDateBR($day)
-                : "<span class='fs-5 poppins-extralight'>Nenhuma tarefa para </span> " . getFormatedDateBR($day) . " . " . ucfirst($weekdayInPortuguese);
+                ? "<span class='fs-5 poppins-extralight'>Nenhuma tarefa para hoje.</span> " . getFormatedDateBR($day) . ", <span class='fs-5 poppins-extralight'> " . $weekdayInPortuguese . "</span> "
+                : "<span class='fs-5 poppins-extralight'>Nenhuma tarefa para </span> " . getFormatedDateBR($day) . ", <span class='fs-5 poppins-extralight'> " . $weekdayInPortuguese . "</span> ";
         } elseif ($tasksExist != null) {
 
             $formatedDate = getFormatedDateBR($day);
 
             $labelOverview = $day->isToday()
-                ? "<span class='fs-5 poppins-extralight'>Hoje, </span>  " . $formatedDate . " .  " . ucfirst($weekdayInPortuguese)
+                ? "<span class='fs-5 poppins-extralight'>Hoje, </span>  " . $formatedDate . ". <span class='fs-5 poppins-extralight'> " . ucfirst($weekdayInPortuguese) . "</span> "
                 : "<span class='fs-5 poppins-extralight'>" . ucfirst($weekdayInPortuguese) . " . </span>  " . "$formatedDate";
         } else {
             $labelOverview = $day->isToday() ? "Agenda de hoje, " . getFormatedDateBR($day) : "Agenda de " . getFormatedDateBR($day) . " . " . ucfirst($weekdayInPortuguese);

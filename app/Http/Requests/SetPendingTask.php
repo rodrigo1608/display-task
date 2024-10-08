@@ -48,7 +48,6 @@ class SetPendingTask extends FormRequest
 
         $alertOptions = getAlertOptions();
 
-
         $duration = getDuration($task);
 
         $now = getCarbonNow();
@@ -56,10 +55,9 @@ class SetPendingTask extends FormRequest
         $start = getCarbonTime($duration->start);
 
         $recurring = $task->reminder->recurring;
+        $hasRecurrence = !isset($recurring->sécificDate);
 
-        $willNotStartSoon = $now->diffInMinutes($start, false) > 30;
-
-        // $recurring->specific_date !== null;
+        $willNotStartSoon = $now->diffInMinutes($start, true) > 30;
 
         // Filtra as opções onde as chaves estão marcadas como 'true'
         $trueOptions = array_filter($alertOptions, function ($label, $key) {
@@ -68,9 +66,8 @@ class SetPendingTask extends FormRequest
             return $this->input($key) === 'true';
         }, ARRAY_FILTER_USE_BOTH);
 
-        // dd(!$this->filled('time') && empty($trueOptions) && $willNotStartSoon);
 
-        if ((!$this->filled('time')) && empty($trueOptions) && $willNotStartSoon) {
+        if (!$this->filled('time') && empty($trueOptions) && $willNotStartSoon && $hasRecurrence) {
 
             $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
         }

@@ -254,6 +254,8 @@ class TaskController extends Controller
 
             $task->notificationAlert = getAlertAboutNotificationTime($task);
 
+            // dd($task->notificationAlert);
+
             $task->shouldHiddenTimeAlertsOptions = in_array($task->notificationAlert, getSpecificDayAlerts(), true);
 
             $task->shouldDisplayRecurringTimeAlert = in_array($task->notificationAlert, getRecurringAlerts(), true);
