@@ -158,6 +158,7 @@
                                             @endif
                                         @endif
                                     </time>
+
                                     @foreach ($tasks->take(3) as $task)
                                         @php
                                             $durarion = getDuration($task);

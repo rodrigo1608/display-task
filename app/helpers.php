@@ -105,7 +105,6 @@ if (!function_exists('getDayOfWeek')) {
 
     function getDayOfWeek($date, $language = 'en')
     {
-
         $dayName = strtolower($date->englishDayOfWeek);
 
         $daysOfWeek = getDaysOfWeek();
@@ -357,8 +356,8 @@ if (!function_exists('getRecurringMessage')) {
                 } else {
 
                     $recurringMessage .=    ($formattedDays[0]) === "sábado" || ($formattedDays[0]) === 'domingo'
-                        ? 'Todos os ' . ($formattedDays[0]) . 's'
-                        : 'Todas as ' .  $formattedDays[0] . 's';
+                        ? 'Todos os ' . ($formattedDays[0]) . '<span class="roboto fs-5">s</spam>'
+                        : 'Todas as ' .  $formattedDays[0] . '<span class="roboto fs-5">s</spam>';
                 }
             }
         } else {
@@ -1107,15 +1106,15 @@ if (!function_exists('handleDurationStatus')) {
     }
 }
 
-
 if (!function_exists('sortStartingFromToday')) {
 
-    function sortStartingFromToday($weekDayReminders)
+    function sortStartingFromToday($weekDay, $language = 'en')
     {
+        $now = getCarbonNow();
 
-        $today = strtolower(Carbon::now()->format('l'));
+        $today = getDayOfWeek($now, $language);
 
-        $week = array_keys($weekDayReminders);
+        $week = array_keys($weekDay);
 
         $startIndex = array_search($today, $week);
 
@@ -1125,14 +1124,14 @@ if (!function_exists('sortStartingFromToday')) {
 
         $reorderedDaysOfWeek = array_merge($partAfterToday, $partBeforeStartIndex);
 
-        $reorderedWeekDayReminders = [];
+        $reorderedWeekDay = [];
 
         foreach ($reorderedDaysOfWeek as $day) {
 
-            $reorderedWeekDayReminders[$day] = $weekDayReminders[$day];
+            $reorderedWeekDay[$day] = $weekDay[$day];
         }
 
-        return $reorderedWeekDayReminders;
+        return $reorderedWeekDay;
     }
 }
 
@@ -1188,9 +1187,9 @@ if (!function_exists('getRemindersByWeekday')) {
 
         $userID = auth()->id();
 
-        foreach (array_keys($daysOfWeek) as $dayOfWeek) {
+        foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
 
-            $weekDayReminders[$dayOfWeek] = Reminder::with('recurring')->where('reminders.user_id', $userID)->where('available', 'true')
+            $weekDayReminders[$dayOfWeekPTBR] = Reminder::with('recurring')->where('reminders.user_id', $userID)->where('available', 'true')
 
                 ->whereHas('recurring', function ($query) use ($dayOfWeek) {
 

@@ -32,33 +32,9 @@
 
             </div>
 
-            {{-- <div class="col-md-4 d-flex justify-content-end align-items-center">
-
-                <form action="{{ route('home') }}" method="get" class="d-flex">
-                    @csrf
-
-                    <input type="date" id="input-date" name="specific_date"
-                        class="form-control rounded-0 rounded-start border-end-1 fs-6"
-                        value="{{ old('specific_date', request()->input('specific_date', Carbon\Carbon::now()->format('Y-m-d'))) }}">
-
-                    <button type="submit" class="btn btn-primary rounded-end rounded-0 border-start-0 py-0"
-                        title="Enviar data">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="19"
-                            height="19" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                        </svg>
-
-                    </button>
-
-                </form>
-
-            </div> --}}
-
         </div>
 
-        <div class="container px-1" style="height:81vh; overflow:auto">
+        <div class="container" style="height:81vh; overflow:auto">
 
             <div class="row mx-0 mb-5 p-0" style="max-widht:100%">
 
@@ -82,19 +58,43 @@
 
                 @if (is_array($selectedUserTasks))
 
-                    <div class='col-md-8 p-0'>
+                    @if (empty($selectedUserTasks))
+                        <span>{{ $labelOverview }}</span>
+                    @else
+                        <div class='col-md-8 p-0'>
 
-                        <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
+                            <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
+                                @php
 
+                                    $now = getCarbonNow();
 
-                            @foreach ($selectedUserTasks as $day => $tasks)
-                                <span>{{ $day }}</span>
+                                    $todayDayOfWeek = getDayOfWeek($now, 'pt-br');
 
-                                @if (empty($tasks))
-                                    <span>{{ $labelOverview }}</span>
-                                @else
+                                    $tomorrowDayOfWeek = getDayOfWeek($now->copy()->addDay(), 'pt-br');
+
+                                @endphp
+
+                                {{-- @dd($selectedUserTasks); --}}
+
+                                @foreach ($selectedUserTasks as $day => $tasks)
+                                    @php
+                                        $isToday = $todayDayOfWeek === $day;
+                                        $isTomorrow = $tomorrowDayOfWeek == $day;
+
+                                    @endphp
+
+                                    <span class="text-secondary">
+                                        @if ($isToday)
+                                            Hoje
+                                        @elseIf($isTomorrow)
+                                            Amanhã
+                                        @else
+                                            {{ ucfirst($day) }}
+                                        @endif
+                                    </span>
+
                                     @foreach ($tasks as $task)
-                                        <div class="accordion-item px-1 ps-3">
+                                        <div class="accordion-item my-2 px-1 ps-3">
 
                                             <h2 class="accordion-header d-flex">
 
@@ -108,19 +108,29 @@
                                                         <div
                                                             class="poppins-regular d-flex align-items-center justify-content-between flex-row">
 
+                                                            @php
+
+                                                                $duration = getDuration($task);
+                                                                $start = getCarbonTime($duration->start)->format('H:i');
+                                                                $end = getCarbonTime($duration->end)->format('H:i');
+
+                                                            @endphp
+
                                                             <div class="mb-3">
-                                                                <span class="fs-2">{{ $task->start }}</span>
+                                                                <span class="fs-2">{{ $start }}</span>
                                                                 <span class="poppins-extralight fs-4 mx-2">até</span>
-                                                                <span class="fs-2">{{ $task->end }}</span>
+                                                                <span class="fs-2">{{ $end }}</span>
                                                             </div>
 
                                                             @if ($task->concluded === 'false')
                                                                 <div class="me-3 text-end">
 
+                                                                    {{-- ícone do relógio --}}
+
                                                                     <svg stroke="currentColor" @class([
-                                                                        'text-success' => $task->status === 'starting',
-                                                                        'text-warning' => $task->status === 'in_progress',
-                                                                        'text-danger' => $task->status === 'finished',
+                                                                        'text-success' => $duration->status === 'starting',
+                                                                        'text-warning' => $duration->status === 'in_progress',
+                                                                        'text-danger' => $duration->status === 'finished',
                                                                     ])
                                                                         stroke-width="2" xmlns="http://www.w3.org/2000/svg"
                                                                         fill="none" viewBox="0 0 24 24"
@@ -134,9 +144,11 @@
                                                             @endif
 
                                                         </div>
+
                                                         <div class="">
                                                             <span class="fs-4 poppins">
-                                                                {{ $task->title }}</span>
+                                                                {{ $task->title }}
+                                                            </span>
                                                         </div>
 
                                                     </div>
@@ -159,8 +171,10 @@
                                                         {{ $task->local }}
                                                     </p>
 
-                                                    <p class="roboto-light"><span class="roboto">Criado
-                                                            por:</span>
+                                                    <p class="roboto-light">
+                                                        <span class="roboto">
+                                                            Responsável:
+                                                        </span>
                                                         {{ $task->creator->name }}
                                                         {{ $task->creator->lastname }}
                                                     </p>
@@ -169,22 +183,24 @@
                                                         $participants = getParticipants($task);
                                                     @endphp
 
-                                                    <div class="d-flex aligm-items-center flex-row">
+                                                    @if (!$participants->isEmpty())
+                                                        <div class="d-flex aligm-items-center flex-row">
 
-                                                        <span class="roboto align-self-center">Participantes:</span>
+                                                            <span class="roboto align-self-center">Participante(s):</span>
 
-                                                        @foreach ($participants as $participant)
-                                                            <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
-                                                                style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
-                                                                title="{{ $participant->name }} {{ $participant->lastname }}">
+                                                            @foreach ($participants as $participant)
+                                                                <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
+                                                                    style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
+                                                                    title="{{ $participant->name }} {{ $participant->lastname }}">
 
-                                                                <img class="w-100"
-                                                                    src="{{ asset('storage/' . $participant->profile_picture) }}"
-                                                                    alt="Imagem do usuário">
-                                                            </div>
-                                                        @endforeach
+                                                                    <img class="w-100"
+                                                                        src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                                        alt="Imagem do usuário">
+                                                                </div>
+                                                            @endforeach
 
-                                                    </div>
+                                                        </div>
+                                                    @endif
 
                                                     <p class="roboto-light mt-2">
                                                         {!! $task->recurringMessage !!}
@@ -204,191 +220,206 @@
                                                         </a>
                                                     </div>
 
-
                                                 </div>
 
                                             </div>
 
                                         </div>
                                     @endforeach
-                                @endif
-                            @endforeach
+                                @endforeach
+                    @endif
+            </div>
 
+        </div>
+    @else
+        <div class='col-md-8 p-0'>
+            {{-- accordion --}}
+            <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
 
-                        </div>
+                @if (isset($selectedUserTasks))
+                    @foreach ($selectedUserTasks as $index => $task)
+                        <div class="accordion-item px-1 ps-3">
 
-                    </div>
-                @else
-                    <div class='col-md-8 p-0'>
-                        {{-- accordeon --}}
-                        <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
+                            <h2 class="accordion-header d-flex">
 
-                            @if (isset($selectedUserTasks))
-                                @foreach ($selectedUserTasks as $index => $task)
-                                    <div class="accordion-item px-1 ps-3">
+                                <button class="accordion-button accordion-button-secondary collapsed py-3" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#flush-collapse{{ $index }}"
+                                    aria-expanded="false" aria-controls="flush-collapseOne">
 
-                                        <h2 class="accordion-header d-flex">
+                                    <div class="w-100 d-flex flex-column">
 
-                                            <button class="accordion-button accordion-button-secondary collapsed py-3"
-                                                type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
-                                                aria-controls="flush-collapseOne">
+                                        <div
+                                            class="poppins-regular d-flex align-items-center justify-content-between flex-row">
 
-                                                <div class="w-100 d-flex flex-column">
-
-                                                    <div
-                                                        class="poppins-regular d-flex align-items-center justify-content-between flex-row">
-
-                                                        <div class="mb-3">
-                                                            <span class="fs-2">{{ $task->start }}</span> <span
-                                                                class="poppins-extralight fs-4 mx-2">até</span>
-                                                            <span class="fs-2">{{ $task->end }}</span>
-                                                        </div>
-
-                                                        @if ($task->concluded === 'false')
-                                                            <div class="me-3 text-end">
-
-                                                                <svg stroke="currentColor" @class([
-                                                                    'text-success' => $task->status === 'starting',
-                                                                    'text-warning' => $task->status === 'in_progress',
-                                                                    'text-danger' => $task->status === 'finished',
-                                                                ])
-                                                                    stroke-width="2" xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                                                    class="size-6" style="width: 1.5em; height: 1.5em;">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                                </svg>
-
-                                                            </div>
-                                                        @endif
-
-                                                    </div>
-                                                    <div class="">
-                                                        <span class="fs-4 poppins"> {{ $task->title }}</span>
-                                                    </div>
-
-                                                </div>
-
-                                            </button>
-
-                                        </h2>
-
-                                        <div id="flush-collapse{{ $index }}"
-                                            class="accordion-collapse fs-5 collapse">
-
-                                            <div class="accordion-body mb-4 pb-5"
-                                                style="border-bottom: solid lightgrey 1px;">
-
-                                                <p class="roboto fs-5 text-secondary w-75 my-4">
-                                                    {{ $task->feedbacks[0]->feedback }}
-                                                </p>
-
-                                                <p class="roboto-light"><span class="roboto">Local:</span>
-                                                    {{ $task->local }}
-                                                </p>
-
-                                                <p class="roboto-light"><span class="roboto">Criado por:</span>
-                                                    {{ $task->creator->name }} {{ $task->creator->lastname }}
-                                                </p>
-
-                                                @php
-                                                    $participants = getParticipants($task);
-                                                @endphp
-
-                                                <div class="d-flex aligm-items-center flex-row">
-
-                                                    <span class="roboto align-self-center">Participantes:</span>
-
-                                                    @foreach ($participants as $participant)
-                                                        <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
-                                                            style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
-                                                            title="{{ $participant->name }} {{ $participant->lastname }}">
-
-
-                                                            <img class="w-100"
-                                                                src="{{ asset('storage/' . $participant->profile_picture) }}"
-                                                                alt="Imagem do usuário">
-                                                        </div>
-                                                    @endforeach
-
-                                                </div>
-
-                                                <p class="roboto-light mt-2">
-                                                    {!! $task->recurringMessage !!}
-                                                </p>
-
-                                                <div class="text-end" title="Ver tarefa">
-                                                    <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                                        class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg"
-                                                            width="1.5em" height="1.5em" fill="none"
-                                                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-                                                            class="size-6">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                        </svg>
-                                                    </a>
-                                                </div>
-
-
+                                            <div class="mb-3">
+                                                <span class="fs-2">{{ $task->start }}</span> <span
+                                                    class="poppins-extralight fs-4 mx-2">até</span>
+                                                <span class="fs-2">{{ $task->end }}</span>
                                             </div>
 
+                                            @if ($task->concluded === 'false')
+                                                <div class="me-3 text-end">
+
+                                                    <svg stroke="currentColor" @class([
+                                                        'text-success' => $task->status === 'starting',
+                                                        'text-warning' => $task->status === 'in_progress',
+                                                        'text-danger' => $task->status === 'finished',
+                                                    ])
+                                                        stroke-width="2" xmlns="http://www.w3.org/2000/svg"
+                                                        fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                        class="size-6" style="width: 1.5em; height: 1.5em;">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                    </svg>
+
+                                                </div>
+                                            @endif
+
+                                        </div>
+                                        <div class="">
+                                            <span class="fs-4 poppins"> {{ $task->title }}</span>
                                         </div>
 
                                     </div>
-                                @endforeach
-                            @endif
 
-                        </div>
+                                </button>
 
-                    </div>
-                @endif
+                            </h2>
 
-                @if ($isThereAnyReminder)
-                    <div class='col-md-4 text-start'>
+                            <div id="flush-collapse{{ $index }}" class="accordion-collapse fs-5 collapse">
 
-                        <div class="card rounded-2 mb-3 border border-2 border-black shadow-none">
+                                <div class="accordion-body mb-4 pb-5" style="border-bottom: solid lightgrey 1px;">
 
-                            <div class="card-header border-bottom-0 border"> Lembretes</div>
+                                    <p class="roboto fs-5 text-secondary w-75 my-4">
+                                        {{ $task->feedbacks[0]->feedback }}
+                                    </p>
 
-                            <div class="card-body text-secondary">
+                                    <p class="roboto-light"><span class="roboto">Local:</span>
+                                        {{ $task->local }}
+                                    </p>
 
-                                <ul class="roboto text-black" style="list-style-type: circle">
+                                    <p class="roboto-light"><span class="roboto">Criado por:</span>
+                                        {{ $task->creator->name }} {{ $task->creator->lastname }}
+                                    </p>
 
-                                    @foreach ($orderedReminders as $reminders)
-                                        @foreach ($reminders as $reminder)
-                                            <li class="mt-2">{{ $reminder->title }}</li>
+                                    @php
+                                        $participants = getParticipants($task);
+                                    @endphp
+
+                                    <div class="d-flex aligm-items-center flex-row">
+
+                                        <span class="roboto align-self-center">Participantes:</span>
+
+                                        @foreach ($participants as $participant)
+                                            <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
+                                                style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
+                                                title="{{ $participant->name }} {{ $participant->lastname }}">
+
+
+                                                <img class="w-100"
+                                                    src="{{ asset('storage/' . $participant->profile_picture) }}"
+                                                    alt="Imagem do usuário">
+                                            </div>
                                         @endforeach
-                                    @endforeach
-                                </ul>
 
-                            </div>
+                                    </div>
 
-                            <div class="card-footer border-top-0 border bg-transparent">
+                                    <p class="roboto-light mt-2">
+                                        {!! $task->recurringMessage !!}
+                                    </p>
 
-                                <div class="d-flex justify-content-end">
-
-                                    <a href="{{ route('reminder.index') }}" class="poppins fs-6 py-2 text-black">
-
-                                        {{-- {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }} --}}
-
-                                    </a>
+                                    <div class="text-end" title="Ver tarefa">
+                                        <a href="{{ route('task.show', ['task' => $task->id]) }}"
+                                            class="btn btn-secondary"><svg xmlns="http://www.w3.org/2000/svg"
+                                                width="1.5em" height="1.5em" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            </svg>
+                                        </a>
+                                    </div>
 
                                 </div>
 
                             </div>
 
                         </div>
-
-                    </div>
+                    @endforeach
                 @endif
 
             </div>
 
         </div>
 
+        @endif
+
+        @if ($isThereAnyReminder)
+            <div class='col-md-4 d-flex justify-content-end ps-5'>
+
+                <div class="rounded-2 w-100 mb-3 me-2">
+
+                    <div class="border-bottom poppins fs-4 px-1 py-3">Lembretes</div>
+
+                    <div class="rounded pt-3">
+
+                        <ul class="roboto text-black" style="list-style-type: circle;">
+                            @php
+
+                                $now = getCarbonNow();
+
+                                $todayDayOfWeek = getDayOfWeek($now, 'pt-br');
+
+                                $tomorrowDayOfWeek = getDayOfWeek($now->copy()->addDay(), 'pt-br');
+
+                            @endphp
+
+                            @foreach ($orderedReminders as $day => $reminders)
+                                @php
+                                    $isToday = $todayDayOfWeek === $day;
+                                    $isTomorrow = $tomorrowDayOfWeek == $day;
+
+                                @endphp
+                                <span class="poppins-extralight">
+
+                                    @if ($isToday)
+                                        Hoje
+                                    @elseIf($isTomorrow)
+                                        Amanhã
+                                    @else
+                                        {{ ucfirst($day) }}
+                                    @endif
+                                </span>
+
+                                @foreach ($reminders as $reminder)
+                                    <li class="roboto text-secondary my-2 ms-4">{{ $reminder->title }}</li>
+                                @endforeach
+                            @endforeach
+                        </ul>
+
+                    </div>
+
+                    <div class="card-footer border-top-0 border bg-transparent">
+
+                        <div class="d-flex justify-content-end">
+
+                            <a href="{{ route('reminder.index') }}" class="poppins fs-6 py-2 text-black">
+
+                                {{-- {{ $currentUserReminders->count() > 5 ? 'Ver todos lembretes' : ' Ver detalhes' }} --}}
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        @endif
+
     </div>
+
 
 @endsection
