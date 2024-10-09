@@ -1108,10 +1108,11 @@ if (!function_exists('handleDurationStatus')) {
 }
 
 
-if (!function_exists('getWeekDaysStartingFromToday')) {
+if (!function_exists('sortStartingFromToday')) {
 
-    function getWeekDaysStartingFromToday($weekDayReminders)
+    function sortStartingFromToday($weekDayReminders)
     {
+
         $today = strtolower(Carbon::now()->format('l'));
 
         $week = array_keys($weekDayReminders);
@@ -1146,7 +1147,7 @@ if (!function_exists('getTasksByWeekday')) {
 
         $userID = auth()->id();
 
-        foreach (array_keys($daysOfWeek) as $dayOfWeek) {
+        foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
 
 
             // dd($dayOfWeek);
@@ -1158,7 +1159,7 @@ if (!function_exists('getTasksByWeekday')) {
                 'reminder.recurring',
                 'durations'
 
-            ])->where('concluded', 'false')->where(function ($query) use ($dayOfWeek, $userID) {
+            ])->where('concluded', 'false')->where(function ($query) use ($userID) {
 
                 $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
 
@@ -1172,7 +1173,7 @@ if (!function_exists('getTasksByWeekday')) {
                 });
             });
 
-            $weekDayTasks[$dayOfWeek] = sortByStart($taskBuilder);
+            $weekDayTasks[$dayOfWeekPTBR] = sortByStart($taskBuilder);
         }
 
         return  $weekDayTasks;

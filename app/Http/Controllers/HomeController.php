@@ -52,7 +52,7 @@ class HomeController extends Controller
 
         $isThereAnyReminder = !empty($userRemindersByWeekDay);
 
-        $orderedReminders = getWeekDaysStartingFromToday($userRemindersByWeekDay);
+        $orderedReminders = sortStartingFromToday($userRemindersByWeekDay);
 
         $selectedUserTask  = null;
 
@@ -62,18 +62,24 @@ class HomeController extends Controller
 
             $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
         } else {
-            $selectedUserTasks = getTasksByWeekday();
-        }
-        $labelOverview = "";
 
+            $userTasks = getTasksByWeekday();
+
+            $selectedUserTasks = sortStartingFromToday($userTasks);
+
+            $filteredUserTasks = array_filter($selectedUserTasks, function ($day) {
+                return !$day->isEmpty();
+            });
+
+            $labelOverview = empty($filteredUserTasks)
+                ? "Nenhuma tarefa agendada" : "";
+        }
 
         // if(($selectedUserTasks != null && is_array($selectedUserTasks)){
 
         // }elseif($selectedUserTasks != null && $selectedUserTasks->isEmpty()){
 
         // }
-
-
 
         //     if ($selectedUserTasks != null && $selectedUserTasks->isEmpty()) {
 
