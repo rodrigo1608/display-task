@@ -62,21 +62,23 @@ class HomeController extends Controller
 
             $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
 
+
             if ($selectedUserTasks->isEmpty()) {
+
                 if ($request->input('filter') === 'participating') {
 
                     $labelOverview = "Você não está participando de nenhuma tarefa";
-                } elseif ($request->input('filter') === 'created_by_me') {
+                } elseif ($request->input('filter') === 'created') {
 
                     $labelOverview = "Atualmente, você não tem nenhuma tarefa criada";
                 } else {
                     $labelOverview = "Você ainda não concluiu nenhuma tarefa";
                 }
             } else {
-                if ($request->input('select_filter') === 'participating') {
+                if ($request->input('filter') === 'participating') {
 
                     $labelOverview = "Tarefas nas quais você está participando:";
-                } elseif ($request->input('select_filter') === 'created_by_me') {
+                } elseif ($request->input('filter') === 'created') {
 
                     $labelOverview = "Tarefas criadas por você:";
                 } else {
@@ -130,80 +132,6 @@ class HomeController extends Controller
             $labelOverview = empty($filteredUserTasks)
                 ? "Nenhuma tarefa agendada" : "";
         }
-
-        // if(($selectedUserTasks != null && is_array($selectedUserTasks)){
-
-        // }elseif($selectedUserTasks != null && $selectedUserTasks->isEmpty()){
-
-        // }
-
-        //     if ($selectedUserTasks != null && $selectedUserTasks->isEmpty()) {
-
-        //         if ($request->has('filter')) {
-
-        //
-        //         } else {
-        //             $labelOverview = $isToday
-        //                 ? "Nenhuma tarefa agendada para hoje, <span class='fs-3 poppins'> " . getFormatedDateBR($today) . "</span>  , " .  $weekdayInPortuguese
-
-        //                 : "Nenhuma tarefa agendada para <span class='fs-3 poppins'> " . getFormatedDateBR($selectedDate) . "</span>, " .  $weekdayInPortuguese;
-        //         }
-        //     } elseif ($selectedUserTasks != null) {
-
-        //         if ($request->has('select_filter')) {
-
-        //             if ($request->input('select_filter') === 'participating') {
-
-        //                 $labelOverview = "Tarefas nas quais você está participando:";
-        //             } elseif ($request->input('select_filter') === 'created_by_me') {
-
-        //                 $labelOverview = "Tarefas criadas por você:";
-        //             } else {
-
-        //                 $labelOverview = "Tarefas concluídas:";
-        //             }
-        //         } else {
-
-        //             $labelOverview = "Agenda de <span class='fs-2 poppins'>" . getFormatedDateBR($selectedDate) . "</span>,  $weekdayInPortuguese.";
-        //         }
-        //     }
-        //     if ($selectedUserTasks != null) {
-
-        //         foreach ($selectedUserTasks as $task) {
-
-        //             $taskID = $task->id;
-
-        //             $creatorOrParticipant  = $task->created_by == $currentUserID ? 'creator' : 'participant';
-
-        //             $notificationTime = null;
-
-        //             $notificationTime = $task->reminder->notificationTimes()->where('user_id', $currentUserID)->first()?->getAttributes();
-
-
-        //             if ($task->participants->isEmpty()) {
-
-        //                 $task->emailsParticipants = "Nenhum participante";
-        //             } else {
-
-        //                 $task->emailsParticipants = $task->participants->pluck('email')->implode(', ');
-        //             }
-
-        //             $duration = $task->durations()->where('user_id', $currentUserID)->where('task_id', $task->id)->first();
-
-        //             if ($duration) {
-        //                 $task->start = substr($duration->start, 0, 5);
-        //                 $task->end =  substr($duration->end, 0, 5);
-        //                 $task->status = $duration->status;
-        //             }
-
-        //             $task->recurringMessage = getRecurringMessage($task->reminder->recurring);
-
-        //             $start = isset($task->start) ? getCarbonTime($task->start) : null;
-        //             $end = isset($task->end) ? getCarbonTime($task->end) : null;
-
-        //             $recurring = $task->reminder->recurring;
-        //         }
-        //     }
 
         return view('home', compact('isThereAnyReminder', 'selectedUserTasks', 'orderedReminders', 'labelOverview'));
     }
