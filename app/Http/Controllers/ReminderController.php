@@ -16,9 +16,12 @@ class ReminderController extends Controller
      */
     public function index()
     {
-        // $reminders =  Reminder::all();
 
-        // return view('reminders/index', compact('reminders'));
+        $userID = auth()->id();
+
+        $reminders =  Reminder::with('recurring')->where('user_id', $userID)->where('available', 'true')->get();
+
+        return view('reminders/index', compact('reminders'));
     }
 
     /**

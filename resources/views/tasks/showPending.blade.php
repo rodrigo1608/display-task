@@ -473,6 +473,8 @@
 
             <div class="col h-100">
 
+                {{-- botão de rrecusar a tarefa --}}
+
                 <button type="button" class="btn rounded-circle btn-outline-danger poppins-regular fs-5 ms-2 border-2"
                     data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="24"
@@ -492,7 +494,7 @@
 
         {{-- botão de voltar --}}
 
-        <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('display.day') }}"
+        <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
             title="voltar">
 
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"

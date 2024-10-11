@@ -19,8 +19,10 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/', function () {
-    return redirect()->route('display.day');
+    return redirect()->route('home');
 });
+
+Route::get('group', AuthMaster::class, '');
 
 Auth::routes(['verify' => true]);
 

@@ -1043,8 +1043,7 @@ if (!function_exists('notify')) {
             Log::info("Job NotifyAtCustomTime: O lembrete foi enviado para  $userToNotify->email");
 
             if (isset($reminder->recurring->specific_date)) {
-                $reminder->available = 'false';
-                $reminder->save();
+                $reminder->delete();
             }
         }
     }
