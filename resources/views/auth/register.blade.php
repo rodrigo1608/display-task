@@ -1,6 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
+
+@if($isTokenValid && !$isExpired)
     <div class="container">
 
         <div class="row justify-content-center">
@@ -11,9 +13,9 @@
 
                     <div class="card-body">
 
+
                         <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                             @csrf
-
                             {{-- Input name --}}
                             <div class="row mb-4">
                                 <label for="name" class="col-md-4 col-form-label text-md-end">{{ __('Name') }}</label>
@@ -65,7 +67,9 @@
                                             <strong>{{ $message }}</strong>
                                         </span>
                                     @enderror
+
                                 </div>
+
                             </div>
 
                             {{-- Input email --}}
@@ -261,9 +265,30 @@
                                 </div>
                             </div>
                         </form>
+
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
+
+@elseif($isExpired)
+
+<div class="alert alert-info text-center" role="alert">
+    O link recebido expirou após o tempo limite de 15 minutos.
+</div>
+
+@else
+    <div class="alert alert-success text-center" role="alert">
+        O link recebido não pôde ser verificado como válido.
+    </div>
+@endif
+
+
+
 @endsection

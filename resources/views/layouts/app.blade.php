@@ -104,6 +104,13 @@
 
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButtonEvent">
 
+                                    @if (auth()->user()->super === 'true')
+                                        <li class="">
+                                            <a class="dropdown-item" href="{{ route('invitation') }}">
+                                                Convidar
+                                            </a>
+                                        </li>
+                                    @endif
                                     <li class="">
                                         <a class="dropdown-item" href="{{ route('reminder.create') }}">
                                             Lembrete
@@ -194,11 +201,11 @@
                                 </li>
                             @endif
 
-                            @if (Route::has('register'))
+                            {{-- @if (Route::has('register'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
-                            @endif
+                            @endif --}}
                         @else
                             <li class="nav-item dropdown">
 

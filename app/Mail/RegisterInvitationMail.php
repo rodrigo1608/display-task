@@ -9,18 +9,17 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ReminderNotify extends Mailable
+class RegisterInvitationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $reminder;
-
+    public $link;
     /**
      * Create a new message instance.
      */
-    public function __construct($reminder)
+    public function __construct($link)
     {
-        $this->reminder = $reminder;
+        $this->link = $link;
     }
 
     /**
@@ -29,7 +28,7 @@ class ReminderNotify extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Lembrete: " . $this->reminder->title,
+            subject: 'Você foi convidado para se registrar no nosso sistema',
         );
     }
 
@@ -39,7 +38,7 @@ class ReminderNotify extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.reminder-notify',
+            markdown: 'mail.invitation-register',
         );
     }
 

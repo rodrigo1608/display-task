@@ -8,6 +8,7 @@ use App\Http\Controllers\DisplayController;
 use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RegisterInvitationController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -22,8 +23,10 @@ Route::get('/', function () {
     return redirect()->route('home');
 });
 
-Route::get('group', AuthMaster::class, '');
-
+Route::prefix('invitation')->group(function () {
+    Route::get('/', [RegisterInvitationController::class, 'index'])->name('invitation');
+    Route::post('/invite', [RegisterInvitationController::class, 'invite'])->name('invitation.invite');
+});
 Auth::routes(['verify' => true]);
 
 Route::get('home', [HomeController::class, 'index'])->name('home');

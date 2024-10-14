@@ -1587,3 +1587,16 @@ if (!function_exists('getMinutesSinceStartOfDay')) {
         return $startOfDay->diffInMinutes($now);
     }
 }
+
+
+if (!function_exists('checkExpiration')) {
+
+    function checkExpiration($stringTime)
+    {
+        $now = getCarbonNow();
+        $expiresTime = getCarbonTime($stringTime);
+
+        return $now->greaterThan($expiresTime);
+    }
+}
+

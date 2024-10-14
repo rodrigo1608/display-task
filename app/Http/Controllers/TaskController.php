@@ -380,7 +380,7 @@ class TaskController extends Controller
 
         $notificationTime->update($notificationTimeAttributes);
 
-        return redirect()->route('display.day')->with('success', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('/')->with('success', 'Tarefa atualizada com sucesso!');
     }
 
     public function acceptPendingTask(SetPendingTask $request, int $id)
@@ -457,7 +457,7 @@ class TaskController extends Controller
 
         $participant->save();
 
-        return redirect()->route('display.day')->with('success', 'Tarefa aceita com sucesso!');
+        return redirect()->route('/')->with('success', 'Tarefa aceita com sucesso!');
     }
 
     /**
@@ -476,6 +476,6 @@ class TaskController extends Controller
 
         $task->update(['concluded' => true]);
 
-        return  redirect()->route('display.day')->with('success', 'Tarefa concluída!');
+        return  redirect()->route('/')->with('success', 'Tarefa concluída!');
     }
 }

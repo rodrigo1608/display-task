@@ -33,6 +33,8 @@ return new class extends Migration
 
             $table->string('password');
 
+            $table->enum('super', ['true', 'false'])->default('false');
+
             $table->enum('available', ['true', 'false'])->default('true');
 
             $table->rememberToken();
