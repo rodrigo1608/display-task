@@ -56,7 +56,7 @@ class SetPendingTask extends FormRequest
 
         $recurring = $task->reminder->recurring;
 
-        $hasRecurrence = !isset($recurring->sécificDate);
+        $hasRecurrence = isset($recurring->specificDate);
 
         $willNotStartSoon = $now->diffInMinutes($start, true) > 30;
 
@@ -69,7 +69,8 @@ class SetPendingTask extends FormRequest
 
         $noInputsFilled = empty($this->input('time')) && empty($trueOptions);
 
-        if ($noInputsFilled  && ($willNotStartSoon || $hasRecurrence)) {
+
+        if ($noInputsFilled && ($willNotStartSoon || $hasRecurrence)) {
 
             $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
         }

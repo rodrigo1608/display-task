@@ -284,10 +284,6 @@ class TaskController extends Controller
 
         return view('tasks/edit', compact('alertOptions', 'participants', 'task'));
 
-        // $task->created_by === $user ?
-
-        // if()
-
     }
 
     /**
@@ -380,7 +376,7 @@ class TaskController extends Controller
 
         $notificationTime->update($notificationTimeAttributes);
 
-        return redirect()->route('/')->with('success', 'Tarefa atualizada com sucesso!');
+        return redirect()->route('home')->with('success', 'Tarefa atualizada com sucesso!');
     }
 
     public function acceptPendingTask(SetPendingTask $request, int $id)
@@ -457,7 +453,7 @@ class TaskController extends Controller
 
         $participant->save();
 
-        return redirect()->route('/')->with('success', 'Tarefa aceita com sucesso!');
+        return redirect()->route('home')->with('success', 'Tarefa aceita com sucesso!');
     }
 
     /**
@@ -476,6 +472,6 @@ class TaskController extends Controller
 
         $task->update(['concluded' => true]);
 
-        return  redirect()->route('/')->with('success', 'Tarefa concluída!');
+        return  redirect()->route('home')->with('success', 'Tarefa concluída!');
     }
 }

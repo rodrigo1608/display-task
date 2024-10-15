@@ -181,6 +181,8 @@
                 </div>
             @endif
 
+            {{-- Container do cartão com informações sobre o responsável --}}
+
             <div class="row py-3">
 
                 <div class="col-md-8">
@@ -254,6 +256,7 @@
             @endphp
 
             @if ($hasAnyAttachment)
+
                 <div class="row border-top py-3">
                     <p class="roboto mb-0">Anexo(s)</p>
                 </div>
@@ -310,14 +313,17 @@
 
         <div class="rounded-bottom container px-4 pb-4 shadow"
             style="width:60%; background-color:#F2F2F2; border-top:solid #D8D8D8 2px">
+
             @if (!$task->isConcluded)
 
                 @php
                     $firstError = null;
 
-                    $alertOptions = ['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'];
+                    // $alertOptions = ['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'];
 
-                    foreach ($alertOptions as $alertIndex) {
+
+                    foreach ($alertOptions as $alertIndex => $alertValue) {
+
                         if ($errors->has($alertIndex)) {
                             $firstError = $errors->first($alertIndex);
                             break;
@@ -329,7 +335,7 @@
                 @if ($firstError)
                     <div class="row">
 
-                        <div class="col-md-6 offset-3 invalid-feedback d-block">
+                        <div class="col-md-6 pt-3 invalid-feedback d-block">
 
                             {{ $firstError }}
 
@@ -339,6 +345,7 @@
                 @endif
 
                 @if ($task->shouldDisplayRecurringTimeAlert)
+
                     <div class="row container mt-4">
 
                         <div class="col-md-12 my-3">
@@ -353,7 +360,9 @@
                         </div>
 
                     </div>
+
                 @endif
+
                 <div class="row mt-4">
                     @if (!$task->shouldHiddenTimeAlertsOptions)
                         <div class="col-4">
@@ -362,10 +371,11 @@
                             </p>
                         </div>
 
-                        <div class="col-4 ms-4">
+                        {{-- <div class="col-4 ms-4">
                             <p class="roboto m-0">
                             </p>
-                        </div>
+                        </div> --}}
+
                     @endif
                 </div>
 
@@ -385,13 +395,16 @@
                                 @if ($task->shouldHiddenTimeAlertsOptions)
                                     <span
                                         class="fs-6 roboto-semibold col-md-7 @if (getDuration($task)->status === 'starting') alert alert-success
-                                                            @elseif (getDuration($task)->status === 'in_progress')
-                                                             alert alert-warning
-                                                            @elseif (getDuration($task)->status === 'finished')
-                                                             alert alert-danger @endif border-3 m-0 rounded text-center">
+                                            @elseif (getDuration($task)->status === 'in_progress')
+                                                alert alert-warning
+                                            @elseif (getDuration($task)->status === 'finished')
+                                                alert alert-danger @endif border-3 m-0 rounded text-center">
                                         {{ $task->notificationAlert }}
                                     </span>
                                 @else
+
+                                    {{-- Input de horário específico --}}
+
                                     <div class="col-md-3 p-0">
 
                                         <input id="custom-alert-time" type="time" name="time"
@@ -405,6 +418,8 @@
                                         @enderror
 
                                     </div>
+
+                                    {{-- Accordion horários pré definidos --}}
 
                                     <div class="col-md-4 offset-1 d-flex align-items-start">
 
@@ -433,7 +448,7 @@
 
                                                                 <input class="form-check-input alertOption"
                                                                     type="checkbox" value="true"
-                                                                    name="{{ $alertValue }}"
+                                                                    name="{{ $alertIndex }}"
                                                                     id="alert{{ $alertIndex }}CheckDefault"
                                                                     {{ old($alertIndex) === 'true' ? 'checked' : '' }}>
 
@@ -473,7 +488,7 @@
 
             <div class="col h-100">
 
-                {{-- botão de rrecusar a tarefa --}}
+                {{-- botão de recusar a tarefa --}}
 
                 <button type="button" class="btn rounded-circle btn-outline-danger poppins-regular fs-5 ms-2 border-2"
                     data-bs-toggle="modal" data-bs-target="#deleteParticipantModal">

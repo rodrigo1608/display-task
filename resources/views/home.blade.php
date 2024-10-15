@@ -56,7 +56,6 @@
 
                 @if (is_array($selectedUserTasks))
 
-
                         <div class='col-md-7 p-0' style="height:81vh; overflow:auto">
 
                             <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
@@ -87,7 +86,7 @@
                                         @endif
                                     </span>
 
-                                    @foreach ($tasks as $task)
+                                    @foreach ($tasks as $index => $task)
                                         <div class="accordion-item my-2 px-1 ps-3">
 
                                             <h2 class="accordion-header d-flex">
@@ -220,6 +219,7 @@
 
                                         </div>
                                     @endforeach
+
                                 @endforeach
 
             </div>
