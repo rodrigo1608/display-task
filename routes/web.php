@@ -9,11 +9,11 @@ use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RegisterInvitationController;
+use App\Http\Middleware\InvitationAccessMiddleware;
 
 use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Route;
-
 
 // Route::get('/', function () {
 //     return view('teste');
@@ -23,10 +23,13 @@ Route::get('/', function () {
     return redirect()->route('home');
 });
 
-Route::prefix('invitation')->group(function () {
+// middleware([InvitationAccessMiddleware::class])
+
+Route::middleware([InvitationAccessMiddleware::class])->prefix('invitation')->group(function () {
     Route::get('/', [RegisterInvitationController::class, 'index'])->name('invitation');
     Route::post('/invite', [RegisterInvitationController::class, 'invite'])->name('invitation.invite');
 });
+
 Auth::routes(['verify' => true]);
 
 Route::get('home', [HomeController::class, 'index'])->name('home');

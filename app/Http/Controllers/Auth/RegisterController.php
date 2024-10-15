@@ -43,6 +43,7 @@ class RegisterController extends Controller
 
     public function showRegistrationForm()
     {
+
         $token  = request()->query('token');
 
         $registerInvitation =  RegisterInvitation::where('token', $token)->first();

@@ -119,6 +119,7 @@ class HomeController extends Controller
                     $recurring = $task->reminder->recurring;
                 }
             }
+
         } else {
 
             $userTasks = getTasksByWeekday();

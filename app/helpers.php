@@ -1588,7 +1588,6 @@ if (!function_exists('getMinutesSinceStartOfDay')) {
     }
 }
 
-
 if (!function_exists('checkExpiration')) {
 
     function checkExpiration($stringTime)

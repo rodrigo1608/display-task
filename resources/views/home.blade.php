@@ -54,13 +54,9 @@
 
             <div class="row mx-0 p-0" style="max-widht:100%">
 
-                {{-- aqui pra baixo se for colar o código --}}
-
                 @if (is_array($selectedUserTasks))
 
-                    @if (empty($selectedUserTasks))
-                        <span>{{ $labelOverview }}</span>
-                    @else
+
                         <div class='col-md-7 p-0' style="height:81vh; overflow:auto">
 
                             <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
@@ -225,7 +221,7 @@
                                         </div>
                                     @endforeach
                                 @endforeach
-                    @endif
+
             </div>
 
         </div>
