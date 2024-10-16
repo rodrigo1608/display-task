@@ -1168,7 +1168,9 @@ if (!function_exists('getTasksByWeekday')) {
                 $query->whereHas('recurring', function ($query) use ($dayOfWeek) {
 
                     $query->where($dayOfWeek, 'true')->orWhere('specific_date_weekday', $dayOfWeek);
+
                 });
+
             });
 
             $weekDayTasks[$dayOfWeekPTBR] = sortByStart($taskBuilder);
@@ -1546,10 +1548,13 @@ if (!function_exists('getTasksByStartTime')) {
             $query->whereHas('recurring', function ($query) use ($formatedToday, $dayOfWeek) {
 
                 $query->where('specific_date', $formatedToday)->where('specific_date_weekday', $dayOfWeek)->orWhere($dayOfWeek, 'true');
+
             });
+
         })->whereHas('durations', function ($query) use ($start, $end) {
 
             $query->whereBetween('start', [$start->format('H:i:s'), $end->format('H:i:s')]);
+
         })->get();
     }
 }

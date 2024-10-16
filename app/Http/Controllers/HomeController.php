@@ -62,7 +62,6 @@ class HomeController extends Controller
 
             $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
 
-
             if ($selectedUserTasks->isEmpty()) {
 
                 if ($request->input('filter') === 'participating') {
