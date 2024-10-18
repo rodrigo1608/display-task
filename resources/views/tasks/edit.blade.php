@@ -343,12 +343,13 @@
                                                             <input class="form-check-input alertOption" type="checkbox"
                                                                 value="true" name="{{ $alertIndex }}"
                                                                 id="alert{{ $alertIndex }}CheckDefault"
+
                                                                 {{-- Caso haja a necessidade do old por algum motivo, o código comentado ao lado é a alternativa -->  {{ old($alertIndex, $notificationTime->$alertIndex) === 'true' ? 'checked' : '' }}> --}}>
 
                                                             <label class="form-check-label"
                                                                 for="alert{{ $alertIndex }}CheckDefault">
                                                                 {{ $alertValue }}
-                                                            </label>''
+                                                            </label>
                                                         </div>
                                                     @endforeach
 

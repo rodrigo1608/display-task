@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-// Date Helpers
-
 if (!function_exists('getFormatedDateBR')) {
 
     function getFormatedDateBR($date)
@@ -155,9 +153,6 @@ if (!function_exists('getMonths')) {
     }
 }
 
-
-// User attributes helpers
-
 if (!function_exists('getFormatedTelephone')) {
 
     function getFormatedTelephone($user)
@@ -203,7 +198,6 @@ if (!function_exists('getParticipantsEmail')) {
     }
 }
 
-// Task helpers
 if (!function_exists('setTask')) {
 
     function setTask($task)
@@ -227,30 +221,91 @@ if (!function_exists('setTask')) {
     }
 }
 
-// Recurring helpers
+if (!function_exists('getConflictingTask')) {
 
-if (!function_exists('getRepeatingDays')) {
-
-    function getRepeatingDays($recurring, $language = 'en')
+    function getConflictingTask($inputData, $recurrencePattern, $currentTaskID = null)
     {
+        $userID = auth()->id();
 
-        $daysOfWeek = getDaysOfWeek();
+        // Primeiramente, a consulta deve ignorar a tarefa que já foi criada para, no caso de algum usuário aceitá-la, não gerar conflito de sobreposição
+        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('concluded', 'false')->where('id', '!=', $currentTaskID)
 
-        $repeatingDays = [];
+            // Consulta que verifica se a tarefa pertence ao usuário logado ou se o usuário está participando de alguma tarefa
+            ->where(function ($query) use ($userID) {
 
-        $isPtBr = $language  == 'pt-br';
+                $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
 
-        foreach ($daysOfWeek as $key => $day) {
+                    $query->where('user_id', $userID)->where('status', 'accepted');
+                });
 
-            if ($recurring->$key === 'true') {
+                // Como as recorrências são vinculadas aos lembretes, a consulta passará pela tabela reminders antes de acessar a tabela recurrings
+            })->whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $inputData) {
 
-                $repeatingDays[] = $isPtBr ? $day : $key;
-            }
+                // Método que lida com a lógica das recorrências
+                getTaskOccurrences($taskReminderQuery,  $recurrencePattern, $inputData);
+
+                // Depois que a recorrência foi verificada, o código abaixo é responsável por verificar se as durações estão se sobrepondo
+            })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($inputData) {
+                addDurationOverlapQuery($taskRecurringsDurtionQuery, $inputData);
+            });
+
+
+        $conflictingTask = $conflictingTaskBuilder->first();
+
+        $hasConflictingTask = $conflictingTaskBuilder->exists();
+
+        if ($hasConflictingTask) {
+
+            $conflitingTaskData = getConflitingTaskData($conflictingTask);
+
+            session()->flash('conflictingTask',  $conflitingTaskData);
+
+            return redirect()->back()->withErrors([
+
+                'conflictingDuration' =>
+                $conflictingTask->title,
+
+            ])->withInput();
         }
-        return $repeatingDays;
     }
 }
 
+if (!function_exists('getConflitingTaskData')) {
+
+    function getConflitingTaskData($conflitingTask)
+    {
+
+        $conflitingTaskData = $conflitingTask->toArray();
+
+        $conflitingTaskData['owner'] = $conflitingTask->creator->name . ' ' . $conflitingTask->creator->lastname;
+
+        $conflitingTaskData['owner_telehpone'] =  getFormatedTelephone($conflitingTask->creator);
+
+        $conflitingTaskData['owner_email'] =  $conflitingTask->creator->email;
+
+        $conflictingDuration =  $conflitingTask->durations->first();
+
+        $conflitingTaskData['start'] = date('H:i', strtotime($conflictingDuration->start));
+
+        $conflitingTaskData['end'] =  date('H:i', strtotime($conflictingDuration->end));
+
+        $conflitingTaskData['recurringMessage'] = getRecurringMessage($conflitingTask->reminder->recurring);
+
+        return $conflitingTaskData;
+    }
+}
+
+if (!function_exists('getRecurrencePatterns')) {
+
+    function getRecurrencePatterns($taskDetails)
+    {
+        $recurrenceKeys = ['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+        return array_filter($taskDetails, function ($value, $key) use ($recurrenceKeys) {
+            return in_array($key, $recurrenceKeys) && ($value === "true" || ($key === 'specific_date' && $value !== null));
+        }, ARRAY_FILTER_USE_BOTH);
+    }
+}
 if (!function_exists('getRecurringMessage')) {
 
     function getRecurringMessage($recurring)
@@ -297,6 +352,28 @@ if (!function_exists('getRecurringMessage')) {
         }
 
         return $recurringMessage;
+    }
+}
+
+if (!function_exists('getRepeatingDays')) {
+
+    function getRepeatingDays($recurring, $language = 'en')
+    {
+
+        $daysOfWeek = getDaysOfWeek();
+
+        $repeatingDays = [];
+
+        $isPtBr = $language  == 'pt-br';
+
+        foreach ($daysOfWeek as $key => $day) {
+
+            if ($recurring->$key === 'true') {
+
+                $repeatingDays[] = $isPtBr ? $day : $key;
+            }
+        }
+        return $repeatingDays;
     }
 }
 
@@ -352,7 +429,30 @@ if (!function_exists('getRecurringLog')) {
     }
 }
 
-// Alert helpers
+if (!function_exists('getTaskOccurrences')) {
+
+    function getTaskOccurrences(Builder $query, $recurrencePattern, $inputData = null)
+    {
+
+        $specificDate = $inputData['specific_date'];
+
+        $date = getCarbonDate($specificDate);
+
+        $dayOfWeek = isset($specificDate) ? getDayOfWeek($date) : null;
+
+        return isset($specificDate)
+            ?
+            $query->whereHas('recurring', function ($query) use ($specificDate, $dayOfWeek) {
+                $query->where('specific_date',  $specificDate)->orWhere($dayOfWeek, "true");
+            })
+            :
+            $query->whereHas('recurring', function ($query) use ($recurrencePattern) {
+                $query->where('specific_date_weekday', $recurrencePattern)->orWhere($recurrencePattern, 'true');
+            });
+    }
+}
+
+
 if (!function_exists('getAlertOptions')) {
 
     function getAlertOptions()
@@ -424,28 +524,6 @@ if (!function_exists('formatAlertDays')) {
     }
 }
 
-if (!function_exists('getTaskOccurrences')) {
-
-    function getTaskOccurrences(Builder $query, $recurrencePattern, $inputData = null)
-    {
-
-        $specificDate = $inputData['specific_date'];
-
-        $date = getCarbonDate($specificDate);
-
-        $dayOfWeek = isset($specificDate) ? getDayOfWeek($date) : null;
-
-        return isset($specificDate)
-            ?
-            $query->whereHas('recurring', function ($query) use ($specificDate, $dayOfWeek) {
-                $query->where('specific_date',  $specificDate)->orWhere($dayOfWeek, "true");
-            })
-            :
-            $query->whereHas('recurring', function ($query) use ($recurrencePattern) {
-                $query->where('specific_date_weekday', $recurrencePattern)->orWhere($recurrencePattern, 'true');
-            });
-    }
-}
 
 if (!function_exists('addDurationOverlapQuery')) {
 
@@ -465,95 +543,9 @@ if (!function_exists('addDurationOverlapQuery')) {
     }
 }
 
-if (!function_exists('getConflitingTaskData')) {
+if (!function_exists('getTaskOccurrencess')) {
 
-    function getConflitingTaskData($conflitingTask)
-    {
-
-        $conflitingTaskData =  $conflitingTask->toArray();
-
-        $conflitingTaskData['owner'] = $conflitingTask->creator->name . ' ' . $conflitingTask->creator->lastname;
-
-        $conflitingTaskData['owner_telehpone'] =  getFormatedTelephone($conflitingTask->creator);
-
-        $conflitingTaskData['owner_email'] =  $conflitingTask->creator->email;
-
-        $conflictingDuration =  $conflitingTask->durations->first();
-
-        $conflitingTaskData['start'] = date('H:i', strtotime($conflictingDuration->start));
-
-        $conflitingTaskData['end'] =  date('H:i', strtotime($conflictingDuration->end));
-
-        $conflitingTaskData['recurringMessage'] = getRecurringMessage($conflitingTask->reminder->recurring);
-
-        return $conflitingTaskData;
-    }
-}
-
-if (!function_exists('getRecurrencePatterns')) {
-
-    function getRecurrencePatterns($taskDetails)
-    {
-        $recurrenceKeys = ['specific_date', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-
-        return array_filter($taskDetails, function ($value, $key) use ($recurrenceKeys) {
-            return in_array($key, $recurrenceKeys) && ($value === "true" || ($key === 'specific_date' && $value !== null));
-        }, ARRAY_FILTER_USE_BOTH);
-    }
-}
-
-if (!function_exists('getConflictingTask')) {
-
-    function getConflictingTask($inputData, $recurrencePattern, $currentTaskID = null)
-    {
-        $userID = auth()->id();
-
-        // Primeiramente, a consulta deve ignorar a tarefa que já foi criada para, no caso de algum usuário aceitá-la, não gerar conflito de sobreposição
-        $conflictingTaskBuilder =  Task::with(['reminder.recurring', 'participants'])->where('concluded', 'false')->where('id', '!=', $currentTaskID)
-
-            // Consulta que verifica se a tarefa pertence ao usuário logado ou se o usuário está participando de alguma tarefa
-            ->where(function ($query) use ($userID) {
-
-                $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-
-                    $query->where('user_id', $userID)->where('status', 'accepted');
-                });
-
-                // Como as recorrências são vinculadas aos lembretes, a consulta passará pela tabela reminders antes de acessar a tabela recurrings
-            })->whereHas('reminder', function ($taskReminderQuery) use ($recurrencePattern, $inputData) {
-
-                // Método que lida com a lógica das recorrências
-                getRecurringTask($taskReminderQuery,  $recurrencePattern, $inputData);
-
-                // Depois que a recorrência foi verificada, o código abaixo é responsável por verificar se as durações estão se sobrepondo
-            })->whereHas('durations', function ($taskRecurringsDurtionQuery) use ($inputData) {
-                addDurationOverlapQuery($taskRecurringsDurtionQuery, $inputData);
-            });
-
-
-        $conflictingTask = $conflictingTaskBuilder->first();
-
-        $hasConflictingTask = $conflictingTaskBuilder->exists();
-
-        if ($hasConflictingTask) {
-
-            $conflitingTaskData = getConflitingTaskData($conflictingTask);
-
-            session()->flash('conflictingTask',  $conflitingTaskData);
-
-            return redirect()->back()->withErrors([
-
-                'conflictingDuration' =>
-                $conflictingTask->title,
-
-            ])->withInput();
-        }
-    }
-}
-
-if (!function_exists('getRecurringTasks')) {
-
-    function getRecurringTasks($pattern, $query)
+    function getTaskOccurrencess($pattern, $query)
     {
         return $query->with('reminder', 'reminder.recurring')->whereHas('reminder', function ($reminderQuery) use ($pattern) {
             $reminderQuery->whereHas('recurring', function ($reminderRecurringQuery) use ($pattern) {
@@ -578,15 +570,6 @@ if (!function_exists('getNotificationQuery')) {
     }
 }
 
-// if (!function_exists('getCurrentUserTasks')) {
-
-//     function getCurrentUserTasks($creatorOrParticipant, $userID, $taskID)
-//     {
-//         return NotificationTime::whereHas('reminder', function ($query) use ($creatorOrParticipant, $userID, $taskID) {
-//             getNotificationQuery($creatorOrParticipant, $query, $userID, $taskID);
-//         })->first()->get();
-//     }
-// } q viagem é essa?
 
 if (!function_exists('getRecurringData')) {
 
@@ -652,70 +635,6 @@ if (!function_exists('getStartDuration')) {
         );
     }
 }
-
-// if (!function_exists('checkIfNotificationTime')) {
-
-//     function checkIfNotificationTime($notificationTime)
-//     // function getAlertOptions()
-//     {
-//         $now = getCarbonNow();
-
-//         $isCustomTime = !is_null($notificationTime->custom_time);
-
-//         if ($isCustomTime) {
-
-//             $customTime = getCarbonTime($notificationTime->custom_time);
-
-//             return ($customTime->format('H:i:s') == $now->format('H:i:s'));
-//         } else {
-
-//             $predefinedAlerts = getPredefinedAlerts($notificationTime);
-
-//             $task = $notificationTime->
-
-//             $start =  getStartDuration($task, $userID);
-
-
-
-//             foreach ($predefinedAlerts as $alert) {
-
-//                 if ($alert == 'half_an_hour_before') {
-
-//                     $halfAnHourBefore = $start->copy()->subMinutes(30);
-
-//                     return $halfAnHourBefore->format('H:i') === $now->format('H:i');
-//                 } elseif ($alert == 'one_hour_before') {
-//                     $oneHourBefore = $start->copy()->subMinutes(60);
-
-//                     return $oneHourBefore->format('H:i') === $now->format('H:i');
-//                 } elseif ($alert == 'two_hours_before') {
-//                     $twoHoursBefore = $start->copy()->subMinutes(120);
-
-//                     return $twoHoursBefore->format('H:i') === $now->format('H:i');
-//                 } elseif ($alert == 'one_day_earlier') {
-
-//                     $oneDayEarlier = $start->copy()->subDay();
-
-//                     return $oneDayEarlier->format('H:i') === $now->format('H:i');
-//                 }
-//             }
-//         }
-
-//         // $isNotificationTime = $specificDate->isToday() && ($now !== $customTime);
-
-//         return [
-
-//             'half_an_hour_before' => 'Meia hora antes',
-
-//             'one_hour_before' => 'Uma hora antes',
-
-//             'two_hours_before' => 'Duas horas antes',
-
-//             'one_day_earlier' => 'Um dia antes'
-
-//         ];
-//     }
-// }
 
 if (!function_exists('logChangeStatusDuration')) {
 
@@ -1076,6 +995,36 @@ if (!function_exists('sortStartingFromToday')) {
     }
 }
 
+
+
+if (!function_exists('getUserTasksBuilder')) {
+    function getUserTasksBuilder()
+    {
+        return  Task::with([
+
+            'participants',
+            'reminder',
+            'reminder.recurring',
+            'durations'
+
+        ])
+        ->where('concluded', 'false')
+        ->where(function ($query)  {
+
+            $query
+            ->where('created_by',auth()->id())
+            ->orWhereHas('participants', function ($query)  {
+
+                $query
+                ->where('user_id',auth()->id())
+                ->where('status', 'accepted');
+            });
+
+        });
+    }
+
+}
+
 if (!function_exists('getTasksByWeekday')) {
 
     function getTasksByWeekday()
@@ -1085,33 +1034,12 @@ if (!function_exists('getTasksByWeekday')) {
 
         $weekDayTasks = [];
 
-        $userID = auth()->id();
-
         foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
 
             // dd($dayOfWeek);
 
-            $taskBuilder = Task::with([
+            $tasksBuilder =  getUserTasksBuilder()
 
-                'participants',
-                'reminder',
-                'reminder.recurring',
-                'durations'
-
-            ])
-            ->where('concluded', 'false')
-            ->where(function ($query) use ($userID) {
-
-                $query
-                ->where('created_by', $userID)
-                ->orWhereHas('participants', function ($query) use ($userID) {
-
-                    $query
-                    ->where('user_id', $userID)
-                    ->where('status', 'accepted');
-                });
-
-            })
             ->whereHas('reminder', function ($query) use ($dayOfWeek) {
 
                 $query
@@ -1125,7 +1053,7 @@ if (!function_exists('getTasksByWeekday')) {
 
             });
 
-            $weekDayTasks[$dayOfWeekPTBR] = sortByStart($taskBuilder);
+            $weekDayTasks[$dayOfWeekPTBR] = sortByStart($tasksBuilder);
         }
 
         return  $weekDayTasks;

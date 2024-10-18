@@ -30,67 +30,6 @@ class HomeController extends Controller
     {
         // //-----------------------------------------------------------------------------------------------Teste
 
-        $daysOfWeek = getDaysOfWeek();
-
-        $dayOfWeek = getDayOfWeek(getCarbonNow());
-
-        $nextTasks = [];
-
-        forEach( $daysOfWeek as $weekDayInEnglish => $weekdayInPortuguese){
-
-            $taskBuilder =  Task::with([
-
-                'participants',
-                'reminder',
-                'reminder.recurring',
-                'durations'
-
-            ])
-            ->where('concluded','false')
-            ->where(function($query){
-
-                $query
-                ->where('created_by',auth()->id())
-                ->orWhereHas('participants',function($query){
-
-                    $query
-                    ->where('user_id',auth()->id())
-                    ->where('status','accepted');
-
-                });
-
-            })
-            ->whereHas('reminder',function($query) use ($weekDayInEnglish){
-                $query->whereHas('recurring',function( $query) use ($weekDayInEnglish){
-
-                    $query
-                    ->where($weekDayInEnglish ,'true')
-                    ->orWhere('specific_date_weekday',$weekDayInEnglish);
-
-                });
-
-            })
-            ->where(function($query){
-
-                $query->whereHas('durations',function($query){
-
-                    $query->where('status','<>','finished');
-
-                })
-            ->whereHas('reminder',function($query){
-
-                    $query->whereHas('recurring',function($query){
-
-                        $query->whereNotNull('specific_date');
-                    });
-
-                });
-            });
-
-        $nextTasks[$weekdayInPortuguese] = sortByStart($taskBuilder);
-    }
-
-        // dd($nextTasks);
 
         //------------------------------------------------------------------------------------------termina o teste
 
@@ -185,18 +124,38 @@ class HomeController extends Controller
 
         } else {
 
-            $userTasks = getTasksByWeekday();
+            $userTasksByWeekday = getTasksByWeekday();
 
-            $filteredUserTasks = array_filter($userTasks, function ($day) {
+            // Exclui as tarefas com ocorrência única que já foram finalizadas
+        //    foreach($userTasksByWeekday as $weekday => $tasks){
+
+        //     $userTasksByWeekday[$weekday] =  $tasks->filter(function($task){
+
+        //         $duration = getDuration($task);
+
+        //         if(isset($task->reminder->recurring->specific_date)){
+
+
+        //             return $duration->status != "finished";
+        //         }else{
+        //             return $duration->status;
+        //         }
+
+        //     });
+
+        //    }
+
+            // Retira as posições vazias do array ou seja os dias que não possuem tarefas
+            $nonEmptyWeekdaysTasks = array_filter($userTasksByWeekday, function ($day) {
+
                 return !$day->isEmpty();
             });
 
-            $selectedUserTasks = sortStartingFromToday($filteredUserTasks, 'pt-br');
-
+            $nextTasks = sortStartingFromToday($nonEmptyWeekdaysTasks, 'pt-br');
             $labelOverview = empty($filteredUserTasks)
                 ? "Nenhuma tarefa agendada" : "";
         }
 
-        return view('home', compact('isThereAnyReminder', 'selectedUserTasks', 'orderedReminders', 'labelOverview'));
+        return view('home', compact('isThereAnyReminder', 'nextTasks', 'orderedReminders', 'labelOverview'));
     }
 }

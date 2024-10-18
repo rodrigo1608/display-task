@@ -54,7 +54,7 @@
 
             <div class="row  mx-0 p-0" style="max-widht:100%">
 
-                @if (is_array($selectedUserTasks))
+                @if (is_array($nextTasks))
 
                         <div class='col-md-7 pe-3 p-0' style="height:81vh; overflow:auto">
                             {{-- Accordion próximas tarefas --}}
@@ -69,7 +69,7 @@
 
                                 @endphp
 
-                                @foreach ($selectedUserTasks as $day => $tasks)
+                                @foreach ($nextTasks as $day => $tasks)
                                     @php
                                         $isToday = $todayDayOfWeek === $day;
                                         $isTomorrow = $tomorrowDayOfWeek == $day;
@@ -159,7 +159,7 @@
                                                         {{ $task->feedbacks[0]->feedback }}
                                                     </p>
 
-                                                    {{-- Botão ver tarefa --}}
+                                                    {{-- Link ver tarefa --}}
                                                     <div class="text-end" title="Ver tarefa">
                                                         <a href="{{ route('task.show', ['task' => $task->id]) }}"
                                                             class="btn btn-secondary"><svg
@@ -232,6 +232,7 @@
                                             @endif
 
                                         </div>
+
                                         <div class="">
                                             <span class="fs-4 poppins"> {{ $task->title }}</span>
                                         </div>
@@ -250,52 +251,19 @@
                                         {{ $task->feedbacks[0]->feedback }}
                                     </p>
 
-                                    <p class="roboto-light"><span class="roboto">Local:</span>
-                                        {{ $task->local }}
-                                    </p>
-
-                                    <p class="roboto-light"><span class="roboto">Criado por:</span>
-                                        {{ $task->creator->name }} {{ $task->creator->lastname }}
-                                    </p>
-
-                                    @php
-                                        $participants = getParticipants($task);
-                                    @endphp
-
-                                    <div class="d-flex aligm-items-center flex-row">
-
-                                        <span class="roboto align-self-center">Participantes:</span>
-
-                                        @foreach ($participants as $participant)
-                                            <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
-                                                style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
-                                                title="{{ $participant->name }} {{ $participant->lastname }}">
-
-                                                <img class="w-100"
-                                                    src="{{ asset('storage/' . $participant->profile_picture) }}"
-                                                    alt="Imagem do usuário">
-                                            </div>
-                                        @endforeach
-
-                                    </div>
-
-                                    <p class="roboto-light mt-2">
-                                        {!! $task->recurringMessage !!}
-                                    </p>
-
                                     <div class="text-end" title="Ver tarefa">
 
+                                        {{-- Link ver tarefa --}}
                                         <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                            title="Ver todos os lembretes" class="btn btn-secondary">
-
+                                            title="Ver tarefa" class="btn btn-secondary">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em"
                                                 fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                                 stroke="currentColor" class="size-6">
 
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36
-                                                                                                                                                                                                                                    4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577
-                                                                                                                                                                                                                                    16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                    4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577
+                                                    16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
 
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -380,7 +348,7 @@
                         @endforeach
 
                         <div class="d-flex justify-content-end">
-
+                            {{-- Link ver todos os lembretes --}}
                             <a href="{{ route('reminder.index') }}"
                                 class="poppins btn-primary fs-6 rounded px-2 py-1 text-black"
                                 style="text-decoration:none">
