@@ -9,32 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-if (!function_exists('getFormatedTelephone')) {
-
-    function getFormatedTelephone($user)
-    {
-        return  $user->telephone = '(' . substr($user->telephone, 0, 2) . ') ' . substr($user->telephone, 2, 1) . ' ' . substr($user->telephone, 3);
-    }
-}
-
-if (!function_exists('getProfilePicturePath')) {
-
-    function getProfilePicturePath($image, $email)
-    {
-        $hasUserUploadedPicture = isset($image);
-
-        if ($hasUserUploadedPicture) {
-
-            $emailWithoutDotCom = str_replace('.com', '', $email);
-
-            $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
-
-            return  $image->storeAs('profile_pictures', $profilePictureName);
-        }
-
-        return 'default_user_icon.jpg';
-    }
-}
+// Date Helpers
 
 if (!function_exists('getFormatedDateBR')) {
 
@@ -180,6 +155,55 @@ if (!function_exists('getMonths')) {
     }
 }
 
+
+// User attributes helpers
+
+if (!function_exists('getFormatedTelephone')) {
+
+    function getFormatedTelephone($user)
+    {
+        return  $user->telephone = '(' . substr($user->telephone, 0, 2) . ') ' . substr($user->telephone, 2, 1) . ' ' . substr($user->telephone, 3);
+    }
+}
+
+if (!function_exists('getProfilePicturePath')) {
+
+    function getProfilePicturePath($image, $email)
+    {
+        $hasUserUploadedPicture = isset($image);
+
+        if ($hasUserUploadedPicture) {
+
+            $emailWithoutDotCom = str_replace('.com', '', $email);
+
+            $profilePictureName = $emailWithoutDotCom . '-' . time() . '-icon.' . $image->getClientOriginalExtension();
+
+            return  $image->storeAs('profile_pictures', $profilePictureName);
+        }
+
+        return 'default_user_icon.jpg';
+    }
+}
+
+if (!function_exists('getParticipantsEmail')) {
+
+    function getParticipantsEmail($request)
+    {
+        $participants = [];
+
+        foreach ($request->all() as $attribute => $value) {
+
+            if (strpos($attribute, 'participant') === 0) {
+
+                $participants[] = $value;
+            }
+        }
+
+        return $participants;
+    }
+}
+
+// Task helpers
 if (!function_exists('setTask')) {
 
     function setTask($task)
@@ -203,6 +227,8 @@ if (!function_exists('setTask')) {
     }
 }
 
+// Recurring helpers
+
 if (!function_exists('getRepeatingDays')) {
 
     function getRepeatingDays($recurring, $language = 'en')
@@ -225,66 +251,6 @@ if (!function_exists('getRepeatingDays')) {
     }
 }
 
-if (!function_exists('getAlertOptions')) {
-
-    function getAlertOptions()
-    {
-        return [
-
-            'half_an_hour_before' => 'Meia hora antes',
-
-            'one_hour_before' => 'Uma hora antes',
-
-            'two_hours_before' => 'Duas horas antes',
-
-            'one_day_earlier' => 'Um dia antes'
-
-        ];
-    }
-}
-
-if (!function_exists('getSelectedNotificationTimes')) {
-
-    function getSelectedNotificationTimes($notificationTime)
-    {
-
-        $defaultTimes = getAlertOptions();
-
-        $selectedTimes = [];
-
-        foreach ($defaultTimes as $defaultTimeInEnglish => $defaultTimeInPortuguese) {
-
-            if ($notificationTime->$defaultTimeInEnglish === 'true') {
-
-                $selectedTimes[] = $defaultTimeInEnglish;
-            }
-        }
-        return $selectedTimes;
-    }
-}
-
-if (!function_exists('getPredefinedAlerts')) {
-
-    function getPredefinedAlerts($notificationTime, $language = 'en')
-    {
-        $getAlertOptions = getAlertOptions();
-
-        $predefinedAlerts = [];
-
-        $isPtBr = $language  == 'pt-br';
-
-        foreach ($getAlertOptions as $key => $option) {
-
-            if ($notificationTime->$key === 'true') {
-
-                $predefinedAlerts[] = $isPtBr ? $option : $key;
-            }
-        }
-
-        return $predefinedAlerts;
-    }
-}
-
 if (!function_exists('getRecurringMessage')) {
 
     function getRecurringMessage($recurring)
@@ -294,7 +260,6 @@ if (!function_exists('getRecurringMessage')) {
             $recurringMessage = '';
 
             $repeatingDays = getRepeatingDays($recurring, 'pt-br');
-
 
             $formattedDays = array_map(function ($day) {
                 return '<span class="roboto fs-5">' . $day . '</span>';
@@ -327,7 +292,7 @@ if (!function_exists('getRecurringMessage')) {
 
             $dayOfWeekInPortuguese = getDayOfWeek($date, 'pt-br');
 
-            $formatedDate = '<span class="fs-4 roboto">' . Carbon::parse($recurring->specific_date)->format('d/m/Y') . '</span>';
+            $formatedDate = '<span class="fs-4 roboto">' . $date ->format('d/m/Y') . '</span>';
             $recurringMessage = "Ocorrerá exclusivamente no dia $formatedDate, $dayOfWeekInPortuguese.";
         }
 
@@ -348,10 +313,6 @@ if (!function_exists('getRecurringLog')) {
         if (is_null($recurring->specific_date)) {
 
             $recurringMessage = '';
-
-            // $daysOfWeek = getDaysOfWeekInPortuguese();
-
-            // $repeatingDays = getRepeatingDays($daysOfWeek, $recurring);
 
             $repeatingDays = getRepeatingDays($recurring, 'pt-br');
 
@@ -382,12 +343,53 @@ if (!function_exists('getRecurringLog')) {
 
             $dayOfWeekInPortuguese = getDayOfWeek($date, 'pt-br');
 
-            $formatedDate =   Carbon::parse($recurring->specific_date)->format('d/m/Y');
+            $formatedDate =  $date->format('d/m/Y');
 
             $recurringMessage = $notificationSnippetContext . ' para ocorrer exclusivamente no dia: ' . $formatedDate . ', ' . $dayOfWeekInPortuguese;
         }
 
         return $recurringMessage;
+    }
+}
+
+// Alert helpers
+if (!function_exists('getAlertOptions')) {
+
+    function getAlertOptions()
+    {
+        return [
+
+            'half_an_hour_before' => 'Meia hora antes',
+
+            'one_hour_before' => 'Uma hora antes',
+
+            'two_hours_before' => 'Duas horas antes',
+
+            'one_day_earlier' => 'Um dia antes'
+
+        ];
+    }
+}
+
+if (!function_exists('getSelectedPredefinedAlerts')) {
+
+    function getSelectedPredefinedAlerts($notificationTime, $language = 'en')
+    {
+        $getAlertOptions = getAlertOptions();
+
+        $predefinedAlerts = [];
+
+        $isPtBr = $language  == 'pt-br';
+
+        foreach ($getAlertOptions as $key => $option) {
+
+            if ($notificationTime->$key === 'true') {
+
+                $predefinedAlerts[] = $isPtBr ? $option : $key;
+            }
+        }
+
+        return $predefinedAlerts;
     }
 }
 
@@ -422,46 +424,25 @@ if (!function_exists('formatAlertDays')) {
     }
 }
 
-if (!function_exists('getParticipantsEmail')) {
+if (!function_exists('getTaskOccurrences')) {
 
-    function getParticipantsEmail($request)
+    function getTaskOccurrences(Builder $query, $recurrencePattern, $inputData = null)
     {
-
-        $participants = [];
-
-        foreach ($request->all() as $attribute => $value) {
-
-            if (strpos($attribute, 'participant') === 0) {
-
-                $participants[] = $value;
-            }
-        }
-
-        return $participants;
-    }
-}
-
-if (!function_exists('getRecurringTask')) {
-
-    function getRecurringTask(Builder $query, $recurrencePattern, $inputData = null)
-    {
-
-        $hasSpecificDate = !is_null($inputData['specific_date']);
 
         $specificDate = $inputData['specific_date'];
 
         $date = getCarbonDate($specificDate);
 
-        $dayOfWeek = $hasSpecificDate ? getDayOfWeek($date) : null;
+        $dayOfWeek = isset($specificDate) ? getDayOfWeek($date) : null;
 
-        return $hasSpecificDate
+        return isset($specificDate)
             ?
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($specificDate, $dayOfWeek) {
-                $taskReminderRecurringQuery->where('specific_date',  $specificDate)->orWhere($dayOfWeek, "true");
+            $query->whereHas('recurring', function ($query) use ($specificDate, $dayOfWeek) {
+                $query->where('specific_date',  $specificDate)->orWhere($dayOfWeek, "true");
             })
             :
-            $query->whereHas('recurring', function ($taskReminderRecurringQuery) use ($recurrencePattern) {
-                $taskReminderRecurringQuery->where('specific_date_weekday', $recurrencePattern)->orWhere($recurrencePattern, 'true');
+            $query->whereHas('recurring', function ($query) use ($recurrencePattern) {
+                $query->where('specific_date_weekday', $recurrencePattern)->orWhere($recurrencePattern, 'true');
             });
     }
 }

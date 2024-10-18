@@ -52,11 +52,11 @@
 
             </div>
 
-            <div class="row mx-0 p-0" style="max-widht:100%">
+            <div class="row  mx-0 p-0" style="max-widht:100%">
 
                 @if (is_array($selectedUserTasks))
 
-                        <div class='col-md-7 p-0' style="height:81vh; overflow:auto">
+                        <div class='col-md-7 pe-3 p-0' style="height:81vh; overflow:auto">
                             {{-- Accordion próximas tarefas --}}
                             <div class="w-100 rounded rounded bg-white" id="accordion-next-tasks">
                                 @php
@@ -159,42 +159,7 @@
                                                         {{ $task->feedbacks[0]->feedback }}
                                                     </p>
 
-
-                                                    <p class="roboto-light">
-                                                        <span class="roboto">
-                                                            Responsável:
-                                                        </span>
-                                                        {{ $task->creator->name }}
-                                                        {{ $task->creator->lastname }}
-                                                    </p>
-
-                                                    @php
-                                                        $participants = getParticipants($task);
-                                                    @endphp
-
-                                                    @if (!$participants->isEmpty())
-                                                        <div class="d-flex aligm-items-center flex-row">
-
-                                                            <span class="roboto align-self-center">Participante(s):</span>
-
-                                                            @foreach ($participants as $participant)
-                                                                <div class="rounded-circle d-flex justify-content-center align-items-center ms-2 overflow-hidden"
-                                                                    style="max-width:2.5em; min-width:2.5em; max-height:2.4em; min-height:2.4em; border:solid 0.25em {{ $participant->color }}"
-                                                                    title="{{ $participant->name }} {{ $participant->lastname }}">
-
-                                                                    <img class="w-100"
-                                                                        src="{{ asset('storage/' . $participant->profile_picture) }}"
-                                                                        alt="Imagem do usuário">
-                                                                </div>
-                                                            @endforeach
-
-                                                        </div>
-                                                    @endif
-
-                                                    <p class="roboto-light mt-2">
-                                                        {!! $task->recurringMessage !!}
-                                                    </p>
-
+                                                    {{-- Botão ver tarefa --}}
                                                     <div class="text-end" title="Ver tarefa">
                                                         <a href="{{ route('task.show', ['task' => $task->id]) }}"
                                                             class="btn btn-secondary"><svg
@@ -217,7 +182,6 @@
                                     @endforeach
 
                                 @endforeach
-
             </div>
 
         </div>
