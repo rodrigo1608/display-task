@@ -57,8 +57,8 @@
                 @if (is_array($selectedUserTasks))
 
                         <div class='col-md-7 p-0' style="height:81vh; overflow:auto">
-
-                            <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
+                            {{-- Accordion próximas tarefas --}}
+                            <div class="w-100 rounded rounded bg-white" id="accordion-next-tasks">
                                 @php
 
                                     $now = getCarbonNow();
@@ -73,7 +73,6 @@
                                     @php
                                         $isToday = $todayDayOfWeek === $day;
                                         $isTomorrow = $tomorrowDayOfWeek == $day;
-
                                     @endphp
 
                                     <span class="text-secondary">
@@ -93,7 +92,7 @@
 
                                                 <button class="accordion-button accordion-button-secondary collapsed py-3"
                                                     type="button" data-bs-toggle="collapse"
-                                                    data-bs-target="#flush-collapse{{ $day }}"
+                                                    data-bs-target="#flush-collapse-{{ $day }}-{{$index}}"
                                                     aria-expanded="false" aria-controls="flush-collapseOne">
 
                                                     <div class="w-100 d-flex flex-column">
@@ -150,7 +149,7 @@
 
                                             </h2>
 
-                                            <div id="flush-collapse{{ $day }}"
+                                            <div id="flush-collapse-{{ $day }}-{{$index}}"
                                                 class="accordion-collapse fs-5 collapse">
 
                                                 <div class="accordion-body mb-4 pb-5"
@@ -160,9 +159,6 @@
                                                         {{ $task->feedbacks[0]->feedback }}
                                                     </p>
 
-                                                    <p class="roboto-light"><span class="roboto">Local:</span>
-                                                        {{ $task->local }}
-                                                    </p>
 
                                                     <p class="roboto-light">
                                                         <span class="roboto">
@@ -232,6 +228,7 @@
             <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
 
                 @if (isset($selectedUserTasks))
+
                     @foreach ($selectedUserTasks as $index => $task)
                         <div class="accordion-item px-1 ps-3">
 

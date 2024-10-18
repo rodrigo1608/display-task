@@ -30,6 +30,68 @@ class HomeController extends Controller
     {
         // //-----------------------------------------------------------------------------------------------Teste
 
+        $daysOfWeek = getDaysOfWeek();
+
+        $dayOfWeek = getDayOfWeek(getCarbonNow());
+
+        $nextTasks = [];
+
+        forEach( $daysOfWeek as $weekDayInEnglish => $weekdayInPortuguese){
+
+            $taskBuilder =  Task::with([
+
+                'participants',
+                'reminder',
+                'reminder.recurring',
+                'durations'
+
+            ])
+            ->where('concluded','false')
+            ->where(function($query){
+
+                $query
+                ->where('created_by',auth()->id())
+                ->orWhereHas('participants',function($query){
+
+                    $query
+                    ->where('user_id',auth()->id())
+                    ->where('status','accepted');
+
+                });
+
+            })
+            ->whereHas('reminder',function($query) use ($weekDayInEnglish){
+                $query->whereHas('recurring',function( $query) use ($weekDayInEnglish){
+
+                    $query
+                    ->where($weekDayInEnglish ,'true')
+                    ->orWhere('specific_date_weekday',$weekDayInEnglish);
+
+                });
+
+            })
+            ->where(function($query){
+
+                $query->whereHas('durations',function($query){
+
+                    $query->where('status','<>','finished');
+
+                })
+            ->whereHas('reminder',function($query){
+
+                    $query->whereHas('recurring',function($query){
+
+                        $query->whereNotNull('specific_date');
+                    });
+
+                });
+            });
+
+        $nextTasks[$weekdayInPortuguese] = sortByStart($taskBuilder);
+    }
+
+        // dd($nextTasks);
+
         //------------------------------------------------------------------------------------------termina o teste
 
         $now = getCarbonNow()->format('H:i');
@@ -74,6 +136,7 @@ class HomeController extends Controller
                     $labelOverview = "Você ainda não concluiu nenhuma tarefa";
                 }
             } else {
+
                 if ($request->input('filter') === 'participating') {
 
                     $labelOverview = "Tarefas nas quais você está participando:";
@@ -105,6 +168,7 @@ class HomeController extends Controller
                     $duration = $task->durations()->where('user_id', $currentUserID)->where('task_id', $task->id)->first();
 
                     if ($duration) {
+
                         $task->start = substr($duration->start, 0, 5);
                         $task->end =  substr($duration->end, 0, 5);
                         $task->status = $duration->status;

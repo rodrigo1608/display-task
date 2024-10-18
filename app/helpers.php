@@ -1147,7 +1147,6 @@ if (!function_exists('getTasksByWeekday')) {
 
         foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
 
-
             // dd($dayOfWeek);
 
             $taskBuilder = Task::with([
@@ -1157,17 +1156,28 @@ if (!function_exists('getTasksByWeekday')) {
                 'reminder.recurring',
                 'durations'
 
-            ])->where('concluded', 'false')->where(function ($query) use ($userID) {
+            ])
+            ->where('concluded', 'false')
+            ->where(function ($query) use ($userID) {
 
-                $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
+                $query
+                ->where('created_by', $userID)
+                ->orWhereHas('participants', function ($query) use ($userID) {
 
-                    $query->where('user_id', $userID)->where('status', 'accepted');
+                    $query
+                    ->where('user_id', $userID)
+                    ->where('status', 'accepted');
                 });
-            })->whereHas('reminder', function ($query) use ($dayOfWeek) {
 
-                $query->whereHas('recurring', function ($query) use ($dayOfWeek) {
+            })
+            ->whereHas('reminder', function ($query) use ($dayOfWeek) {
 
-                    $query->where($dayOfWeek, 'true')->orWhere('specific_date_weekday', $dayOfWeek);
+                $query
+                ->whereHas('recurring', function ($query) use ($dayOfWeek) {
+
+                    $query
+                    ->where($dayOfWeek, 'true')
+                    ->orWhere('specific_date_weekday', $dayOfWeek);
 
                 });
 
@@ -1350,11 +1360,13 @@ if (!function_exists('getFilteredTasks')) {
                     $query->where('user_id', $userID)->where('status', 'accepted');
                 });
             });
+
         } elseif ($request->has('filter') && $request->input('filter') === 'created') {
 
             $selectedUserTasksBuilder =  $selectedUserTasksBuilder->where('concluded', 'false')->where(function ($query) use ($userID) {
                 $query->where('created_by', $userID);
             });
+
         } elseif ($request->has('filter') && $request->input('filter') === 'participating') {
             $selectedUserTasksBuilder  = $selectedUserTasksBuilder->where('concluded', 'false')->whereHas('participants', function ($query) use ($userID) {
                 $query->where('user_id', $userID)->where('status', 'accepted');
