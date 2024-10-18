@@ -180,36 +180,6 @@ if (!function_exists('getMonths')) {
     }
 }
 
-
-
-
-
-
-// if (!function_exists('checkValidDayAlert')) {
-
-//     function checkValidDayAlert($date)
-//     {
-//         $today = getToday();
-
-//         $dayOfWeekToday = getDayOfWeek($today);
-
-//         if ($date instanceof Carbon) {
-
-//             $dayBeforeSpecificDate = $date->copy()->subDay();
-
-//             return   $dayBeforeSpecificDate->isToday() || $date->isToday();
-//         } else {
-
-//             $carbonDate = Carbon::parse($date);
-
-//             $dayBeforeRecurringDate = $carbonDate->subDay()->format('l');
-
-//             return $dayOfWeekToday ===  strtolower($dayBeforeRecurringDate) || $dayOfWeekToday === $date;
-//         }
-//     }
-// }
-
-
 if (!function_exists('setTask')) {
 
     function setTask($task)
@@ -255,35 +225,6 @@ if (!function_exists('getRepeatingDays')) {
     }
 }
 
-if (!function_exists('getSelectedNotificationTimes')) {
-
-    function getSelectedNotificationTimes($notificationTime)
-    {
-
-        $defaultTimes = [
-
-            'half_an_hour_before',
-
-            'one_hour_before',
-
-            'two_hours_before',
-
-            'one_day_earlier',
-        ];
-
-        $selectedTimes = [];
-
-        foreach ($defaultTimes as $defaultTime) {
-
-            if ($notificationTime->$defaultTime === 'true') {
-
-                $selectedTimes[] = $defaultTime;
-            }
-        }
-        return $selectedTimes;
-    }
-}
-
 if (!function_exists('getAlertOptions')) {
 
     function getAlertOptions()
@@ -299,6 +240,26 @@ if (!function_exists('getAlertOptions')) {
             'one_day_earlier' => 'Um dia antes'
 
         ];
+    }
+}
+
+if (!function_exists('getSelectedNotificationTimes')) {
+
+    function getSelectedNotificationTimes($notificationTime)
+    {
+
+        $defaultTimes = getAlertOptions();
+
+        $selectedTimes = [];
+
+        foreach ($defaultTimes as $defaultTimeInEnglish => $defaultTimeInPortuguese) {
+
+            if ($notificationTime->$defaultTimeInEnglish === 'true') {
+
+                $selectedTimes[] = $defaultTimeInEnglish;
+            }
+        }
+        return $selectedTimes;
     }
 }
 
@@ -1390,37 +1351,6 @@ if (!function_exists('getTasksForDayAndTime')) {
         $userID = auth()->id();
 
         $currentDayOfWeek = getDayOfWeek($day);
-
-        // $testTask =  Task::with([
-        //     'participants',
-        //     'reminder',
-        //     'reminder.recurring',
-        //     'durations'
-
-        // ])->where('concluded', 'false')->where(function ($query) use ($userID) {
-
-        //     $query->where('created_by', $userID)->orWhereHas('participants', function ($query) use ($userID) {
-        //         $query->where('user_id', $userID)->where('status', 'accepted');
-        //     });
-        // })->whereHas('reminder', function ($query) use ($day, $currentDayOfWeek) {
-
-        //     $query->whereHas('recurring', function ($query) use ($day, $currentDayOfWeek) {
-
-        //         $query->where(function ($query) use ($day, $currentDayOfWeek) {
-
-        //             $query->where('specific_date', $day->format('Y-m-d'))->where('specific_date_weekday', $currentDayOfWeek);
-        //         })->orWhere($currentDayOfWeek, 'true');
-        //     });
-        // })->whereHas('durations', function ($query) use ($userID, $time, $timePlusOneHour) {
-
-        //     $query->where('user_id', $userID)->whereBetween('start', [$time->format('H:i:s'), $timePlusOneHour->format('H:i:s')]);
-        // })->get();
-
-        // if ($testTask->isNotEmpty()) {
-        //     // dd($testTask);
-        // }
-
-        // dd($day->format('Y-m-d'));
 
         return Task::with([
             'participants',
