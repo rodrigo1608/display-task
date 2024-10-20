@@ -227,7 +227,7 @@ class NotifyAtCustomTime implements ShouldQueue
                             }
                         } else {
 
-                            $selectedTimes = getSelectedNotificationTimes($notificationTime);
+                            $selectedTimes = getSelectedPredefinedAlerts($notificationTime);
 
                             foreach ($selectedTimes as $time) {
 

@@ -460,7 +460,11 @@
 
                                 <div id="panelsStayOpen-collapse{{ $key }}" class="accordion-collapse collapse">
 
-                                    <div class="accordion-body">
+                                    <div class="accordion-body text-wrap" style="
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+  ">
 
                                         <p class="roboto text-secondary fs-5">{!! $feedback->feedback !!}</p>
 

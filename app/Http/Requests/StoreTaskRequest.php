@@ -80,15 +80,18 @@ class StoreTaskRequest extends FormRequest
 
     public function checkAlertTimesSufficiency($validator)
     {
-        if (!filled($this->input('start'))) {
+
+        if (!filled($this->input('start')) ) {
             return;
         }
 
         $start = Carbon::createFromFormat('H:i', $this->input('start'));
 
         $specificDate = $this->filled('specific_date')
-            ? getCarbonDate($this->input('specific_date'))
-            : null;
+        ? getCarbonDate($this->input('specific_date'))
+        : null;
+
+        $isSpecificDateAndToday = checkIsToday($specificDate);
 
         $alertOptions = [
             'half_an_hour_before' => 30,
@@ -98,7 +101,9 @@ class StoreTaskRequest extends FormRequest
 
         foreach ($alertOptions as $alertIndex => $minutes) {
 
-            if (isset($specificDate) && $this->input($alertIndex) === 'true') {
+            $isPredefinedTime = $this->input($alertIndex) === 'true';
+
+            if ($isSpecificDateAndToday && $isPredefinedTime ) {
 
                 // $timeDifference = $start->diffInMinutes(now()->addMinutes($minutes), false);
 

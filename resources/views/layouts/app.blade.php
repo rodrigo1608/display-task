@@ -91,7 +91,9 @@
                         @auth
 
                             <div class="dropdown">
+
                                 {{-- Botão de criar eventos --}}
+
                                 <button class="btn btn-secondary ms-5 px-2" type="button" id="dropdownMenuButtonEvent"
                                     data-bs-toggle="dropdown" aria-expanded="false" title="Criar evento">
 
@@ -248,7 +250,7 @@
 
         @if (session('success'))
 
-            <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;">
+            <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
 
                 <div id="success-alert" class="row justify-content-center mt-4">
 
@@ -264,7 +266,7 @@
 
         @elseIf (session('warning'))
 
-        <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;">
+        <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
 
             <div id="warning-alert" class="row justify-content-center mt-4">
 
@@ -283,7 +285,7 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                const alertBox = document.getElementById('success-alert');
+                const alertBox = document.querySelector('[data-alert]');
                 if (alertBox) {
                     setTimeout(() => {
 
@@ -298,6 +300,7 @@
                     }, 3000);
                 }
             });
+
         </script>
 
         @if (Auth::check())

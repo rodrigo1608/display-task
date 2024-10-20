@@ -54,9 +54,9 @@
 
             <div class="row  mx-0 p-0" style="max-widht:100%">
 
-                @if (is_array($nextTasks))
+                @if (is_array($selectedUserTasks))
 
-                        <div class='col-md-7 pe-3 p-0' style="height:81vh; overflow:auto">
+                        <div class='col-md-7 pe-3 p-0' style="height:87vh; overflow:auto">
                             {{-- Accordion próximas tarefas --}}
                             <div class="w-100 rounded rounded bg-white" id="accordion-next-tasks">
                                 @php
@@ -69,7 +69,7 @@
 
                                 @endphp
 
-                                @foreach ($nextTasks as $day => $tasks)
+                                @foreach ($selectedUserTasks as $day => $tasks)
                                     @php
                                         $isToday = $todayDayOfWeek === $day;
                                         $isTomorrow = $tomorrowDayOfWeek == $day;

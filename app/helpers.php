@@ -995,8 +995,6 @@ if (!function_exists('sortStartingFromToday')) {
     }
 }
 
-
-
 if (!function_exists('getUserTasksBuilder')) {
     function getUserTasksBuilder()
     {
@@ -1030,30 +1028,56 @@ if (!function_exists('getTasksByWeekday')) {
     function getTasksByWeekday()
     {
 
-        $daysOfWeek = getDaysOfWeek();
+        $tasks = getUserTasksBuilder();
+
+        $daysOfWeek =getDaysOfWeek();
 
         $weekDayTasks = [];
 
+        $specificDateTasksBuilder =  (clone $tasks)->whereHas('reminder', function($query){
+
+            $query->whereHas('recurring', function($query){
+
+                $query->whereNotNull('specific_date');
+            });
+
+        })->whereHas('durations',function($query){
+
+            $query->where('status','<>','finished');
+
+        });
+
+        $recurringTasksBuilder  = (clone $tasks)->whereHas('reminder',function($query){
+
+            $query->whereHas('recurring', function($query){
+
+                $query->whereNull('specific_date');
+            });
+
+        });
+
+        $mergedTasks = $specificDateTasksBuilder->union($recurringTasksBuilder)->get();
+
+
+
         foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
 
-            // dd($dayOfWeek);
+            $weekDayTasks[$dayOfWeekPTBR] = $mergedTasks->filter(function($task) use ($dayOfWeek) {
 
-            $tasksBuilder =  getUserTasksBuilder()
+                $recurring = $task->reminder->recurring;
 
-            ->whereHas('reminder', function ($query) use ($dayOfWeek) {
+                $isRecurringDay = $recurring->specific_date_weekday ===  $dayOfWeek || $recurring-> $dayOfWeek === 'true';
 
-                $query
-                ->whereHas('recurring', function ($query) use ($dayOfWeek) {
+                return $isRecurringDay;
 
-                    $query
-                    ->where($dayOfWeek, 'true')
-                    ->orWhere('specific_date_weekday', $dayOfWeek);
+            })->sortBy(function($task){
 
-                });
+                $duration = getDuration($task);
+
+                return $duration->start;
 
             });
 
-            $weekDayTasks[$dayOfWeekPTBR] = sortByStart($tasksBuilder);
         }
 
         return  $weekDayTasks;
@@ -1422,6 +1446,8 @@ if (!function_exists('sortByStart')) {
         });
     }
 }
+
+
 if (!function_exists('getHourForBlock')) {
 
     function getHourForBlock(int $index)

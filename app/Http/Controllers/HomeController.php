@@ -127,23 +127,20 @@ class HomeController extends Controller
             $userTasksByWeekday = getTasksByWeekday();
 
             // Exclui as tarefas com ocorrência única que já foram finalizadas
-        //    foreach($userTasksByWeekday as $weekday => $tasks){
+           foreach($userTasksByWeekday as $weekday => $tasks){
 
-        //     $userTasksByWeekday[$weekday] =  $tasks->filter(function($task){
+            $userTasksByWeekday[$weekday] =  $tasks->filter(function($task){
 
-        //         $duration = getDuration($task);
+                $duration = getDuration($task);
 
-        //         if(isset($task->reminder->recurring->specific_date)){
+                if(isset($task->reminder->recurring->specific_date)){
 
-
-        //             return $duration->status != "finished";
-        //         }else{
-        //             return $duration->status;
-        //         }
-
-        //     });
-
-        //    }
+                    return $duration->status != "finished";
+                }else{
+                    return $duration->status;
+                }
+            });
+           }
 
             // Retira as posições vazias do array ou seja os dias que não possuem tarefas
             $nonEmptyWeekdaysTasks = array_filter($userTasksByWeekday, function ($day) {
@@ -151,11 +148,12 @@ class HomeController extends Controller
                 return !$day->isEmpty();
             });
 
-            $nextTasks = sortStartingFromToday($nonEmptyWeekdaysTasks, 'pt-br');
+            $selectedUserTasks = sortStartingFromToday($nonEmptyWeekdaysTasks, 'pt-br');
+
             $labelOverview = empty($filteredUserTasks)
                 ? "Nenhuma tarefa agendada" : "";
         }
 
-        return view('home', compact('isThereAnyReminder', 'nextTasks', 'orderedReminders', 'labelOverview'));
+        return view('home', compact('isThereAnyReminder',  'orderedReminders', 'labelOverview','selectedUserTasks'));
     }
 }
