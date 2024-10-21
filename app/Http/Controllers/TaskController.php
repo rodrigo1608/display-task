@@ -49,9 +49,14 @@ class TaskController extends Controller
     {
 
         $currentUserID = auth()->id();
+
         $recurrencePatterns = getRecurrencePatterns($request->all());
 
         $isSpecificDayPattern  = isset($recurrencePatterns['specific_date']);
+
+        $dayOfWeekToday = strtolower(getCarbonNow()->format('l'));
+
+        $hasRecurrenceToday = array_key_exists($dayOfWeekToday, $recurrencePatterns);
 
         if ($isSpecificDayPattern) {
 
@@ -161,16 +166,25 @@ class TaskController extends Controller
 
         ]);
 
-        $duration->status = match (true) {
+        if($hasRecurrenceToday){
 
-            getCarbonTime($duration->start)->isFuture() => 'starting',
+            $duration->status = match (true) {
 
-            getCarbonTime($duration->start)->isPast() && getCarbonTime($duration->end)->isFuture() => 'in_progress',
+                getCarbonTime($duration->start)->isFuture() => 'starting',
 
-            getCarbonTime($duration->end)->isPast() => 'finished',
+                getCarbonTime($duration->start)->isPast() && getCarbonTime($duration->end)->isFuture() => 'in_progress',
 
-            default => $duration->status,
-        };
+                getCarbonTime($duration->end)->isPast() => 'finished',
+
+                default => $duration->status,
+            };
+
+        }else{
+
+            $duration->status = 'starting';
+
+        }
+
 
         $duration->save();
 
@@ -189,7 +203,7 @@ class TaskController extends Controller
 
         $feedbacks = Feedback::all();
 
-        return redirect()->route('display.day', compact('task'))->with('success', 'Tarefa criada com sucesso!');
+        return redirect()->route('task.show',['task'=> $task->id ])->with('success', 'Tarefa criada com sucesso!');
     }
 
     /**
