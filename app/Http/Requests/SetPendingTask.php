@@ -56,11 +56,13 @@ class SetPendingTask extends FormRequest
 
         $recurring = $task->reminder->recurring;
 
+        $date  = getCarbonDate($recurring->specific_date);
+
         $hasSpecificDate = isset($recurring->specific_date);
 
-        $isSpecificDateToday = checkIsToday($recurring->specific_date);
+        $isSpecificDateToday = checkIsToday($date);
 
-        $willNotStartSoon = $isSpecificDateToday  ? $now->diffInMinutes($start, true) > 30: true;
+        $willNotStartSoon = $isSpecificDateToday  ? $now->diffInMinutes($start, false) > 30: true;
 
         // Filtra as opções onde as chaves estão marcadas como 'true'
         $trueOptions = array_filter($alertOptions, function ($label, $key) {
@@ -76,7 +78,6 @@ class SetPendingTask extends FormRequest
         $emptyFieldsForRecurringDates = $noInputsFilled && !$hasSpecificDate;
 
         if ($emptyFieldsForRecurringDates || $emptyFieldsForSpecificDate ) {
-
 
             $validator->errors()->add('time', 'Para não dar branco, crie um lembrete!');
         }

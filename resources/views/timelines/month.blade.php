@@ -7,62 +7,63 @@
         <form class="d-flex align_items-center justify-content-end mt-5 flex-row gap-2 p-0"
             action="{{ route('display.month') }}" method="GET">
 
-            <div>
-
-                @php
-
-                    $currentMonthInEN = getCarbonNow()->format('F');
-
-                    $currentMonthPTBR = $months[$currentMonthInEN];
-
-                    $abreviatedCurrentMonthPTBR = mb_substr($currentMonthPTBR, 0, 3, 'UTF-8');
-
-                @endphp
-
-                <select class="btn btn-primary" name="month" id="month">
-
-                    @foreach ($months as $monthInEN => $monthInPTBR)
-                        <option value="{{ $monthInEN }}"
-                            {{ $monthInPTBR === $selectedMOnthInPortuguese ? 'selected' : '' }}>
-                            {{ $monthInPTBR }}
-                        </option>
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div>
-
-                <select class="btn btn-primary" name="year" id="year">
-
+            <div class="d-flex align-items-center gap-1">
+                <div  border border-2 rounded>
                     @php
 
-                        $currentYear = date('Y');
-                        $startYear = $currentYear - 5;
-                        $endYear = $currentYear + 5;
+                        $currentMonthInEN = getCarbonNow()->format('F');
+
+                        $currentMonthPTBR = $months[$currentMonthInEN];
+
+                        $abreviatedCurrentMonthPTBR = mb_substr($currentMonthPTBR, 0, 3, 'UTF-8');
 
                     @endphp
 
-                    @for ($year = $startYear; $year <= $endYear; $year++)
-                        <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
-                            {{ $year }}
-                        </option>
-                    @endfor
+                    <select class="btn btn-primary px-3 border-0" name="month" id="month">
 
-                </select>
+                        @foreach ($months as $monthInEN => $monthInPTBR)
+                            <option value="{{ $monthInEN }}"
+                                {{ $monthInPTBR === $selectedMOnthInPortuguese ? 'selected' : '' }}>
+                                {{ $monthInPTBR }}
+                            </option>
+                        @endforeach
 
+                    </select>
+
+                </div>
+
+                <div>
+
+                    <select class="btn btn-primary border-0 px-3 " name="year" id="year">
+
+                        @php
+
+                            $currentYear = date('Y');
+                            $startYear = $currentYear - 5;
+                            $endYear = $currentYear + 5;
+
+                        @endphp
+
+                        @for ($year = $startYear; $year <= $endYear; $year++)
+                            <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
+                        @endfor
+
+                    </select>
+
+                </div>
+
+                {{-- Botão para enviar a data escolhida em relação ao ano e mês --}}
+                <button type="submit" class="btn btn-primary border-0 rounded-circle py-2" title="Enviar data">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="19" height="19"
+                        stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                    </svg>
+
+                </button>
             </div>
-
-            {{-- Botão para enviar a data escolhida em relação ao ano e mês --}}
-            <button type="submit" class="btn btn-primary rounded-circle py-2" title="Enviar data">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="19" height="19"
-                    stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                </svg>
-
-            </button>
 
         </form>
 
