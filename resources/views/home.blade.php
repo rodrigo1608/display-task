@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+
     <div class="container">
 
         <div class="row d-flex justify-content-start flex-row" style=" border-bottom: 1px solid lightgrey;">
@@ -34,7 +35,7 @@
 
         </div>
 
-        <div class="container" style="height:81vh; overflow:hidden">
+        <div class="container" style="height:87vh; overflow:hidden">
 
             <div class="row mx-0 mb-5 p-0" style="max-widht:100%">
 
@@ -56,9 +57,11 @@
 
                 @if (is_array($selectedUserTasks))
 
-                        <div class='col-md-7 pe-3 p-0' style="height:87vh; overflow:auto">
+                        <div class='col-md-7 pe-3 pb-5 p-0 ' style="height:87vh; overflow:auto">
+
                             {{-- Accordion próximas tarefas --}}
-                            <div class="w-100 rounded rounded bg-white" id="accordion-next-tasks">
+
+                            <div class="w-100 rounded rounded pb-5 bg-white" id="accordion-next-tasks">
                                 @php
 
                                     $now = getCarbonNow();
@@ -73,9 +76,12 @@
                                     @php
                                         $isToday = $todayDayOfWeek === $day;
                                         $isTomorrow = $tomorrowDayOfWeek == $day;
+
+
                                     @endphp
 
                                     <span class="text-secondary">
+
                                         @if ($isToday)
                                             Hoje
                                         @elseIf($isTomorrow)
@@ -86,99 +92,107 @@
                                     </span>
 
                                     @foreach ($tasks as $index => $task)
-                                        <div class="accordion-item my-2 px-1 ps-3">
 
-                                            <h2 class="accordion-header d-flex">
+                                    @php
 
-                                                <button class="accordion-button accordion-button-secondary collapsed py-3"
-                                                    type="button" data-bs-toggle="collapse"
-                                                    data-bs-target="#flush-collapse-{{ $day }}-{{$index}}"
-                                                    aria-expanded="false" aria-controls="flush-collapseOne">
+                                    @endphp
 
-                                                    <div class="w-100 d-flex flex-column">
+                                    <div class="accordion-item my-2 px-1 ps-3">
 
-                                                        <div
-                                                            class="poppins-regular d-flex align-items-center justify-content-between flex-row">
+                                        <h2 class="accordion-header d-flex">
 
-                                                            @php
+                                            <button class="accordion-button accordion-button-secondary collapsed py-3"
+                                                type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#flush-collapse-{{ $day }}-{{$index}}"
+                                                aria-expanded="false" aria-controls="flush-collapseOne">
 
-                                                                $duration = getDuration($task);
-                                                                $start = getCarbonTime($duration->start)->format('H:i');
-                                                                $end = getCarbonTime($duration->end)->format('H:i');
+                                                <div class="w-100 d-flex flex-column">
 
-                                                            @endphp
+                                                    <div
+                                                        class="poppins-regular d-flex align-items-center justify-content-between flex-row">
 
-                                                            <div class="mb-3">
-                                                                <span class="fs-2">{{ $start }}</span>
-                                                                <span class="poppins-extralight fs-4 mx-2">até</span>
-                                                                <span class="fs-2">{{ $end }}</span>
+                                                        @php
+
+                                                            $duration = getDuration($task);
+                                                            $start = getCarbonTime($duration->start)->format('H:i');
+                                                            $end = getCarbonTime($duration->end)->format('H:i');
+
+                                                        @endphp
+
+                                                        <div class="mb-3">
+                                                            <span class="fs-2">{{ $start }}</span>
+                                                            <span class="poppins-extralight fs-4 mx-2">até</span>
+                                                            <span class="fs-2">{{ $end }}</span>
+                                                        </div>
+
+                                                        @if ($task->concluded === 'false')
+                                                            <div class="me-3 text-end">
+
+                                                                {{-- ícone do relógio --}}
+
+                                                                <svg stroke="currentColor" @class([
+                                                                    'text-success' => $duration->status === 'starting',
+                                                                    'text-warning' => $duration->status === 'in_progress',
+                                                                    'text-danger' => $duration->status === 'finished',
+                                                                ])
+                                                                    stroke-width="2" xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none" viewBox="0 0 24 24"
+                                                                    stroke-width="1.5" class="size-6"
+                                                                    style="width: 1.5em; height: 1.5em;">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
+
                                                             </div>
-
-                                                            @if ($task->concluded === 'false')
-                                                                <div class="me-3 text-end">
-
-                                                                    {{-- ícone do relógio --}}
-
-                                                                    <svg stroke="currentColor" @class([
-                                                                        'text-success' => $duration->status === 'starting',
-                                                                        'text-warning' => $duration->status === 'in_progress',
-                                                                        'text-danger' => $duration->status === 'finished',
-                                                                    ])
-                                                                        stroke-width="2" xmlns="http://www.w3.org/2000/svg"
-                                                                        fill="none" viewBox="0 0 24 24"
-                                                                        stroke-width="1.5" class="size-6"
-                                                                        style="width: 1.5em; height: 1.5em;">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                                    </svg>
-
-                                                                </div>
-                                                            @endif
-
-                                                        </div>
-
-                                                        <div class="">
-                                                            <span class="fs-4 poppins">
-                                                                {{ $task->title }}
-                                                            </span>
-                                                        </div>
+                                                        @endif
 
                                                     </div>
 
-                                                </button>
-
-                                            </h2>
-
-                                            <div id="flush-collapse-{{ $day }}-{{$index}}"
-                                                class="accordion-collapse fs-5 collapse">
-
-                                                <div class="accordion-body mb-4 pb-5"
-                                                    style="border-bottom: solid lightgrey 1px;">
-
-                                                    <p class="roboto fs-5 text-secondary w-75 my-4">
-                                                        {{ $task->feedbacks[0]->feedback }}
-                                                    </p>
-
-                                                    {{-- Link ver tarefa --}}
-                                                    <div class="text-end" title="Ver tarefa">
-                                                        <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                                            class="btn btn-secondary"><svg
-                                                                xmlns="http://www.w3.org/2000/svg" width="1.5em"
-                                                                height="1.5em" fill="none" viewBox="0 0 24 24"
-                                                                stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                                            </svg>
-                                                        </a>
+                                                    <div class="">
+                                                        <span class="fs-4 poppins">
+                                                            {{ $task->title }}
+                                                        </span>
                                                     </div>
 
+                                                </div>
+
+                                            </button>
+
+                                        </h2>
+
+                                        <div id="flush-collapse-{{ $day }}-{{$index}}"
+                                            class="accordion-collapse fs-5 collapse">
+
+                                            <div class="accordion-body mb-4 pb-5"
+                                                style="border-bottom: solid lightgrey 1px;">
+
+                                                <p class="roboto fs-5 text-secondary w-75 my-4">
+                                                    {{ $task->feedbacks[0]->feedback }}
+                                                </p>
+
+                                                {{-- Link ver tarefa --}}
+                                                <div class="text-end" title="Ver tarefa">
+                                                    <a href="{{ route('task.show', ['task' => $task->id]) }}"
+                                                        class="btn btn-secondary"><svg
+                                                            xmlns="http://www.w3.org/2000/svg" width="1.5em"
+                                                            height="1.5em" fill="none" viewBox="0 0 24 24"
+                                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        </svg>
+                                                    </a>
                                                 </div>
 
                                             </div>
 
                                         </div>
+
+                                    </div>
+
+
+
                                     @endforeach
 
                                 @endforeach

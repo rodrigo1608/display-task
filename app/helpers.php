@@ -1058,17 +1058,29 @@ if (!function_exists('getTasksByWeekday')) {
 
         $mergedTasks = $specificDateTasksBuilder->union($recurringTasksBuilder)->get();
 
+            foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
+
+                $isdayOfWeekToday  =checkIsToday($dayOfWeek);
+
+                $weekDayTasks[$dayOfWeekPTBR] = $mergedTasks->filter(function($task) use ($isdayOfWeekToday, $dayOfWeek) {
+
+                    $duration = getDuration($task);
+
+                    $recurring = $task->reminder->recurring;
+
+                    $isFinished =  $duration->status == "finished";
+
+                    $isValidRecurringTask = !($isdayOfWeekToday && $isFinished);
+
+                    $isRecurringDay = $recurring->$dayOfWeek ==='true';
+
+                    $isSpecificDateDay =  $recurring->specific_date_weekday ===  $dayOfWeek;
 
 
-        foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
 
-            $weekDayTasks[$dayOfWeekPTBR] = $mergedTasks->filter(function($task) use ($dayOfWeek) {
+                $isOcurrenceTodayDay =   $isSpecificDateDay  || ($isRecurringDay && $isValidRecurringTask );
 
-                $recurring = $task->reminder->recurring;
-
-                $isRecurringDay = $recurring->specific_date_weekday ===  $dayOfWeek || $recurring-> $dayOfWeek === 'true';
-
-                return $isRecurringDay;
+                return $isOcurrenceTodayDay;
 
             })->sortBy(function($task){
 
@@ -1077,6 +1089,25 @@ if (!function_exists('getTasksByWeekday')) {
                 return $duration->start;
 
             });
+
+            // foreach ($daysOfWeek as $dayOfWeek => $dayOfWeekPTBR) {
+
+            //     $weekDayTasks[$dayOfWeekPTBR] = $mergedTasks->filter(function($task) use ($dayOfWeek) {
+
+            //         $recurring = $task->reminder->recurring;
+
+            //         $isRecurringDay = $recurring->specific_date_weekday ===  $dayOfWeek || $recurring-> $dayOfWeek === 'true';
+
+            //         return $isRecurringDay;
+
+            //     })->sortBy(function($task){
+
+            //         $duration = getDuration($task);
+
+            //         return $duration->start;
+
+            //     });
+
 
         }
 

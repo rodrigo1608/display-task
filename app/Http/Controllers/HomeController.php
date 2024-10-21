@@ -127,13 +127,17 @@ class HomeController extends Controller
             $userTasksByWeekday = getTasksByWeekday();
 
             // Exclui as tarefas com ocorrência única que já foram finalizadas
-           foreach($userTasksByWeekday as $weekday => $tasks){
+           foreach($userTasksByWeekday as $weekdayPTBR => $tasks){
 
-            $userTasksByWeekday[$weekday] =  $tasks->filter(function($task){
+            $userTasksByWeekday[$weekdayPTBR] =  $tasks->filter(function($task) use($weekdayPTBR){
+
+                $recurring = $task->reminder->recurring;
+
+                $hasspecificDate = isset($recurring->specific_date);
 
                 $duration = getDuration($task);
 
-                if(isset($task->reminder->recurring->specific_date)){
+                if($hasspecificDate  ){
 
                     return $duration->status != "finished";
                 }else{
@@ -141,7 +145,6 @@ class HomeController extends Controller
                 }
             });
            }
-
             // Retira as posições vazias do array ou seja os dias que não possuem tarefas
             $nonEmptyWeekdaysTasks = array_filter($userTasksByWeekday, function ($day) {
 
