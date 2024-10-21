@@ -222,7 +222,7 @@
                                             class="poppins-regular d-flex align-items-center justify-content-between flex-row">
 
                                             <div class="mb-3">
-                                                <span class="fs-2">{{ $task->start }}</span> <span
+                                                <span class="fs-2">{{ $task->title }}</span> <span
                                                     class="poppins-extralight fs-4 mx-2">até</span>
                                                 <span class="fs-2">{{ $task->end }}</span>
                                             </div>

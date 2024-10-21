@@ -61,7 +61,7 @@ class HomeController extends Controller
 
             $selectedUserTasksBuilder = getFilteredTasks($request);
 
-            $selectedUserTasks = sortByStart($selectedUserTasksBuilder);
+            $selectedUserTasks = $selectedUserTasksBuilder->orderBy('created_at', 'asc')->get();;
 
             if ($selectedUserTasks->isEmpty()) {
 
