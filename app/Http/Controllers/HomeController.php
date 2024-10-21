@@ -153,7 +153,7 @@ class HomeController extends Controller
 
             $selectedUserTasks = sortStartingFromToday($nonEmptyWeekdaysTasks, 'pt-br');
 
-            $labelOverview = empty($filteredUserTasks)
+            $labelOverview = empty($selectedUserTasks)
                 ? "Nenhuma tarefa agendada" : "";
         }
 

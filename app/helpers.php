@@ -13,7 +13,7 @@ if (!function_exists('getFormatedDateBR')) {
 
     function getFormatedDateBR($date)
     {
-        return Carbon::parse($date)->format('d.m.Y');
+        return Carbon::parse($date)->format('d/m/Y');
     }
 }
 
@@ -335,10 +335,10 @@ if (!function_exists('getRecurringMessage')) {
 
                     $recurringMessage .= ' e ' . $lastDay;
                 } else {
+                    $recurringMessage .= (stripos($formattedDays[0], "sábado") !== false || stripos($formattedDays[0], "domingo") !== false)
+                    ? 'Todos os ' . $formattedDays[0] . '<span class="roboto fs-5">s</span>'
+                    : 'Todas as ' . $formattedDays[0] . '<span class="roboto fs-5">s</span>';
 
-                    $recurringMessage .=    ($formattedDays[0]) === "sábado" || ($formattedDays[0]) === 'domingo'
-                        ? 'Todos os ' . ($formattedDays[0]) . '<span class="roboto fs-5">s</spam>'
-                        : 'Todas as ' .  $formattedDays[0] . '<span class="roboto fs-5">s</spam>';
                 }
             }
         } else {

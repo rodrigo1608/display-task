@@ -16,11 +16,6 @@
                     Próximas
                 </a>
 
-                <a href="{{ route('home', ['filter' => 'concluded']) }}"
-                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'concluded' ? 'selected poppins' : '' }} ms-5 text-black">
-                    Concluídas
-                </a>
-
                 <a href="{{ route('home', ['filter' => 'created']) }}"
                     class="text-decoration-none fs-5 side-link {{ request('filter') == 'created' ? 'selected poppins' : '' }} ms-5 text-black">
                     Criadas por mim
@@ -29,6 +24,11 @@
                 <a href="{{ route('home', ['filter' => 'participating']) }}"
                     class="text-decoration-none fs-5 side-link {{ request('filter') == 'participating' ? 'selected poppins' : '' }} ms-5 text-black">
                     Estou participando
+                </a>
+
+                <a href="{{ route('home', ['filter' => 'concluded']) }}"
+                    class="text-decoration-none fs-5 side-link {{ request('filter') == 'concluded' ? 'selected poppins' : '' }} ms-5 text-black">
+                    Concluídas
                 </a>
 
             </div>
@@ -74,9 +74,9 @@
 
                                 @foreach ($selectedUserTasks as $day => $tasks)
                                     @php
+
                                         $isToday = $todayDayOfWeek === $day;
                                         $isTomorrow = $tomorrowDayOfWeek == $day;
-
 
                                     @endphp
 
