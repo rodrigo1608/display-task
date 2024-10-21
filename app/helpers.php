@@ -338,7 +338,6 @@ if (!function_exists('getRecurringMessage')) {
                     $recurringMessage .= (stripos($formattedDays[0], "sábado") !== false || stripos($formattedDays[0], "domingo") !== false)
                     ? 'Todos os ' . $formattedDays[0] . '<span class="roboto fs-5">s</span>'
                     : 'Todas as ' . $formattedDays[0] . '<span class="roboto fs-5">s</span>';
-
                 }
             }
         } else {
