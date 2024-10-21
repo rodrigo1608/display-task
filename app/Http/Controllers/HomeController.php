@@ -30,7 +30,6 @@ class HomeController extends Controller
     {
         // //-----------------------------------------------------------------------------------------------Teste
 
-
         //------------------------------------------------------------------------------------------termina o teste
 
         $now = getCarbonNow()->format('H:i');
@@ -78,13 +77,13 @@ class HomeController extends Controller
 
                 if ($request->input('filter') === 'participating') {
 
-                    $labelOverview = "Tarefas nas quais você está participando:";
+                    $labelOverview = "Tarefas nas quais você está participando";
                 } elseif ($request->input('filter') === 'created') {
 
-                    $labelOverview = "Tarefas criadas por você:";
+                    $labelOverview = "Tarefas criadas por você";
                 } else {
 
-                    $labelOverview = "Tarefas concluídas:";
+                    $labelOverview = "Tarefas concluídas";
                 }
                 foreach ($selectedUserTasks as $task) {
 

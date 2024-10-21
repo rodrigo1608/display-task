@@ -70,3 +70,8 @@ Route::prefix('display')
         Route::get('month', 'displayMonth')->name('month');
         Route::get('panel', 'displayPanel')->name('panel');
     });
+
+
+    Route::fallback(function () {
+        return redirect()->route('home')->with(['error' => 'Página não encontrada']);
+    });

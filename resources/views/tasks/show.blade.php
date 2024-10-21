@@ -461,14 +461,13 @@
                                 <div id="panelsStayOpen-collapse{{ $key }}" class="accordion-collapse collapse">
 
                                     <div class="accordion-body text-wrap" style="
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    white-space: normal;
-  ">
+                                        overflow-wrap: break-word;
+                                        word-wrap: break-word;
+                                        white-space: normal;
+                                    ">
 
                                         <p class="roboto text-secondary fs-5">{!! $feedback->feedback !!}</p>
 
-                                        {{-- @dd($feedback->attachments->isEmpty()) --}}
 
                                         @if (!$feedback->attachments->isEmpty())
                                             <p><span class="poppins-semibold">Anexos:</span></p>

@@ -221,10 +221,8 @@
                                         <div
                                             class="poppins-regular d-flex align-items-center justify-content-between flex-row">
 
-                                            <div class="mb-3">
-                                                <span class="fs-2">{{ $task->title }}</span> <span
-                                                    class="poppins-extralight fs-4 mx-2">até</span>
-                                                <span class="fs-2">{{ $task->end }}</span>
+                                            <div class="mb-3 ">
+                                                <span class="fs-2">{{ $task->title }}</span>
                                             </div>
 
                                             @if ($task->concluded === 'false')
@@ -248,7 +246,14 @@
                                         </div>
 
                                         <div class="">
-                                            <span class="fs-4 poppins"> {{ $task->title }}</span>
+
+                                            @php
+                                                $recurring = $task->reminder->recurring;
+                                                $recurringmessage = getRecurringMessage($recurring);
+                                            @endphp
+
+                                            <span class="fs-5 poppins"> {!!  $recurringmessage !!}</span>
+
                                         </div>
 
                                     </div>

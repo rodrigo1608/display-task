@@ -212,7 +212,7 @@ class TaskController extends Controller
     public function show(int $id)
     {
 
-        $task = Task::find($id);
+        $task = Task::findOrFail($id);
 
         $userID = auth()->id();
 
@@ -290,7 +290,7 @@ class TaskController extends Controller
     {
         $userID  = auth()->id();
 
-        $task = Task::find($id);
+        $task = Task::findOrFail($id);
 
         $alertOptions = getAlertOptions();
 
@@ -398,7 +398,7 @@ class TaskController extends Controller
 
         $currentUserID = auth()->id();
 
-        $currentTask = Task::find($id);
+        $currentTask = Task::findOrFail($id);
 
         $currentTaskRecurring = $currentTask->reminder->recurring->getAttributes();
 
@@ -480,7 +480,7 @@ class TaskController extends Controller
 
     public function markAsConcluded(int $id)
     {
-        $task =  Task::find($id);
+        $task =  Task::findOrFail($id);
 
         $task->participants()->wherePivot('status', 'pending')->detach();
 

@@ -280,6 +280,22 @@
 
         </div>
 
+        @elseIf(session('error'))
+
+        <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
+
+            <div id="danger-alert" class="row justify-content-center mt-4">
+
+                <div class="alert fs-4 alert-danger p-4 text-center">
+
+                    {{ session('warning') }}
+
+                </div>
+
+            </div>
+
+        </div>
+
         @endif
 
         <script>
