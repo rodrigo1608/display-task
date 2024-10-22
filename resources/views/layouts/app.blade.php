@@ -119,11 +119,25 @@
                                         </a>
                                     </li>
 
-                                    <li class="">
-                                        <a class="dropdown-item" href="{{ route('task.create') }}">
-                                            Tarefa
-                                        </a>
-                                    </li>
+                                    @if(auth()->user()->super === 'true')
+
+                                        <!-- Button trigger modal -->
+                                        <button type="button" class="btn ms-1 btn-primary border-0 text-start rounded-0 w-100" data-bs-toggle="modal" data-bs-target="#assign-task-modal">
+                                             Tarefa
+                                        </button>
+
+                                    @else
+
+                                        <li class="">
+
+                                            <a class="dropdown-item" href="{{ route('task.create', ['user' => $user->id]) }}">
+                                                Tarefa
+                                            </a>
+
+                                        </li>
+
+                                    @endif
+
                                 </ul>
 
                             </div>
@@ -247,6 +261,63 @@
             </div>
 
         </nav>
+
+        <!-- Modal Atribuir trefa-->
+        <div class="modal fade" id="assign-task-modal" tabindex="-1" aria-labelledby="assign-task-modal" aria-hidden="true">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h1 class="modal-title fs-5" id="assign-task-modal-label">Atribuir Tarefa</h1>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    </div>
+
+                    <div class="modal-body d-flex flex-column align-items-start">
+
+                        <a class="user-invitation" href="{{ route('task.create', ['user' => $user->id])}}" >
+                            <div class="rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                            style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $user->color }}"
+                            title="{{ $user->name }} {{ $user->lastname }}">
+
+                            <img class="w-100" src="{{ asset('storage/' . $user->profile_picture) }}"
+                                alt="Imagem do usuário">
+
+                        </div>
+
+                        <span class=" text-dark">
+                           Para mim
+                        </span>
+
+                        </a>
+
+                        @foreach ( $allUsers as $user )
+
+                            <a class="user-invitation" href="{{ route('task.create', ['user' => $user->id])}}">
+
+                                <div class="rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
+                                    style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $user->color }}"
+                                    title="{{ $user->name }} {{ $user->lastname }}">
+
+                                    <img class="w-100" src="{{ asset('storage/' . $user->profile_picture) }}"
+                                        alt="Imagem do usuário">
+
+                                </div>
+                                <span class=" text-dark">
+                                    {{ $user->email}}
+                                </span>
+                            </a>
+
+                        @endforeach
+                    </div>
+
+                </div>
+            </div>
+        </div>
 
         @if (session('success'))
 

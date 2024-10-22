@@ -35,6 +35,7 @@
                                 <a class="btn btn-primary" href="{{ route('home') }}">voltar</a>
 
                                 <button type="submit" class="btn btn-secondary">Salvar lembrete</button>
+
                             </div>
 
                         </form>

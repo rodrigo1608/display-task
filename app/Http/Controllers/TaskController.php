@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\Participant;
 use App\Models\Recurring;
 use App\Models\Reminder;
+use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
@@ -32,8 +33,9 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
+        $userID = $request->query('user');
 
         $alertOptions = getAlertOptions();
 

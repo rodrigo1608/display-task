@@ -26,23 +26,27 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts/app', function ($view) {
 
             $user = Auth::user();
+            $userID = null;
+            $pendingTasks = collect();
+            $allUsers = collect();
 
             if ($user) {
 
                 $userID = $user->id;
+
+                $allUsers = User::where('id', '!=', $user->id)->get();
 
                 $pendingTasks = Task::with('durations')->whereHas('participants', function ($query) use ($userID) {
                     $query->where('concluded', 'false')
                         ->where('user_id', $userID)
                         ->where('status', 'pending');
                 })->get();
-            } else {
 
-                $userID = null;
-                $pendingTasks = collect();
             }
 
             $view->with('user', $user);
+
+            $view->with('allUsers', $allUsers);
 
             $view->with('pendingTasks',   $pendingTasks);
         });
