@@ -39,9 +39,9 @@ class TaskController extends Controller
 
         $alertOptions = getAlertOptions();
 
-        $participants = User::where('id', '!=', auth()->id())->get();
+        $participants = User::where('id', '!=', $userID)->get();
 
-        return view('tasks/create', compact('alertOptions', 'participants'));
+        return view('tasks/create', compact('alertOptions', 'participants', 'userID'));
     }
 
     /**
@@ -50,7 +50,7 @@ class TaskController extends Controller
     public function store(StoreTaskRequest $request)
     {
 
-        $currentUserID = auth()->id();
+        $currentUserID = $request->userID;
 
         $recurrencePatterns = getRecurrencePatterns($request->all());
 
@@ -65,8 +65,11 @@ class TaskController extends Controller
             $conflict = getConflictingTask($request->all(), 'specific_date');
 
             if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+
                 return $conflict;
+
             }
+
         } else {
 
             foreach (array_keys($recurrencePatterns) as $pattern) {
@@ -74,7 +77,9 @@ class TaskController extends Controller
                 $conflict = getConflictingTask($request,  $pattern);
 
                 if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
+
                     return $conflict;
+
                 }
             }
         }
@@ -164,7 +169,7 @@ class TaskController extends Controller
             'start' => $request->start,
             'end' => $request->end,
             'task_id' => $task->id,
-            'user_id' => auth()->id(),
+            'user_id' => $task->created_by,
 
         ]);
 
@@ -187,7 +192,6 @@ class TaskController extends Controller
 
         }
 
-
         $duration->save();
 
         $participantsEmails = getParticipantsEmail($request);
@@ -203,9 +207,10 @@ class TaskController extends Controller
             SendInvitationEmail::dispatch($participantsEmails, $task, $creatorName);
         }
 
-        $feedbacks = Feedback::all();
+        // $isForMe =  $task->created_by->id === auth()->id();
 
         return redirect()->route('task.show',['task'=> $task->id ])->with('success', 'Tarefa criada com sucesso!');
+
     }
 
     /**
@@ -216,23 +221,23 @@ class TaskController extends Controller
 
         $task = Task::findOrFail($id);
 
-        $userID = auth()->id();
+        $createdBy = User::findOrFail($task->created_by);
+
+        $createdByID =  $createdBy ->id;
 
         $taskID = $task->id;
 
         $possibleParticipants = User::whereDoesntHave('participatingTasks', function ($query) use ($taskID) {
             $query->where('task_id', $taskID);
-        })->where('id', '!=', $userID)->get();
+        })->where('id', '!=', $createdByID)->get();
 
         if (isset($task)) {
 
             $view = request()->query('view', 'default');
 
-            $createdBy =  $task->creator;
-
             $task->creator_name = $createdBy->name . ' ' . $createdBy->lastname;
 
-            $task->is_creator = $createdBy->id === $userID;
+            $task->is_creator = $createdBy->id === auth()->id();
 
             $task->creator_email = $createdBy->email;
 
@@ -240,7 +245,7 @@ class TaskController extends Controller
 
             $task->attachments = $task->feedbacks->first()->attachments->all();
 
-            $duration = getDuration($task, $task->created_by);
+            $duration = getDuration($task);
 
             $task->start = date('H:i', strtotime($duration->start));
 
@@ -254,7 +259,7 @@ class TaskController extends Controller
 
             $hasSpecificDate = filled($task->reminder->recurring->specific_date);
 
-            $expiredTask = getDuration($task)->status === 'finished';
+            $expiredTask = $duration->status === 'finished';
 
             $task->shoudDisplayButton = !($hasSpecificDate && $expiredTask);
 

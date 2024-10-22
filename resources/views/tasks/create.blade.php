@@ -22,6 +22,8 @@
                             <form method="POST" action="{{ route('task.store') }}" enctype="multipart/form-data">
                                 @csrf
 
+                                <input type="hidden" name="userID" value="{{$userID}}">
+
                                 <div class="row mt-2">
 
                                     <div class="col-9 d-flex">
@@ -193,7 +195,7 @@
 
                                         <h1></h1>
 
-                                        <div class="accordion accordion-flush" id="accordionFlushExample">
+                                        <div class="accordion accordion-flush" id="conflicting-accordion">
 
                                             <div class="accordion-item">
 
@@ -208,7 +210,7 @@
                                                 </h2>
 
                                                 <div id="flush-collapseOne" class="accordion-collapse collapse"
-                                                    data-bs-parent="#accordionFlushExample">
+                                                    data-bs-parent="#conflicting-accordion">
 
                                                     <div class="accordion-body">
                                                         <p class=""><span class="poppins-semibold">Tarefa
@@ -280,7 +282,7 @@
 
                                     <div class="col-md-6 mt-3">
 
-                                        <div class="accordion" id="accordionPanelsStayOpenExample">
+                                        <div class="accordion" id="pre-defined schedule-accordion">
 
                                             <div class="accordion-item">
 
@@ -398,7 +400,6 @@
 
                                     {{-- botão de voltar --}}
                                     <a class="btn btn-primary me-3 py-2" href="{{ route('home') }}"  aria-label="Voltar para a pagina inicial">
-
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             fill="none" viewBox="0 0 24 24" stroke-width="1.8"
                                             stroke="currentColor" class="size-6">
@@ -444,12 +445,14 @@
 
                                     <div>
                                         @if ($participants->isNotEmpty())
+
                                             <button id="participants-button" type="button"
                                                 class="btn btn-primary me-3" data-bs-toggle="modal"
                                                 data-bs-target="#participantsModal">
                                                 Adicionar participantes
                                                 <span id="participantCounterDisplay"></span>
                                             </button>
+
                                         @endif
 
                                         <!-- Modal -->

@@ -1149,6 +1149,7 @@ if (!function_exists('getDuration')) {
 
     function getDuration($task)
     {
+
         return $task->durations()->where('user_id',  $task->created_by)->where('task_id', $task->id)->first();
     }
 }

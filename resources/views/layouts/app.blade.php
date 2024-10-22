@@ -122,7 +122,15 @@
                                     @if(auth()->user()->super === 'true')
 
                                         <!-- Button trigger modal -->
-                                        <button type="button" class="btn ms-1 btn-primary border-0 text-start rounded-0 w-100" data-bs-toggle="modal" data-bs-target="#assign-task-modal">
+                                        <button type="button" class="
+                                            btn
+                                            border-0
+                                            text-start
+                                            rounded-0
+                                            dropdown-item
+                                            w-100
+                                        "
+                                        data-bs-toggle="modal" data-bs-target="#assign-task-modal">
                                              Tarefa
                                         </button>
 
@@ -261,7 +269,7 @@
             </div>
 
         </nav>
-
+        @if(isset($user))
         <!-- Modal Atribuir trefa-->
         <div class="modal fade" id="assign-task-modal" tabindex="-1" aria-labelledby="assign-task-modal" aria-hidden="true">
 
@@ -280,44 +288,51 @@
                     <div class="modal-body d-flex flex-column align-items-start">
 
                         <a class="user-invitation" href="{{ route('task.create', ['user' => $user->id])}}" >
+
                             <div class="rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
-                            style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $user->color }}"
-                            title="{{ $user->name }} {{ $user->lastname }}">
+                                style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $user->color }}"
+                                title="{{ $user->name }} {{ $user->lastname }}">
 
-                            <img class="w-100" src="{{ asset('storage/' . $user->profile_picture) }}"
-                                alt="Imagem do usuário">
+                                <img class="w-100" src="{{ asset('storage/' . $user->profile_picture) }}"
+                                    alt="Imagem do usuário">
 
-                        </div>
+                            </div>
 
-                        <span class=" text-dark">
-                           Para mim
-                        </span>
+                            <span class=" text-dark">
+                                Para mim
+                            </span>
 
                         </a>
 
-                        @foreach ( $allUsers as $user )
 
-                            <a class="user-invitation" href="{{ route('task.create', ['user' => $user->id])}}">
+                        @foreach ( $allUsers as $invitationUser )
+
+                            <a class="user-invitation" href="{{ route('task.create', ['user' => $invitationUser->id])}}">
 
                                 <div class="rounded-circle d-flex justify-content-center align-items-center overflow-hidden"
-                                    style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $user->color }}"
-                                    title="{{ $user->name }} {{ $user->lastname }}">
+                                    style="max-width:3em; min-width:3em; max-height:3em; min-height:3em; border:solid 0.20em {{ $invitationUser->color }}"
+                                    title="{{ $invitationUser->name }} {{ $invitationUser->lastname }}">
 
-                                    <img class="w-100" src="{{ asset('storage/' . $user->profile_picture) }}"
+                                    <img class="w-100" src="{{ asset('storage/' . $invitationUser->profile_picture) }}"
                                         alt="Imagem do usuário">
 
                                 </div>
+
                                 <span class=" text-dark">
-                                    {{ $user->email}}
+                                    {{ $invitationUser->email}}
                                 </span>
+
                             </a>
 
                         @endforeach
+
                     </div>
 
                 </div>
             </div>
         </div>
+
+        @endif
 
         @if (session('success'))
 
@@ -391,7 +406,7 @@
         </script>
 
         @if (Auth::check())
-            <div class="offcanvas border-start-0 rounded-end offcanvas-start border border-2 border-black ps-2"
+            <div class="offcanvas border-start-0 rounded-end offcanvas-start ps-2"
                 data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
                 aria-labelledby="offcanvasWithBothOptionsLabel">
 

@@ -77,9 +77,14 @@ class UserController extends Controller
 
         $user->telephone = $request->input('telephone');
 
-        if ($request->has('profile_picture')) {
+        $hasProfilePicture = isset($user->profile_picture);
 
-            Storage::delete($user->profile_picture);
+        if ($request->has('profile_picture') ) {
+
+            if ($hasProfilePicture ) {
+
+                Storage::delete($user->profile_picture);
+            }
 
             $profilePicturePath = getProfilePicturePath($request->profile_picture, $request->email) ?? null;
 

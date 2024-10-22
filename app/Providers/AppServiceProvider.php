@@ -34,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
 
                 $userID = $user->id;
 
-                $allUsers = User::where('id', '!=', $user->id)->get();
+                $allUsers = User::where('id', '!=',  $userID)->get();
 
                 $pendingTasks = Task::with('durations')->whereHas('participants', function ($query) use ($userID) {
                     $query->where('concluded', 'false')
