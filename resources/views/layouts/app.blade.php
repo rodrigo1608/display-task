@@ -374,7 +374,7 @@
 
                 <div class="alert fs-4 alert-danger p-4 text-center">
 
-                    {{ session('warning') }}
+                    {{ session('error') }}
 
                 </div>
 

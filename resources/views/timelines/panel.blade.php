@@ -40,7 +40,6 @@
 
         <div class="row d-flex align-items-center mt-5">
 
-            {{-- botão de offcanvas --}}
 
             <div class="col-md-2">
 
@@ -134,6 +133,12 @@
 
                         $tasks = getTasksByStartTime($blockTime, $now);
 
+                        $publicTasks  = $tasks->filter(function($task){
+
+                            return $task->visibility === 'public';
+
+                        });
+
                         $endBlockTime = $startBlockTime->copy()->addHour()->subSecond();
 
                         $shouldDisplayTimeMarker = $now->between($startBlockTime, $endBlockTime);
@@ -167,6 +172,7 @@
                         @endif
 
                         @if ($i >= 1)
+
                             <time id="block-time" class="fs-5 poppins"
                                 style="
                                 color:#4F4F4F;
@@ -176,9 +182,11 @@
                             ">
                                 {{ $blockTime }}
                             </time>
+
                         @endif
 
-                        @foreach ($tasks as $index => $task)
+                        @foreach ($publicTasks  as $index => $task)
+
                             @php
 
                                 $previousTask = $index > 0 ? $tasks[$index - 1] : null;
@@ -198,6 +206,7 @@
                                 $overlap = false;
 
                                 if ($previousTask !== null) {
+
                                     $previousDuration = getDuration($previousTask);
 
                                     $previousStart = getCarbonTime($previousDuration->start);

@@ -21,6 +21,8 @@ class Task extends Model
 
         'created_by',
 
+        'visibility',
+
     ];
 
     // Função de relacionamento

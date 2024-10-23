@@ -33,6 +33,7 @@ class TaskController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
     public function create(Request $request)
     {
         $userID = $request->query('user');
@@ -91,6 +92,8 @@ class TaskController extends Controller
             'local' => $request->local ?? null,
 
             'created_by' => $currentUserID,
+
+            'visibility' => $request->visibility,
         ]);
 
         $reminder = Reminder::create([
@@ -238,6 +241,10 @@ class TaskController extends Controller
             $task->creator_name = $createdBy->name . ' ' . $createdBy->lastname;
 
             $task->is_creator = $createdBy->id === auth()->id();
+
+            $task->is_participant = $task->participants()->where(function($query){
+                $query->where('user_id',auth()->id())->where('status','accepteds');
+            })->exists();
 
             $task->creator_email = $createdBy->email;
 

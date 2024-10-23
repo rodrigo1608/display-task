@@ -10,6 +10,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RegisterInvitationController;
 use App\Http\Middleware\InvitationAccessMiddleware;
+use App\Http\Middleware\TaskVisibilityMiddleware;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -23,7 +24,6 @@ Route::get('/', function () {
     return redirect()->route('home');
 });
 
-// middleware([InvitationAccessMiddleware::class])
 
 Route::middleware([InvitationAccessMiddleware::class])->prefix('invitation')->group(function () {
     Route::get('/', [RegisterInvitationController::class, 'index'])->name('invitation');
@@ -37,6 +37,7 @@ Route::get('home', [HomeController::class, 'index'])->name('home');
 Route::resource('reminder', ReminderController::class);
 
 Route::resource('task', TaskController::class);
+
 Route::put('task/{task}/accept-pending-task', [TaskController::class, 'acceptPendingTask'])->name('task.acceptPendingTask');
 Route::post('task/{id}/mark-as-concluded', [TaskController::class, 'markAsConcluded'])->name('task.markAsConcluded');
 

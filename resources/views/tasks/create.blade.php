@@ -394,6 +394,8 @@
 
                             </div>
 
+                            {{-- Container dos botões de baixo --}}
+
                             <div class="d-flex justify-content-between align-items-center mt-4">
 
                                 <div class>
@@ -418,7 +420,9 @@
                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                 d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" />
                                         </svg>
+
                                         <span id="imageCountDisplay"></span>
+
                                     </label>
 
                                     <input id="task_attachments" name="task_attachments[]" type="file"
@@ -440,6 +444,66 @@
                                     </script>
 
                                 </div>
+
+                                     {{--Grupo dos botões de visibilidade  --}}
+
+                                        <div class="d-flex ">
+
+                                            <div class="form-check start py-1 px-3 p-0"
+
+                                            style="  border-top-left-radius: 50px;
+                                                    border-bottom-left-radius: 50px;"
+                                                >
+                                                <input class="form-check-input d-none" type="radio" name="visibility" id="flexRadioDefault1" data-visibility  value="public" checked>
+                                                <label class="form-check-label fs-6 m-0 p-0" for="flexRadioDefault1">Público</label>
+                                            </div>
+
+                                            <div class="form-check  py-1 px-3"
+                                            style="  border-top-right-radius: 50px;
+                                                    border-bottom-right-radius: 50px;">
+                                                <input class="form-check-input d-none" type="radio" name="visibility" id="flexRadioDefault2" value="private"  data-visibility>
+                                                <label class="form-check-label fs-6 m-0 p-0" for="flexRadioDefault2">Privado</label>
+                                            </div>
+                                        </div>
+
+                                     <script>
+
+                                        document.addEventListener('DOMContentLoaded',function(){
+
+                                            const visibilityRadios = document.querySelectorAll('[data-visibility]');
+
+                                            const updateCheckedRadioStyle = () => {
+
+                                                visibilityRadios.forEach(radio => {
+
+                                                    const radioParent  = radio.closest('.form-check');
+
+                                                    if(radio.checked){
+
+                                                        radioParent.classList.remove("btn-primary");
+                                                        radioParent.classList.add("btn-secondary");
+
+                                                    }else{
+                                                        radioParent.classList.remove("btn-secondary");
+                                                        radioParent.classList.add("btn-primary");
+                                                    }
+
+                                                });
+
+                                            }
+
+                                            updateCheckedRadioStyle();
+
+                                            visibilityRadios.forEach(radio => {
+
+                                                radio.addEventListener('change',updateCheckedRadioStyle);
+
+                                            });
+
+                                        });
+
+
+                                     </script>
 
                                 <div class="d-flex justify-content-between">
 
@@ -654,8 +718,6 @@
             const setTaskLabelFromInputDate = () => {
 
                 const selectedDate = new Date(inputDate.value + "T00:00:00");
-
-                console.log(selectedDate);
 
                 if (isNaN(selectedDate.getTime())) {
 

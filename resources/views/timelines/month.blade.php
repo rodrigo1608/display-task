@@ -8,7 +8,7 @@
             action="{{ route('display.month') }}" method="GET">
 
             <div class="d-flex align-items-center gap-1">
-                <div  border border-2 rounded>
+                <div    >
                     @php
 
                         $currentMonthInEN = getCarbonNow()->format('F');
