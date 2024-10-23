@@ -21,6 +21,8 @@ return new class extends Migration
 
             $table->enum('concluded', ['true', 'false'])->default('false');
 
+            $table->enum('visibility', ['public', 'private'])->default('public');
+
             $table->timestamps();
 
             $table->unsignedBigInteger('created_by');
