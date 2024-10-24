@@ -321,7 +321,6 @@
 
                     // $alertOptions = ['half_an_hour_before', 'one_hour_before', 'two_hours_before', 'one_day_earlier'];
 
-
                     foreach ($alertOptions as $alertIndex => $alertValue) {
 
                         if ($errors->has($alertIndex)) {
@@ -370,11 +369,6 @@
                                 específico
                             </p>
                         </div>
-
-                        {{-- <div class="col-4 ms-4">
-                            <p class="roboto m-0">
-                            </p>
-                        </div> --}}
 
                     @endif
                 </div>
@@ -519,6 +513,8 @@
         </a>
 
     </div>
+
+    {{-- Modal de rejeitar tarefa --}}
 
     <div class="modal fade" id="deleteParticipantModal" tabindex="-1" aria-labelledby="deleteParticipantModalLabel"
         aria-hidden="true">

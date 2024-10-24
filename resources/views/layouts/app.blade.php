@@ -336,13 +336,17 @@
 
         @if (session('success'))
 
-            <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
+            <div style="position:fixed; left:50%; top:15%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
 
                 <div id="success-alert" class="row justify-content-center mt-4">
 
-                    <div class="alert alert-success fs-4 p-4 text-center">
+                    <div class="alert alert-success d-flex align-items-center gap-2 fs-4 p-4 text-center">
 
-                        {{ session('success') }}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-6 border border-success  border-3 p-1 rounded-circle" width="2em">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                          </svg>
+
+                        <span>{{ session('success') }}</span>
 
                     </div>
 
@@ -352,13 +356,19 @@
 
         @elseIf (session('warning'))
 
-        <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
+
+        <div style="position:fixed; left:50%; top:15%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
 
             <div id="warning-alert" class="row justify-content-center mt-4">
 
                 <div class="alert fs-4 alert-warning p-4 text-center">
 
-                    {{ session('warning') }}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" width="2em">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                      </svg>
+
+
+                      <span> {{ session('warning') }}</span>
 
                 </div>
 
@@ -368,13 +378,18 @@
 
         @elseIf(session('error'))
 
-        <div style="position:fixed; left:50%; top:10%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
+        <div style="position:fixed; left:50%; top:15%; transform: translate(-50%, -50%); z-index: 2;"  data-alert>
 
             <div id="danger-alert" class="row justify-content-center mt-4">
 
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" width="2em">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+                  </svg>
+
                 <div class="alert fs-4 alert-danger p-4 text-center">
 
-                    {{ session('error') }}
+                    <span>  {{ session('error') }} </span>
 
                 </div>
 
@@ -387,8 +402,10 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
 
-                const alertBox = document.querySelector('[data-alert]');
+               const alertBox = document.querySelector('[data-alert]');
+
                 if (alertBox) {
+
                     setTimeout(() => {
 
                         alertBox.style.transition = 'opacity 1s';

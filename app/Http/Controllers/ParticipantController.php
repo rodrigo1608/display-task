@@ -54,6 +54,6 @@ class ParticipantController extends Controller
         $creator = $participant->task->creator->name . " " . $participant->task->creator->lastname;
         $taskTitle = $participant->task->title;
 
-        return redirect()->route('display.day')->with('warning', "Você recusou o convite de  $creator  para participar da tarerfa $taskTitle.");
+        return redirect()->route('home')->with('warning', "Você recusou o convite de  $creator  para participar da tarerfa $taskTitle.");
     }
 }

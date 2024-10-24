@@ -1,14 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
+@php
 
-    @if (!$task->is_participant)
+    $canNotViewTask = auth()->id() !== $task->created_by && !$task->is_participant;
 
-    <div class="alert alert-info fs-4 text-center">
-        Para acessar esta tarefa, é necessário que você esteja participando dela.
+@endphp
+
+@if ($canNotViewTask )
+
+    <div class="container">
+
+        <div id="warning-alert" class="row justify-content-center mt-4 ">
+
+            <div class="alert fs-4 alert-info p-4 text-center shadow">
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" width="2em">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+
+                <span>  Para acessar esta tarefa, é necessário que você esteja participando dela.</span>
+
+            </div>
+
+        </div>
+
     </div>
 
-    @else
+ @else
+
     <div class="container-fluid pt-5" style="background-color:#F2F2F2; height:94vh; overflow:auto ">
 
         <div class="w-50 container mt-5 rounded bg-white ps-4">
@@ -37,6 +57,7 @@
 
             </div>
 
+            {{-- Título da tarefa e label de duração da tarefa container --}}
             <div class="row mb-5 p-0">
 
                 <div class="col-10 d-flex align-items-center flex-row">
@@ -79,6 +100,7 @@
 
             </div>
 
+            {{-- Descrição da tarefa container --}}
             <div class="row pb-2">
 
                 <div class="col-md-10">
@@ -89,11 +111,14 @@
 
             </div>
 
+            {{-- Body com informações detalhadas sobre a tarefa --}}
+
             <div class="fs-5 collapse pb-3" id="collapseDetails">
 
                 <div class="row">
 
-                    @if (!$task->isConcluded)
+                @if (!$task->isConcluded)
+
                         <div class="border-top mb-2 mt-4 border-2">
 
                             <div class="d-flex align-items-center mt-3 flex-row">
@@ -131,6 +156,7 @@
                         </div>
                     @endif
 
+                    {{-- Ícone de localização --}}
                     <div class="mt-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             width="1.3em" stroke="currentColor" class="size-6">
@@ -143,15 +169,11 @@
                         <span class="roboto-light ms-3"> {{ $task->local }}</span>
                     </div>
 
+                    {{-- Cartão do autor --}}
                     <p class="roboto mb-0 mt-3">Autor</p>
 
-                    <div class="card"
-                        style="
-                            max-width: 50%;
-                            min-width:50%;
-                            border: 1px solid lightgrey;
-                            box-shadow: none;
-                        ">
+                    <div class="rounded"
+                        style="background-color:#f9f9f9;">
 
                         <div class="row g-0">
 
@@ -167,17 +189,33 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-8">
+                            <div class="col">
 
-                                <div class="card-body">
+                                <div class="py-2">
 
-                                    <div class="d-flex fs-6 flex-column">
-                                        <h5 class="card-title">{{ $task->creator_name }}</h5>
+                                    <div class="d-inline-flex fs-6 flex-column">
 
-                                        <span class="roboto-light mx-3 my-1">{{ $task->creator_email }}</span>
+                                        <h5  class="card-title">{{ $task->creator_name }}</h5>
 
-                                        <span
-                                            class="roboto-light mx-3 my-1">{{ getFormatedTelephone($task->creator) }}</span>
+                                        {{-- Label do email --}}
+                                     <div class="mx-3 my-1 border px-2 py-1 gap-1 rounded-pill d-inline-flex justify-content-between" style="background-color:#f9f9f9" title="Copiar e-mail para a área de transferência">
+                                        <span id="user-email" class="roboto-light ">{{ $task->creator_email }}</span>
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" width="1.2em">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                                          </svg>
+                                     </div>
+
+                                        {{-- Label do telefone --}}
+                                     <div class="mx-3 my-1 border p-1 px-2 py-1 d-inline-flex justify-content-between align-item-center rounded-pill" style="background-color:#f9f9f9" title="Copiar telefone para a área de transferência">
+
+                                        <span id="user-email" class="roboto-light ">{{ getFormatedTelephone($task->creator) }}</span>
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6" width="1.2em">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                                          </svg>
+                                     </div>
+
                                     </div>
 
                                 </div>
@@ -300,6 +338,7 @@
         <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
 
             {{-- botão de voltar --}}
+
             <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
                 title="voltar">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"

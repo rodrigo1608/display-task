@@ -1377,7 +1377,6 @@ if (!function_exists('getPaneldateLabel')) {
         $panelLabel = "";
 
         $day = getCarbonNow();
-        $day = getCarbonDate('1-02-2025');
 
         $weekdayInPortuguese = getDayOfWeek($day, 'pt-br');
 
@@ -1387,7 +1386,7 @@ if (!function_exists('getPaneldateLabel')) {
 
             $formatedDate = getFormatedDateBR($day);
 
-            $panelLabel = "<span class='fs-4'>" . ucfirst($weekdayInPortuguese) . ". </span> "  . $formatedDate;
+            $panelLabel = "<span class='fs-4'>" . ucfirst($weekdayInPortuguese) . ", </span> "  . $formatedDate;
         }
 
         return $panelLabel;

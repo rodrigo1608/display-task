@@ -243,7 +243,9 @@ class TaskController extends Controller
             $task->is_creator = $createdBy->id === auth()->id();
 
             $task->is_participant = $task->participants()->where(function($query){
-                $query->where('user_id',auth()->id())->where('status','accepteds');
+
+                $query->where('user_id', auth()->id())->where('status','accepted');
+
             })->exists();
 
             $task->creator_email = $createdBy->email;
