@@ -109,11 +109,26 @@ body,
     background-color: rgb(222, 222, 222);
 }
 
+.clipboradLabel {
+    border: 1px lightgrey solid;
+    padding: 0.25rem 0.5rem;
+    border-radius: 50rem;
+    display: inline-flex;
+    justify-content: space-between;
+    background-color: #f7f9f9;
+    cursor: pointer;
+}
+
+// .clipboradLabel:hover {
+//     color: black;
+//     background-color: #f0f3f4;
+//     font-weight: 500;
+// }
+
 .btn-primary:active {
     border: 2px solid black !important;
     color: white !important;
     background-color: black !important;
-
 }
 
 .btn-primary:focus {
@@ -353,7 +368,8 @@ body,
 }
 
 .user-invitation {
-    border: 1px lightgrey solid; /* Substitua por sua regra de borda específica, se necessário */
+    border: 1px lightgrey solid;
+    /* Substitua por sua regra de borda específica, se necessário */
     text-decoration: none;
     display: flex;
     align-items: center;
