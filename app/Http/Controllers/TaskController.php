@@ -68,9 +68,7 @@ class TaskController extends Controller
             if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
 
                 return $conflict;
-
             }
-
         } else {
 
             foreach (array_keys($recurrencePatterns) as $pattern) {
@@ -80,7 +78,6 @@ class TaskController extends Controller
                 if ($conflict instanceof \Illuminate\Http\RedirectResponse) {
 
                     return $conflict;
-
                 }
             }
         }
@@ -176,7 +173,7 @@ class TaskController extends Controller
 
         ]);
 
-        if($hasRecurrenceToday){
+        if ($hasRecurrenceToday) {
 
             $duration->status = match (true) {
 
@@ -188,11 +185,9 @@ class TaskController extends Controller
 
                 default => $duration->status,
             };
-
-        }else{
+        } else {
 
             $duration->status = 'starting';
-
         }
 
         $duration->save();
@@ -212,8 +207,7 @@ class TaskController extends Controller
 
         // $isForMe =  $task->created_by->id === auth()->id();
 
-        return redirect()->route('task.show',['task'=> $task->id ])->with('success', 'Tarefa criada com sucesso!');
-
+        return redirect()->route('task.show', ['task' => $task->id])->with('success', 'Tarefa criada com sucesso!');
     }
 
     /**
@@ -226,7 +220,7 @@ class TaskController extends Controller
 
         $createdBy = User::findOrFail($task->created_by);
 
-        $createdByID =  $createdBy ->id;
+        $createdByID =  $createdBy->id;
 
         $taskID = $task->id;
 
@@ -242,10 +236,9 @@ class TaskController extends Controller
 
             $task->is_creator = $createdBy->id === auth()->id();
 
-            $task->is_participant = $task->participants()->where(function($query){
+            $task->is_participant = $task->participants()->where(function ($query) {
 
-                $query->where('user_id', auth()->id())->where('status','accepted');
-
+                $query->where('user_id', auth()->id())->where('status', 'accepted');
             })->exists();
 
             $task->creator_email = $createdBy->email;
@@ -313,7 +306,6 @@ class TaskController extends Controller
         $participants = User::where('id', '!=', auth()->id())->get();
 
         return view('tasks/edit', compact('alertOptions', 'participants', 'task'));
-
     }
 
     /**
