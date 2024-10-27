@@ -12,16 +12,19 @@ Sistema que mostra tarefas na tela! Esta aplicação, construída em **Laravel 1
 - **Alocação de Tempo**: Os usuários podem especificar o tempo dedicado a cada tarefa, com horários de início e fim definidos.
 
 - **Status da Tarefa**: O sistema atualiza automaticamente o status das tarefas com base em seus prazos, alternando entre:
-
+  
   - A Começar
   
   - Em Progresso
   
   - Finalizado
   
-- **Notificações**: Os usuários podem configurar notificações para lembrá-los sobre as tarefas, escolhendo entre horários específicos ou cronogramas predefinidos.
+- **Notificações**: Os usuários podem configurar notificações para lembrá-los sobre as tarefas, escolhendo entre horários específicos ou cronogramas predefinidos. As notificações, por enquanto, chegarão por email.
 
-- **Participantes**: Os usuários têm a capacidade de adicionar participantes às tarefas, facilitando a colaboração e a comunicação.
+- **Lembretes**: Os usuários poderão criar lembretes, que também serão enviados por email para garantir que não percam prazos importantes.
+
+- **Participantes**: Os usuários têm a capacidade de adicionar participantes às tarefas, facilitando a colaboração e a comun
+
 
 ## Começando
 
