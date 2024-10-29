@@ -53,46 +53,45 @@
 
             </div>
 
-            <div class="row  mx-0 p-0" style="max-widht:100%">
+            <div class="row mx-0 p-0" style="max-widht:100%">
 
                 @if (is_array($selectedUserTasks))
 
-                        <div class='col-md-7 pe-3 pb-5 p-0 ' style="height:87vh; overflow:auto">
+                    <div class='col-md-7 p-0 pb-5 pe-3' style="height:87vh; overflow:auto">
 
-                            {{-- Accordion próximas tarefas --}}
+                        {{-- Accordion próximas tarefas --}}
 
-                            <div class="w-100 rounded rounded pb-5 bg-white" id="accordion-next-tasks">
+                        <div class="w-100 rounded rounded bg-white pb-5" id="accordion-next-tasks">
+                            @php
+
+                                $now = getCarbonNow();
+
+                                $todayDayOfWeek = getDayOfWeek($now, 'pt-br');
+
+                                $tomorrowDayOfWeek = getDayOfWeek($now->copy()->addDay(), 'pt-br');
+
+                            @endphp
+
+                            @foreach ($selectedUserTasks as $day => $tasks)
                                 @php
 
-                                    $now = getCarbonNow();
-
-                                    $todayDayOfWeek = getDayOfWeek($now, 'pt-br');
-
-                                    $tomorrowDayOfWeek = getDayOfWeek($now->copy()->addDay(), 'pt-br');
+                                    $isToday = $todayDayOfWeek === $day;
+                                    $isTomorrow = $tomorrowDayOfWeek == $day;
 
                                 @endphp
 
-                                @foreach ($selectedUserTasks as $day => $tasks)
-                                    @php
+                                <span class="text-secondary">
 
-                                        $isToday = $todayDayOfWeek === $day;
-                                        $isTomorrow = $tomorrowDayOfWeek == $day;
+                                    @if ($isToday)
+                                        Hoje
+                                    @elseIf($isTomorrow)
+                                        Amanhã
+                                    @else
+                                        {{ ucfirst($day) }}
+                                    @endif
+                                </span>
 
-                                    @endphp
-
-                                    <span class="text-secondary">
-
-                                        @if ($isToday)
-                                            Hoje
-                                        @elseIf($isTomorrow)
-                                            Amanhã
-                                        @else
-                                            {{ ucfirst($day) }}
-                                        @endif
-                                    </span>
-
-                                    @foreach ($tasks as $index => $task)
-
+                                @foreach ($tasks as $index => $task)
                                     @php
 
                                     @endphp
@@ -103,7 +102,7 @@
 
                                             <button class="accordion-button accordion-button-secondary collapsed py-3"
                                                 type="button" data-bs-toggle="collapse"
-                                                data-bs-target="#flush-collapse-{{ $day }}-{{$index}}"
+                                                data-bs-target="#flush-collapse-{{ $day }}-{{ $index }}"
                                                 aria-expanded="false" aria-controls="flush-collapseOne">
 
                                                 <div class="w-100 d-flex flex-column">
@@ -136,9 +135,8 @@
                                                                     'text-danger' => $duration->status === 'finished',
                                                                 ])
                                                                     stroke-width="2" xmlns="http://www.w3.org/2000/svg"
-                                                                    fill="none" viewBox="0 0 24 24"
-                                                                    stroke-width="1.5" class="size-6"
-                                                                    style="width: 1.5em; height: 1.5em;">
+                                                                    fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                                    class="size-6" style="width: 1.5em; height: 1.5em;">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                         d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                                                 </svg>
@@ -160,7 +158,7 @@
 
                                         </h2>
 
-                                        <div id="flush-collapse-{{ $day }}-{{$index}}"
+                                        <div id="flush-collapse-{{ $day }}-{{ $index }}"
                                             class="accordion-collapse fs-5 collapse">
 
                                             <div class="accordion-body mb-4 pb-5"
@@ -173,14 +171,14 @@
                                                 {{-- Link ver tarefa --}}
                                                 <div class="text-end" title="Ver tarefa">
                                                     <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                                        class="btn btn-secondary"><svg
-                                                            xmlns="http://www.w3.org/2000/svg" width="1.5em"
-                                                            height="1.5em" fill="none" viewBox="0 0 24 24"
-                                                            stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                                        class="btn btn-secondary">
+
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="currentColor" class="size-6" width="1.5em">
+                                                            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+                                                            <path fill-rule="evenodd"
+                                                                d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
+                                                                clip-rule="evenodd" />
                                                         </svg>
                                                     </a>
                                                 </div>
@@ -190,210 +188,210 @@
                                         </div>
 
                                     </div>
-
-
-
-                                    @endforeach
-
                                 @endforeach
-            </div>
+                            @endforeach
+                        </div>
 
-        </div>
-    @else
-        <div class='col-md-7 p-0'>
+                    </div>
+                @else
+                    <div class='col-md-7 p-0'>
 
-            {{-- accordion --}}
-            <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
+                        {{-- accordion --}}
+                        <div class="w-100 rounded rounded bg-white" id="accordionFlushExample">
 
-                @if (isset($selectedUserTasks))
+                            @if (isset($selectedUserTasks))
+                                @foreach ($selectedUserTasks as $index => $task)
+                                    <div class="accordion-item px-1 ps-3">
 
-                    @foreach ($selectedUserTasks as $index => $task)
-                        <div class="accordion-item px-1 ps-3">
+                                        <h2 class="accordion-header d-flex">
 
-                            <h2 class="accordion-header d-flex">
+                                            <button class="accordion-button accordion-button-secondary collapsed py-3"
+                                                type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#flush-collapse{{ $index }}" aria-expanded="false"
+                                                aria-controls="flush-collapseOne">
 
-                                <button class="accordion-button accordion-button-secondary collapsed py-3" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#flush-collapse{{ $index }}"
-                                    aria-expanded="false" aria-controls="flush-collapseOne">
+                                                <div class="w-100 d-flex flex-column">
 
-                                    <div class="w-100 d-flex flex-column">
+                                                    <div
+                                                        class="poppins-regular d-flex align-items-center justify-content-between flex-row">
 
-                                        <div
-                                            class="poppins-regular d-flex align-items-center justify-content-between flex-row">
+                                                        <div class="mb-3">
+                                                            <span class="fs-2">{{ $task->title }}</span>
+                                                        </div>
 
-                                            <div class="mb-3 ">
-                                                <span class="fs-2">{{ $task->title }}</span>
-                                            </div>
+                                                        @if ($task->concluded === 'false')
+                                                            <div class="me-3 text-end">
 
-                                            @if ($task->concluded === 'false')
-                                                <div class="me-3 text-end">
+                                                                <svg stroke="currentColor" @class([
+                                                                    'text-success' => $task->status === 'starting',
+                                                                    'text-warning' => $task->status === 'in_progress',
+                                                                    'text-danger' => $task->status === 'finished',
+                                                                ])
+                                                                    stroke-width="2" xmlns="http://www.w3.org/2000/svg"
+                                                                    fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                                                    class="size-6" style="width: 1.5em; height: 1.5em;">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                                        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                                                </svg>
 
-                                                    <svg stroke="currentColor" @class([
-                                                        'text-success' => $task->status === 'starting',
-                                                        'text-warning' => $task->status === 'in_progress',
-                                                        'text-danger' => $task->status === 'finished',
-                                                    ])
-                                                        stroke-width="2" xmlns="http://www.w3.org/2000/svg"
-                                                        fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                                        class="size-6" style="width: 1.5em; height: 1.5em;">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                                    </svg>
+                                                            </div>
+                                                        @endif
+
+                                                    </div>
+
+                                                    <div class="">
+
+                                                        @php
+                                                            $recurring = $task->reminder->recurring;
+                                                            $recurringmessage = getRecurringMessage($recurring);
+                                                        @endphp
+
+                                                        <span class="fs-5 poppins"> {!! $recurringmessage !!}</span>
+
+                                                    </div>
 
                                                 </div>
-                                            @endif
 
-                                        </div>
+                                            </button>
 
-                                        <div class="">
+                                        </h2>
 
-                                            @php
-                                                $recurring = $task->reminder->recurring;
-                                                $recurringmessage = getRecurringMessage($recurring);
-                                            @endphp
+                                        <div id="flush-collapse{{ $index }}"
+                                            class="accordion-collapse fs-5 collapse">
 
-                                            <span class="fs-5 poppins"> {!!  $recurringmessage !!}</span>
+                                            <div class="accordion-body mb-4 pb-5"
+                                                style="border-bottom: solid lightgrey 1px;">
+
+                                                <p class="roboto fs-5 text-secondary w-75 my-4">
+                                                    {{ $task->feedbacks[0]->feedback }}
+                                                </p>
+
+                                                <div class="text-end" title="Ver tarefa">
+
+                                                    {{-- Link ver tarefa --}}
+                                                    <a href="{{ route('task.show', ['task' => $task->id]) }}"
+                                                        title="Ver tarefa" class="btn btn-secondary">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em"
+                                                            height="1.5em" fill="none" viewBox="0 0 24 24"
+                                                            stroke-width="1.5" stroke="currentColor" class="size-6">
+
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36
+                                                            4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577
+                                                            16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+
+                                                        </svg>
+
+                                                    </a>
+                                                </div>
+
+                                            </div>
 
                                         </div>
 
                                     </div>
+                                @endforeach
+                            @endif
 
-                                </button>
+                        </div>
 
-                            </h2>
+                    </div>
 
-                            <div id="flush-collapse{{ $index }}" class="accordion-collapse fs-5 collapse">
+                @endif
 
-                                <div class="accordion-body mb-4 pb-5" style="border-bottom: solid lightgrey 1px;">
+                @if ($isThereAnyReminder)
+                    <div class='col-md-4 offset-1 d-flex align-items-start justify-content-end p-0 ps-5'>
 
-                                    <p class="roboto fs-5 text-secondary w-75 my-4">
-                                        {{ $task->feedbacks[0]->feedback }}
-                                    </p>
+                        <div class="rounded-2 w-100 mb-3 me-2 border p-2">
 
-                                    <div class="text-end" title="Ver tarefa">
+                            <div class="poppins px-1">Lembretes</div>
 
-                                        {{-- Link ver tarefa --}}
-                                        <a href="{{ route('task.show', ['task' => $task->id]) }}"
-                                            title="Ver tarefa" class="btn btn-secondary">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em"
-                                                fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            <div class="rounded">
+
+                                <ul class="roboto text-black" style="list-style-type: circle;">
+                                    @php
+
+                                        $now = getCarbonNow();
+
+                                        $todayDayOfWeek = getDayOfWeek($now, 'pt-br');
+
+                                        $tomorrowDayOfWeek = getDayOfWeek($now->copy()->addDay(), 'pt-br');
+
+                                    @endphp
+
+                                    @foreach ($orderedReminders as $day => $reminders)
+                                        @php
+                                            $isToday = $todayDayOfWeek === $day;
+                                            $isTomorrow = $tomorrowDayOfWeek == $day;
+
+                                        @endphp
+                                        <li class="poppins text-secondary mt-3" style="list-style-type: none;">
+
+                                            @if ($isToday)
+                                                Hoje
+                                            @elseIf($isTomorrow)
+                                                Amanhã
+                                            @else
+                                                {{ ucfirst($day) }}
+                                            @endif
+                                        </li>
+
+                                        @foreach ($reminders as $reminder)
+                                            @php
+
+                                                $notificationTimeInString = $reminder
+                                                    ->notificationTimes()
+                                                    ->where('user_id', auth()->id())
+                                                    ->where('reminder_id', $reminder->id)
+                                                    ->first();
+
+                                                $notificationTime = getCarbonTime(
+                                                    $notificationTimeInString->custom_time,
+                                                );
+
+                                            @endphp
+                                            <li
+                                                class="roboto-light fs-5 @if ($notificationTime->isPast() && $isToday) text-decoration-line-through text-secondary @endif ms-4">
+                                                {{ $reminder->title }} -
+                                                {{ $notificationTime->format('H:i') }}</li>
+                                        @endforeach
+
+                                        @if ($loop->iteration > 3)
+                                        @break
+                                    @endif
+                                @endforeach
+
+                                <div class="d-flex justify-content-end">
+                                    {{-- Link ver todos os lembretes --}}
+                                    <a href="{{ route('reminder.index') }}"
+                                        class="poppins btn-primary fs-6 rounded px-2 py-1 text-black"
+                                        style="text-decoration:none">
+
+                                        <span>
+
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none"
+                                                viewBox="0 0 24 24" width="1.5em" stroke-width="1.2"
                                                 stroke="currentColor" class="size-6">
-
                                                 <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36
-                                                    4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577
-                                                    16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-
+                                                    d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                                             </svg>
 
-                                        </a>
-                                    </div>
+                                        </span>
+
+                                    </a>
 
                                 </div>
 
-                            </div>
-
-                        </div>
-                    @endforeach
-                @endif
-
-            </div>
-
-        </div>
-
-        @endif
-
-        @if ($isThereAnyReminder)
-            <div class='col-md-4 offset-1 d-flex align-items-start justify-content-end p-0 ps-5'>
-
-                <div class="rounded-2 w-100 mb-3 me-2 border p-2">
-
-                    <div class="poppins px-1">Lembretes</div>
-
-                    <div class="rounded">
-
-                        <ul class="roboto text-black" style="list-style-type: circle;">
-                            @php
-
-                                $now = getCarbonNow();
-
-                                $todayDayOfWeek = getDayOfWeek($now, 'pt-br');
-
-                                $tomorrowDayOfWeek = getDayOfWeek($now->copy()->addDay(), 'pt-br');
-
-                            @endphp
-
-                            @foreach ($orderedReminders as $day => $reminders)
-                                @php
-                                    $isToday = $todayDayOfWeek === $day;
-                                    $isTomorrow = $tomorrowDayOfWeek == $day;
-
-                                @endphp
-                                <li class="poppins text-secondary mt-3" style="list-style-type: none;">
-
-                                    @if ($isToday)
-                                        Hoje
-                                    @elseIf($isTomorrow)
-                                        Amanhã
-                                    @else
-                                        {{ ucfirst($day) }}
-                                    @endif
-                                </li>
-
-                                @foreach ($reminders as $reminder)
-                                    @php
-
-                                        $notificationTimeInString = $reminder
-                                            ->notificationTimes()
-                                            ->where('user_id', auth()->id())
-                                            ->where('reminder_id', $reminder->id)
-                                            ->first();
-
-                                        $notificationTime = getCarbonTime($notificationTimeInString->custom_time);
-
-                                    @endphp
-                                    <li
-                                        class="roboto-light fs-5 @if ($notificationTime->isPast() && $isToday) text-decoration-line-through text-secondary @endif ms-4">
-                                        {{ $reminder->title }} -
-                                        {{ $notificationTime->format('H:i') }}</li>
-                                @endforeach
-
-                                @if ($loop->iteration > 3)
-                                @break
-                            @endif
-                        @endforeach
-
-                        <div class="d-flex justify-content-end">
-                            {{-- Link ver todos os lembretes --}}
-                            <a href="{{ route('reminder.index') }}"
-                                class="poppins btn-primary fs-6 rounded px-2 py-1 text-black"
-                                style="text-decoration:none">
-
-                                <span>
-
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                        width="1.5em" stroke-width="1.2" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-                                    </svg>
-
-                                </span>
-
-                            </a>
+                            </ul>
 
                         </div>
 
-                    </ul>
+                    </div>
 
                 </div>
-
-            </div>
+            @endif
 
         </div>
-    @endif
-
-</div>
-@endsection
+    @endsection

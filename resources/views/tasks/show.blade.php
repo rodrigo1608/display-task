@@ -39,7 +39,6 @@
                     {{-- Botão de visualizar detalhes --}}
                     <div class="row px-2 pb-2 pt-4">
 
-
                         <div class="text-end">
 
                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
@@ -583,126 +582,121 @@
                 </div>
             @endif
 
+        @endif
 
-            {{-- Botões voltar e opções --}}
-            <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
+        {{-- Botões voltar e opções --}}
+        <div class="col-md-2 position-fixed" style="bottom: 30px; right: 0;">
 
-                {{-- botão de voltar --}}
+            {{-- botão de voltar --}}
 
-                <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
-                    title="voltar">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
-                    </svg>
-                </a>
+            <a class="btn btn-primary me-3" aria-label="Voltar para a pagina inicial" href="{{ route('home') }}"
+                title="voltar">
 
-                @php
-                    $shoudDisplayTaskOptions = $task->is_creator
-                        ? !$task->isConcluded
-                        : $task->shoudDisplayButton && !$task->isConcluded;
-                @endphp
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                    viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" />
+                </svg>
+            </a>
 
-                @if ($shoudDisplayTaskOptions && !$canNotViewTask)
-                    {{-- Dropdown de opções --}}
-                    <div class="btn-group dropup">
+            @php
+                $shoudDisplayTaskOptions = $task->is_creator
+                    ? !$task->isConcluded
+                    : $task->shoudDisplayButton && !$task->isConcluded;
+            @endphp
+            {{-- botão de opções --}}
+            @if ($shoudDisplayTaskOptions && !$canNotViewTask)
+                {{-- Dropdown de opções --}}
+                <div class="btn-group dropup">
 
-                        <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
-                            aria-expanded="false" title="Visualizar opções da tarefa">
+                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown"
+                        aria-expanded="false" title="Visualizar opções da tarefa">
 
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="32" height="32"
-                                viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="32" height="32"
+                            viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
 
-                        </button>
+                    </button>
 
-                        <ul class="dropdown-menu fs-5 mb-4">
+                    <ul class="dropdown-menu fs-5 mb-4">
 
-                            @if ($task->shoudDisplayButton && $task->created_by === auth()->id())
-                                <li>
-                                    <button id="participants-button" type="button" class="dropdown-item poppins-regular"
-                                        data-bs-toggle="modal" data-bs-target="#participantsModal">
-                                        Adicionar participantes
-                                        <span id="participantCounterDisplay"></span>
-                                    </button>
-                                </li>
-                            @endif
+                        @if ($task->shoudDisplayButton && $task->created_by === auth()->id())
+                            <li>
+                                <button id="participants-button" type="button" class="dropdown-item poppins-regular"
+                                    data-bs-toggle="modal" data-bs-target="#participantsModal">
+                                    Adicionar participantes
+                                    <span id="participantCounterDisplay"></span>
+                                </button>
+                            </li>
+                        @endif
 
-                            @if ($task->shoudDisplayButton)
-                                <li>
-                                    <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
-                                        data-bs-target="#staticBackdrop">
+                        @if ($task->shoudDisplayButton)
+                            <li>
+                                <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
+                                    data-bs-target="#staticBackdrop">
+                                    Criar Feedback
+                                </button>
+                            </li>
+                        @endif
 
-                                        Criar Feedback
+                        @if ($task->is_creator && !$task->isConcluded)
+                            <li>
+                                <a class="dropdown-item poppins-regular" href="{{ route('task.edit', $task->id) }}">
+                                    Editar
+                                </a>
+                            </li>
+                        @endif
 
-                                    </button>
-                                </li>
-                            @endif
+                        @if ($task->is_creator)
+                            @php
+                                $hasSpecificDate = filled($task->reminder->recurring->specific_date);
+                                $expiredTask = getDuration($task)->status === 'finished';
+                            @endphp
 
-                            @if ($task->is_creator && !$task->isConcluded)
-                                <li>
-                                    <a class="dropdown-item poppins-regular"
-                                        href="{{ route('task.edit', $task->id) }}">Editar</a>
-                                </li>
-                            @endif
+                            <script>
+                                const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
 
-                            @if ($task->is_creator)
-                                @php
-                                    $hasSpecificDate = filled($task->reminder->recurring->specific_date);
-                                    $expiredTask = getDuration($task)->status === 'finished';
-                                @endphp
+                                const participantCounterDisplay = document.getElementById('participantCounterDisplay');
 
-                                <script>
-                                    const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+                                function updateParticipantCounter() {
 
-                                    const participantCounterDisplay = document.getElementById('participantCounterDisplay');
+                                    const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
+                                    const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
 
-                                    function updateParticipantCounter() {
+                                    const checkedCounter = checkedParticipants.length;
 
-                                        const participantsCheckBoxesInArray = Array.from(participantCheckboxes);
-                                        const checkedParticipants = participantsCheckBoxesInArray.filter(checkbox => checkbox.checked);
+                                    const hasAnyParticipant = checkedCounter > 0;
 
-                                        const checkedCounter = checkedParticipants.length;
-
-                                        const hasAnyParticipant = checkedCounter > 0;
-
-                                        if (hasAnyParticipant) {
-                                            participantCounterDisplay.innerText = '(' + checkedCounter + ')';
-                                        } else {
-                                            participantCounterDisplay.innerText = '';
-                                        }
+                                    if (hasAnyParticipant) {
+                                        participantCounterDisplay.innerText = '(' + checkedCounter + ')';
+                                    } else {
+                                        participantCounterDisplay.innerText = '';
                                     }
+                                }
 
-                                    // updateParticipantCounter();
+                                participantCheckboxes.forEach(
+                                    participantCheckbox => participantCheckbox.addEventListener('change', () =>
+                                        updateParticipantCounter()));
 
-                                    participantCheckboxes.forEach(
-                                        participantCheckbox => participantCheckbox.addEventListener('change', () =>
-                                            updateParticipantCounter()));
+                                updateParticipantCounter();
+                            </script>
 
-                                    updateParticipantCounter();
-                                </script>
+                            <!-- Button trigger modal -->
+                            <li>
+                                <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
+                                    data-bs-target="#completeTaskModal">
+                                    Marcar como concluída
+                                </button>
+                            </li>
+                        @endif
 
-                                <!-- Button trigger modal -->
+                    </ul>
 
-                                <li>
-                                    <button type="button" class="dropdown-item poppins-regular" data-bs-toggle="modal"
-                                        data-bs-target="#completeTaskModal">
-                                        Marcar como concluída
-                                    </button>
+                </div>
+            @endif
 
-                                </li>
-                            @endif
-
-                        </ul>
-
-                    </div>
-                @endif
-
-            </div>
-
+        </div>
     </div>
 
 
@@ -750,6 +744,7 @@
                     </div>
 
                     <div class="modal-body">
+
                         @if ($possibleParticipants->isNotEmpty())
                             @foreach ($possibleParticipants as $index => $possibleParticipant)
                                 <div class="list-group">
@@ -898,7 +893,7 @@
         </div>
 
     </div>
-    @endif
+
 
     <div class="position-fixed bottom-0 end-0 p-3">
         <button class="btn btn-primary">Botão</button>

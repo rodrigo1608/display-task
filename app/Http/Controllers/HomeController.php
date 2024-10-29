@@ -29,7 +29,6 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         // //-----------------------------------------------------------------------------------------------Teste
-
         //------------------------------------------------------------------------------------------termina o teste
 
         $now = getCarbonNow()->format('H:i');
@@ -120,30 +119,29 @@ class HomeController extends Controller
                     $recurring = $task->reminder->recurring;
                 }
             }
-
         } else {
 
             $userTasksByWeekday = getTasksByWeekday();
 
             // Exclui as tarefas com ocorrência única que já foram finalizadas
-           foreach($userTasksByWeekday as $weekdayPTBR => $tasks){
+            foreach ($userTasksByWeekday as $weekdayPTBR => $tasks) {
 
-            $userTasksByWeekday[$weekdayPTBR] =  $tasks->filter(function($task) use($weekdayPTBR){
+                $userTasksByWeekday[$weekdayPTBR] =  $tasks->filter(function ($task) use ($weekdayPTBR) {
 
-                $recurring = $task->reminder->recurring;
+                    $recurring = $task->reminder->recurring;
 
-                $hasspecificDate = isset($recurring->specific_date);
+                    $hasspecificDate = isset($recurring->specific_date);
 
-                $duration = getDuration($task);
+                    $duration = getDuration($task);
 
-                if($hasspecificDate  ){
+                    if ($hasspecificDate) {
 
-                    return $duration->status != "finished";
-                }else{
-                    return $duration->status;
-                }
-            });
-           }
+                        return $duration->status != "finished";
+                    } else {
+                        return $duration->status;
+                    }
+                });
+            }
             // Retira as posições vazias do array ou seja os dias que não possuem tarefas
             $nonEmptyWeekdaysTasks = array_filter($userTasksByWeekday, function ($day) {
 
@@ -156,6 +154,6 @@ class HomeController extends Controller
                 ? "Nenhuma tarefa agendada" : "";
         }
 
-        return view('home', compact('isThereAnyReminder',  'orderedReminders', 'labelOverview','selectedUserTasks'));
+        return view('home', compact('isThereAnyReminder',  'orderedReminders', 'labelOverview', 'selectedUserTasks'));
     }
 }
